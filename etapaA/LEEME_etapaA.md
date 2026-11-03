@@ -149,10 +149,12 @@ Los scripts se probaron en **GNU Octave 8.4** dentro de la sesión de Claude Cod
 la sintaxis y la coherencia. Los números de abajo salen de esa corrida y **quedan como
 preliminares hasta que el equipo corra los scripts en MATLAB**.
 
-- Mecanismo: pendiente de 0,343 °/° en el neutro; ±45° de servo dan −13,73° y +14,75° de plato
-  (asimétrico), así que la inclinación simétrica alcanzable es ±13,7°. Si el firmware resuelve
-  cada eje por separado, en vez de la cinemática 3D, el error llega a 0,65° en una rejilla de
-  ±12°.
+- Mecanismo (con la geometría del artefacto del ensamble, brazo apuntando hacia el centro):
+  pendiente de 0,343 °/° en el neutro; ±45° de servo dan −13,45° y +14,07° de plato
+  (asimétrico), así que la inclinación simétrica alcanzable es ±13,4°. La cinemática inversa
+  coincide con la del visor 3D del ensamble en los ángulos probados (−13,4°, ±5°, 10°, 14,1°).
+  Si el firmware resuelve cada eje por separado, en vez de la cinemática 3D, el error llega a
+  0,63° en una rejilla de ±12°.
 - Modelo lineal con los valores nominales: c·g = 7007 mm/(s²·rad) (122,3 mm/s² por grado),
   c·h_ef = 55,0 mm/rad, c·h_ef − h = −14,0 mm/rad. Ceros de X/Θ en ±11,3 rad/s y de Xm/Θ en
   ±j22,4 rad/s. El jacobiano numérico coincide con el analítico (diferencia relativa del orden de 1e-13) y no tiene
@@ -168,11 +170,16 @@ preliminares hasta que el equipo corra los scripts en MATLAB**.
 
 ## 5. Datos que cambian estos resultados
 
-| Dato | Qué cambia | Estado |
-|---|---|---|
-| h_sup (altura de la cara superior del plato sobre el centro de la junta) | Ceros del modelo, error de la cámara | PROVISIONAL, 49 mm de cotas de diseño |
-| Tabla de comando del servo vs. ángulo medido del plato | Pendiente y rango del actuador | Pendiente de medir |
-| σ (lado del brazo), r_brazo | Asimetría y rango | PROVISIONAL |
-| Tensión de los servos | Velocidad máxima del plato y peso del término centrífugo | PENDIENTE |
-| c (coeficiente de rodadura) | Ganancia c·g | Se identifica en la Etapa B |
-| Ts y retardo | Modelo discreto | Pendiente de medir con `run_benchmark.py` |
+El prototipo no está disponible por ahora. Por decisión del equipo (2026-11-03), la Etapa A usa
+los valores del **diseño**: el artefacto "Ensamble Ball on Plate" y `docs/`. Cuando se tenga el
+prototipo, estos valores se reemplazan en `A0_parametros_BoP.m` y se corren de nuevo A1 y A2.
+
+| Dato | Valor usado | Fuente | Qué cambia si difiere |
+|---|---|---|---|
+| h_sup (cara superior del plato sobre el centro de la junta) | 49,0 mm | Diseño; el propio ensamble supone el pivote a media altura de la junta | Ceros del modelo, error de la cámara |
+| Lado del brazo (σ) | −1: el brazo apunta hacia el centro, eje del servo en 94 mm | Artefacto del ensamble | Asimetría del rango |
+| r_brazo, L_var, d, z_rot, H_serv | 24 / 162,2 / 70 / 26,2 / 136,0 mm | Diseño | Pendiente y rango del actuador |
+| Relación servo → plato | Calculada con la cinemática (A1) | Diseño | Se verifica con la tabla del inclinómetro cuando haya prototipo |
+| Tensión de los servos | 4,8 V (600°/s) | **Supuesto** conservador | Velocidad máxima del plato y peso del término centrífugo |
+| c (coeficiente de rodadura) | 5/7 | Nominal | Ganancia c·g; se identifica en la Etapa B |
+| Ts y retardo | 33,3 ms y 75 ms | Nominal y estimación a priori | Modelo discreto; medir con `run_benchmark.py` |

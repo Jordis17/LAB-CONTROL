@@ -16,6 +16,10 @@ function P = A0_parametros_BoP(imprimir)
 %   PENDIENTE    falta el valor; se usa un nominal marcado como tal
 %
 % Si cambia un valor medido, se cambia AQUI y se vuelven a correr A1 y A2.
+%
+% Fuente de la geometria (2026-11-03): artefacto "Ensamble Ball on Plate"
+% (claude.ai/artifact/6PcHmV5aB5q97c3f2V5pK1) y docs/mecanica-decisiones-y-medidas.md.
+% El prototipo no esta disponible por ahora: todo lo geometrico es de DISENO.
 
 if nargin < 1
     imprimir = false;
@@ -35,31 +39,34 @@ P.k_inercia = 1/P.c_rod - 1;   % J/(m r^2) [-], derivado de c
 %% Geometria del plato y del pivote (alturas medidas desde la cara superior de la base)
 cota_cara_inf_plato = 215.4;   % [mm]                                     DISENO
 espesor_plato       = 3.0;     % [mm]                                     DISENO
-cota_pivote_junta   = 169.4;   % [mm] centro de la junta universal ("aprox." en docs)  PROVISIONAL
+cota_pivote_junta   = 169.4;   % [mm] centro de la junta universal       DISENO (supuesto del ensamble:
+                               %      pivote a media altura de la junta de 60 mm)
 cota_pivote_rotula  = 195.6;   % [mm]                                     DISENO
 cota_eje_servo      = 33.4;    % [mm] (ajustable 29,4 a 37,4)             DISENO
 
-P.h_sup = cota_cara_inf_plato + espesor_plato - cota_pivote_junta;  % cara superior del plato sobre el pivote [mm]  PROVISIONAL
-P.h     = P.h_sup + P.r_bola;  % centro de la bola sobre el pivote [mm]   PROVISIONAL
+P.h_sup = cota_cara_inf_plato + espesor_plato - cota_pivote_junta;  % cara superior del plato sobre el pivote [mm]  DISENO
+P.h     = P.h_sup + P.r_bola;  % centro de la bola sobre el pivote [mm]   DISENO
 
 P.x_max = 127;                 % rango util del centro de la bola, por eje [mm]
 
 %% Mecanismo servo -> plato (cada eje en su plano vertical)
 P.d       = 70.0;              % centro del plato -> pivote de la rotula, sobre +X y +Y [mm]   DISENO
-P.r_brazo = 24.0;              % brazo del servo [mm]                     PROVISIONAL
+P.r_brazo = 24.0;              % brazo del servo [mm]                     DISENO
 P.z_rot   = cota_pivote_rotula - cota_pivote_junta;   % pivote de rotula sobre la junta [mm]
 P.H_serv  = cota_pivote_junta - cota_eje_servo;       % junta sobre el eje del servo [mm]
 P.L_var   = 162.2;             % distancia entre las bolas de la cadena [mm]   DISENO
-P.sigma_brazo = +1;            % +1: el eje del servo esta del lado del centro del plato
-                               %     (brazo apuntando hacia afuera); -1: al reves.
-                               % PENDIENTE confirmar en el prototipo. Solo cambia la asimetria.
+P.sigma_brazo = -1;            % +1: eje del servo del lado del centro (brazo apunta hacia afuera)
+                               % -1: eje del servo hacia afuera (brazo apunta hacia el centro).
+                               % DISENO: en el ensamble el eje del servo X esta en x = 94 mm y la
+                               % punta del brazo en x = 70 mm, o sea sigma = -1.
 % Hipotesis de neutro: plato horizontal con brazo horizontal y varilla vertical.
 % Se cumple por construccion si L_var = z_rot + H_serv (se verifica en A1).
 
 %% Servo (Tower Pro MG90D, confirmar modelo)
 P.phi_max   = deg2rad(45);     % carrera del servo, +-[rad]               HOJA_DATOS
 P.omega_srv = deg2rad(60)/0.10;% velocidad sin carga a 4,8 V [rad/s]      HOJA_DATOS
-                               % (a 6 V seria 60 grados/0,08 s). Tension de alimentacion PENDIENTE.
+                               % SUPUESTO: alimentacion a 4,8 V (caso lento, conservador).
+                               % A 6 V seria 60 grados/0,08 s.
 P.T_pwm     = 0.020;           % periodo del PWM del servo [s] (50 Hz)    HOJA_DATOS / habitual
 
 %% Medicion
@@ -70,11 +77,11 @@ P.H_cam     = 450.0;           % lente sobre la cara superior del plato [mm]   M
 
 %% Estados (para imprimir y para guardar con los resultados)
 P.estado = struct( ...
-    'c_rod','PENDIENTE identificar (Etapa B)', ...
-    'h','PROVISIONAL (cotas de diseno, pivote aprox.)', ...
-    'r_brazo','PROVISIONAL', ...
-    'sigma_brazo','PENDIENTE confirmar', ...
-    'omega_srv','HOJA_DATOS a 4,8 V (tension PENDIENTE)', ...
+    'c_rod','NOMINAL 5/7 (identificar en la Etapa B)', ...
+    'h','DISENO (pivote supuesto a media altura de la junta)', ...
+    'r_brazo','DISENO', ...
+    'sigma_brazo','DISENO (artefacto del ensamble)', ...
+    'omega_srv','HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)', ...
     'Ts','PENDIENTE medir (nominal 30 fps)', ...
     'retardo','ESTIMADO a priori, no medido', ...
     'H_cam','MEDIDO');

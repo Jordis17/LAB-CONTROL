@@ -38,13 +38,14 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | Rango útil del centro de la bola | ±127 mm por eje | Calculado de la geometría | CLAUDE.md 0 |
 | Bola | Ø 40 mm (r = 20 mm), masa 34 g | Medido | CLAUDE.md 0.1 |
 | Coeficiente de rodadura c = 1/(1 + J/(m r²)) | 5/7 ≈ 0,714 nominal; estimado 0,685–0,714 | PENDIENTE identificar (Etapa B) | CLAUDE.md 0.1 |
-| Brazo del servo r | 24 mm | PROVISIONAL | CLAUDE.md 0.1 |
+| Brazo del servo r | 24 mm | DISEÑO | CLAUDE.md 0.1, artefacto del ensamble |
+| Lado del brazo en neutro | Apunta hacia el centro del plato: eje del servo en x = 94 mm, punta en x = 70 mm (`sigma_brazo = −1`) | DISEÑO | Artefacto "Ensamble Ball on Plate" |
 | Distancia centro del plato → rótula d | 70 mm (+X y +Y) | Diseñado | CLAUDE.md 0.1 |
 | Relación servo → plato | ±45° servo ≈ ±14° plato; ≈0,34 °/° cerca del centro; no lineal | Calculada; verificar en el prototipo | CLAUDE.md 0 |
 | Servo | Tower Pro MG90D (confirmar; `componentes.xlsx` dice MG90S). 0,10 s/60° a 4,8 V; 0,08 s/60° a 6 V; carrera ±45° | Hoja de datos | CLAUDE.md 0 |
-| Tensión de alimentación de los servos | — | **PENDIENTE** (define la velocidad: 4,8 V o 6 V) | — |
+| Tensión de alimentación de los servos | 4,8 V usado en el modelo | **SUPUESTO** conservador (define la velocidad: 4,8 V o 6 V) | — |
 | Cotas del ensamble (desde la cara superior de la base) | cara inferior del plato 215,4 mm; pivote de la junta ≈169,4 mm (aprox.); pivote de las rótulas 195,6 mm; eje de los servos 33,4 mm; distancia entre las bolas de la cadena 162,2 mm | Diseño | `docs/mecanica-decisiones-y-medidas.md` |
-| Altura del centro de la bola sobre el pivote de la junta, h | ≈ 69 mm **derivado de las cotas de diseño** (215,4 + 3 + 20 − 169,4), no medido | **PROVISIONAL** — medir | cálculo a partir de `docs/` |
+| Altura del centro de la bola sobre el pivote de la junta, h | 69 mm (215,4 + 3 + 20 − 169,4) | DISEÑO; el propio ensamble supone el pivote a media altura de la junta | `docs/`, artefacto del ensamble |
 | Periodo de muestreo Ts | 33,3 ms nominal (30 fps, piso del hardware) | PENDIENTE medir (`run_benchmark.py --period`) | CLAUDE.md 0 |
 | Latencia de extremo a extremo | estimación a priori de 60 a 90 ms + dinámica del servo | PENDIENTE medir (`run_benchmark.py --latency`) | CLAUDE.md 0 |
 | Ruido de medición σ | 1 mm en `config.py` es un marcador | PENDIENTE medir (`medir_ruido.py`) | `config.py` |
@@ -69,6 +70,7 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | La salida del controlador es la **inclinación del plato** (θx, θy); la cinemática inversa va en un bloque aparte. | Propuesta de la IA; el equipo aprobó el plan con un "ok". El modelo de la planta queda casi lineal en θ y la no linealidad del mecanismo se aísla y se verifica sola. **Confirmarlo explícitamente** antes de la Etapa C. | 2026-11-03 |
 | Etapa A sin toolboxes: modelo lineal y discretización escritos a mano (`bop_discretizar`). | Todavía no se conoce la instalación de MATLAB; si está Control System Toolbox, A2 compara con `c2d`. | 2026-11-03 |
 | Umbral de validez del modelo lineal: error de trayectoria < 5 % de max\|x\| (decisión de ingeniería). | Ningún documento lo fija. | 2026-11-03 |
+| Sin prototipo disponible por ahora: la Etapa A usa la geometría del **diseño** (artefacto "Ensamble Ball on Plate" + `docs/`) y 4,8 V para los servos. | Indicación del equipo. Las mediciones reemplazan estos valores cuando haya prototipo. | 2026-11-03 |
 
 ## 5. Discrepancias y observaciones
 
@@ -77,11 +79,12 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 3. **Junta universal:** `componentes.xlsx` lista un cardán de 1/2″; las piezas son para 3/8″ (ya anotado por el equipo en `docs/`). Sin efecto en el modelo.
 4. **README del pipeline** dice que "el PD y la cinemática inversa viven en la ESP32". La estructura del controlador **no está decidida**: se elige y justifica en la Etapa C. La frase del README es una intención previa, no una decisión del proyecto.
 5. **Altura del pivote:** el centro de la bola queda unos 69 mm sobre el centro de la junta (cotas de diseño, el pivote está marcado "aprox."). Ese desplazamiento agrega al modelo un término proporcional a la aceleración angular del plato que puede introducir ceros en la función de transferencia. Hay que incluirlo en la Etapa A y cuantificar su peso; por eso conviene medir h en el prototipo.
-6. **Geometría horizontal del eslabonamiento servo–plato:** `docs/` da cotas verticales y la distancia entre las bolas de la cadena (162,2 mm), pero no la posición horizontal del eje del servo respecto de la rótula. La relación ±45° → ±14° sale de la aproximación r·sen φ = d·sen θ (varilla casi vertical). Para la cinemática exacta hace falta esa cota.
+6. ~~Geometría horizontal del eslabonamiento~~ **Resuelto** con el artefacto del ensamble: eje del servo en 94 mm, brazo hacia el centro. La cinemática de `etapaA/` coincide con la del visor 3D. Con esta geometría, ±45° de servo dan −13,45° y +14,07° de plato.
+10. **El artefacto del ensamble describe la bola al 100 % de relleno (~41,5 g).** Está desactualizado: CLAUDE.md y `docs/` dicen 90 % y 34 g medidos. No afecta al modelo, porque la masa se cancela.
 
 7. **La cámara no mide la posición sobre el plato cuando el plato está inclinado.** Con la homografía fija, mide la proyección horizontal: a primer orden Xm = x − h·θ. Con 14° la diferencia llega a unos 14 mm en el borde (A1, sección 5, Octave). Esto cambia los ceros del modelo que se realimenta. Verificarlo en la Etapa B dejando la bola quieta contra el borde con el plato a ángulos conocidos.
 8. **El término no lineal dominante es el centrífugo x·θ̇²**, no el seno. El modelo lineal es bueno con velocidades de inclinación bajas y empeora rápido con la velocidad máxima del servo (Octave, preliminar). Esto pesa en la Etapa C: conviene limitar la velocidad de inclinación que pide el controlador.
-9. El mecanismo es asimétrico con las cotas nominales: ±45° de servo dan −13,73° y +14,75° de plato (Octave, preliminar).
+9. El mecanismo es asimétrico con las cotas de diseño: ±45° de servo dan −13,45° y +14,07° de plato (Octave, preliminar).
 
 ## 6. Archivos generados
 
@@ -109,8 +112,8 @@ Resultados obtenidos: modelo no lineal de 2 ejes, modelo lineal por eje (doble i
   ceros que dependen de h_sup), discretización con retardo y comparación lineal vs no lineal.
   Todo corrido solo en Octave 8.4: es PRELIMINAR.
 Archivos generados: etapaA/ (ver sección 6)
-Datos pendientes: corrida en MATLAB (A1, A2) + `ver`; mediciones en el prototipo: h_sup, tabla
-  de comando del servo vs. ángulo del plato, lado del brazo, tensión de los servos.
+Datos pendientes: corrida en MATLAB (A1, A2) + `ver`. Las mediciones del prototipo (h_sup, tabla
+  de servo vs. plato, tensión) quedan aplazadas: por ahora se usan los valores del diseño.
 Problemas detectados: discrepancias 1 a 9 de la sección 5.
 Decisiones tomadas: ver sección 4.
 Qué debe conservarse: etapaA/ completa, resultados de MATLAB en etapaA/resultados/.
