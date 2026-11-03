@@ -1,0 +1,58 @@
+\section{Discusión}
+
+El recorrido completo deja ver que cada etapa del flujo responde una pregunta distinta, y que
+ninguna sustituye a las demás.
+
+El modelo obtenido del balance de energía resultó útil para entender el sistema pero no para
+diseñar. Su linealización es válida solo en un entorno reducido del punto de operación, como
+cuantifica la Tabla~\ref{tab:fisico}, mientras que el transitorio que debe manejar el controlador
+es precisamente un calentamiento desde temperatura ambiente. Por eso el modelo de diseño tuvo que
+obtenerse de forma experimental. El FOPDT identificado con el ensayo escalón cumple
+esa función, pero la validación cruzada mostró también su límite: los residuos no son ruido
+alrededor de cero sino un patrón que crece con el nivel de potencia. Esto significa que el modelo no
+falla al azar, sino que subestima la temperatura de forma creciente a medida que se aleja de la
+región donde fue identificado, y que un solo modelo lineal con retardo no describe la planta en todo
+el rango. La elección del modelo nominal fue, en ese sentido, una elección de región de operación
+más que de calidad absoluta.
+
+El efecto de la saturación resultó ser el factor de diseño más relevante de toda la práctica. El PI
+sintonizado con SIMC demanda un \SI{274}{\percent} de potencia en el primer instante, casi tres
+veces lo que el actuador puede entregar. Con el actuador limitado pero sin protección del
+integrador, el controlador sintonizado correctamente incumple el requisito de sobreimpulso por un
+factor de seis. La causa no está en la sintonización sino en que el integrador sigue acumulando
+mientras la potencia ya no puede crecer, de modo que el estado del controlador deja de corresponder
+a lo que realmente ocurre en la planta. El \emph{clamping} corrige eso deteniendo la acumulación
+durante la saturación, y el costo es de apenas \SI{10}{\second} de tiempo de subida. La lección es
+que el desempeño de un controlador no puede evaluarse sin las restricciones del actuador: el caso
+ideal de la Tabla~\ref{tab:mil} cumple los requisitos y a la vez es irrealizable.
+
+La comparación entre los dos diseños refuerza esa idea. Sobre el modelo lineal sin restricciones el
+PI--CSD parece claramente superior, con mejor tiempo de establecimiento, menor sobreimpulso y
+márgenes mayores. Al incorporar el límite de potencia el orden cambia parcialmente: el PI--SIMC
+resulta más rápido porque aprovecha toda la autoridad disponible, mientras que el PI--CSD se
+mantiene mucho más cerca de la capacidad real del actuador. Ambos cumplen, y decidir entre ellos
+exige un criterio explícito ---rapidez frente a robustez y esfuerzo de control--- que no se deduce
+de las métricas por sí solas.
+
+Las verificaciones SIL y PIL cumplieron un papel distinto del de MIL. MIL evalúa si el algoritmo
+resuelve el problema de control; SIL y PIL no evalúan desempeño en absoluto, sino conservación de
+comportamiento al cambiar de representación. Que ambas dieran igualdad exacta y no solo equivalencia
+dentro de una tolerancia da confianza en que las diferencias observadas después, sobre la planta
+real, no provienen del código ni del procesador. Ese es su valor práctico: al llegar a la
+implementación física, el conjunto de causas posibles de una discrepancia ya está acotado al modelo
+de la planta y al hardware de entrada y salida. Al mismo tiempo, conviene no sobreinterpretar el
+resultado: durante PIL la planta, el retardo y la temperatura ambiente siguen siendo señales de
+Simulink, y no se ejercita ningún canal físico.
+
+Efectivamente, las diferencias aparecieron al cerrar el lazo sobre la TCLab, y son del tipo que las
+etapas anteriores no podían revelar. La más significativa es el error de ganancia: la planta
+necesita en régimen más potencia que la prevista (Tabla~\ref{tab:experimental}), lo que equivale a
+una ganancia estática aparente cerca de un \SI{15}{\percent} menor que la nominal. Esa
+diferencia es coherente con el sesgo detectado en la validación cruzada y con la dependencia de la
+ganancia respecto de la región de operación, y se traduce en un lazo más lento que el simulado. A
+ello se suman efectos ausentes del modelo: el ruido de medición amplificado por
+$\Kp = \SI{7.62}{\percent\per\celsius}$, la cuantización del convertidor, y variaciones ambientales
+durante los \SI{607}{\second} del experimento. Ninguno de estos efectos invalida el diseño ---el
+controlador cumple los requisitos sobre la planta real--- pero sí muestran que el margen con que se
+cumplen es menor que el que sugería la simulación, y que ese margen proviene en buena medida de
+haber elegido un $\tau_c$ conservador.

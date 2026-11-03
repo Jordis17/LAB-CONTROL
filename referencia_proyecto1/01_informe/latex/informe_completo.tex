@@ -1,0 +1,1161 @@
+% ============================================================
+%  Informe tecnico — EL-5409 Laboratorio de Control Automatico
+%  Laboratorio 1: Model-Based Design para la planta termica TCLab
+%  Formato IEEE, dos columnas. Compilar con pdfLaTeX + BibTeX.
+% ============================================================
+\documentclass[conference,a4paper,10pt]{IEEEtran}
+
+%%%%%%%%%%%%%%%%%%%%  PREAMBULO  %%%%%%%%%%%%%%%%%%%%
+% ============================================================
+%  Preambulo — Informe IEEE (dos columnas) · Lab 1 EL-5409
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{xurl}          % permite cortar URLs largas en la bibliografia
+\usepackage[hidelinks,unicode]{hyperref}
+
+% IEEEtran define \IEEEproof etc.; evitamos choques de babel
+\addto\captionsspanish{\renewcommand{\tablename}{TABLA}}
+
+% ---------- Unidades ----------
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  group-separator       = {\,},
+  per-mode              = symbol,
+  detect-all            = true
+}
+
+% ---------- Graficas ----------
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{matrix}
+
+% Ruta a la carpeta de datos
+\newcommand{\G}{../Graficas}
+
+\definecolor{cAzul}   {HTML}{1F4E79}
+\definecolor{cNaranja}{HTML}{C55A11}
+\definecolor{cVerde}  {HTML}{2E7D32}
+\definecolor{cGris}   {HTML}{6E6E6E}
+\definecolor{cRojo}   {HTML}{A61C1C}
+
+% Estilo base: pensado para una columna IEEE
+\pgfplotsset{
+  estilo/.style={
+    width            = \columnwidth,
+    height           = 4.1cm,
+    scale only axis  = false,
+    grid             = major,
+    grid style       = {gray!20, line width=0.25pt},
+    tick label style = {font=\scriptsize},
+    label style      = {font=\scriptsize},
+    legend style     = {font=\scriptsize, draw=gray!45, fill=white,
+                        fill opacity=0.85, text opacity=1,
+                        inner sep=1.5pt, row sep=-1pt},
+    legend cell align = left,
+    every axis plot/.append style = {line width=0.7pt},
+    scaled ticks = false,
+    tick align   = outside,
+    max space between ticks = 40pt,
+  },
+  ancho/.style = {width=0.47\textwidth, height=4.3cm},
+  aligera/.style = {each nth point=#1, filter discard warning=false,
+                    unbounded coords=discard},
+  aligera/.default = 4,
+}
+
+% ---------- Codigo fuente ----------
+\lstdefinestyle{estiloC}{
+  language=C, basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{cAzul}\bfseries,
+  commentstyle=\color{cGris}\itshape,
+  frame=single, rulecolor=\color{gray!40},
+  breaklines=true, showstringspaces=false, columns=fullflexible,
+  xleftmargin=0.6em, aboveskip=4pt, belowskip=2pt
+}
+\lstset{style=estiloC}
+
+% ---------- Marcas de trabajo pendiente ----------
+% Cambie a \mostrarpendientesfalse antes de entregar
+\newif\ifmostrarpendientes
+\mostrarpendientestrue
+\newcommand{\pendiente}[1]{%
+  \ifmostrarpendientes
+    \par\noindent\fcolorbox{cRojo}{red!4}{%
+      \parbox{0.95\columnwidth}{\scriptsize\color{cRojo}\textbf{PENDIENTE:} #1}}\par\smallskip
+  \fi}
+
+% ---------- Atajos ----------
+\newcommand{\Tref}{T_{\mathrm{ref}}}
+\newcommand{\Tamb}{T_{\mathrm{amb}}}
+\newcommand{\Qcmd}{Q_{\mathrm{cmd}}}
+\newcommand{\Gpnom}{G_{p,\mathrm{nom}}}
+\newcommand{\Kp}{K_p}
+\newcommand{\Ki}{K_i}
+\newcommand{\Ti}{T_i}
+%%%%%%%%%%%%%%%%%%  FIN PREAMBULO  %%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\title{Diseño basado en modelos de un controlador PI\\
+de temperatura para la planta térmica TCLab}
+
+\author{%
+\IEEEauthorblockN{Abner López Méndez, 2022273075 \qquad Jordi Segura Chinchilla, 2022240646}
+\IEEEauthorblockA{Escuela de Ingeniería Electrónica, Tecnológico de Costa Rica\\
+EL-5409 --- Laboratorio de Control Automático, II Semestre 2026\\
+Profesor: Ing. Juan Luis Guerrero Fernández, PhD}}
+
+\maketitle
+
+\begin{abstract}
+Se documenta el desarrollo de un sistema de control de temperatura para la planta térmica TCLab
+siguiendo un flujo de diseño basado en modelos. A partir de un balance de energía se obtuvo un
+modelo no lineal y su linealización alrededor de $Q_1 = \SI{50}{\percent}$. Dos experimentos sobre
+la planta física, un escalón y una secuencia multinivel, permitieron identificar sendos modelos de
+primer orden con tiempo muerto; la validación cruzada seleccionó como nominal el modelo obtenido
+del ensayo escalón, $\Gpnom(s) = 0{,}979\,e^{-8{,}00 s}/(179{,}1 s + 1)$, con un ajuste del
+\SI{88.7}{\percent} sobre datos no empleados en su identificación. Las reglas SIMC con
+$\tau_c = 2\theta$ produjeron un controlador PI con $\Kp = \SI{7.62}{\percent\per\celsius}$ y
+$\Ti = \SI{96}{\second}$, que en simulación Model-in-the-Loop alcanza un tiempo de establecimiento
+de \SI{205}{\second} sin sobreimpulso al incorporar anti-windup por \emph{clamping}, frente a
+\SI{392}{\second} y \SI{30.1}{\percent} de sobreimpulso sin él. El código generado con Embedded
+Coder reprodujo exactamente la respuesta del modelo tanto en Software-in-the-Loop como en
+Processor-in-the-Loop sobre un Arduino Uno R4 Minima. La implementación final sobre la TCLab,
+ejecutada en el Arduino Leonardo mediante Monitor \& Tune, alcanzó la referencia de
+\SI{60}{\celsius} con un error estacionario de \SI{0.04}{\celsius} y un tiempo de establecimiento
+de \SI{298}{\second}, con una ganancia estática aparente cerca de un \SI{15}{\percent} menor que la
+del modelo nominal.
+\end{abstract}
+
+\begin{IEEEkeywords}
+TCLab, diseño basado en modelos, identificación FOPDT, SIMC, anti-windup, SIL, PIL, Embedded Coder.
+\end{IEEEkeywords}
+
+%% ===== 01_introduccion.tex =====================================
+\section{Introducción}
+
+La Temperature Control Lab (TCLab) es una planta térmica didáctica montada sobre un Arduino
+Leonardo. Dispone de dos transistores que actúan como calentadores y de dos sensores de temperatura
+adheridos a ellos; la potencia de cada calentador se comanda como un porcentaje de su valor máximo
+y la temperatura se mide en grados Celsius. En este trabajo se utilizó únicamente el primer par
+calentador--sensor, de modo que la variable manipulada es $Q_1$, expresada en porcentaje, y la
+variable controlada es $T_1$.
+
+El problema de control consiste en llevar $T_1$ desde la temperatura ambiente hasta una referencia
+de \SI{60}{\celsius} y mantenerla en ese valor, respetando el límite de potencia
+$Q_1 \in [0, 90]\,\si{\percent}$ impuesto para proteger el equipo. Los requisitos de desempeño
+establecidos fueron un tiempo de establecimiento $t_s \leq \SI{600}{\second}$ y un sobreimpulso
+$M_p \leq \SI{5}{\percent}$.
+
+El objetivo del trabajo no se limita a obtener un controlador que funcione en simulación, sino a
+recorrer un flujo completo de diseño basado en modelos (\emph{Model-Based Design}, MBD). En este
+enfoque el modelo ejecutable es el eje del desarrollo, y entre el diseño matemático y el sistema
+físico se intercalan etapas sucesivas de verificación que comprueban aspectos distintos de la
+solución \cite{mw_hil}. El flujo seguido fue
+
+\begin{center}
+modelado $\rightarrow$ identificación $\rightarrow$ diseño $\rightarrow$ MIL $\rightarrow$
+código $\rightarrow$ SIL $\rightarrow$ PIL $\rightarrow$ implementación física.
+\end{center}
+
+Cada etapa acota el riesgo de la siguiente. La evaluación \emph{Model-in-the-Loop} (MIL) comprueba
+el desempeño del algoritmo contra un modelo de la planta; \emph{Software-in-the-Loop} (SIL)
+verifica que el código generado se comporte como el modelo del que proviene;
+\emph{Processor-in-the-Loop} (PIL) verifica que ese código conserve su comportamiento al ejecutarse
+sobre el procesador objetivo; y solo entonces el controlador se cierra sobre la planta real. El
+documento sigue ese mismo orden.
+
+%% ===== 02_modelado.tex =====================================
+\section{Modelado e identificación del sistema}
+
+\subsection{Modelo físico}
+
+El conjunto formado por el transistor calentador y el sensor se representó como una única masa a
+temperatura uniforme. Bajo esa hipótesis, y considerando pérdidas por convección natural y por
+radiación hacia el entorno, el balance de energía conduce a \cite{hedengren_modeling}
+
+\begin{equation}
+m c_p \frac{dT}{dt} = \alpha Q - UA\,(T - T_a) - \epsilon\sigma A\,(T^4 - T_\infty^4),
+\label{eq:nolineal}
+\end{equation}
+
+donde $\alpha$ convierte el porcentaje de potencia comandado en vatios entregados al sistema, $UA$
+es el coeficiente global de convección, y $\epsilon$ y $\sigma$ son la emisividad y la constante de
+Stefan--Boltzmann. Las hipótesis adoptadas fueron masa concentrada y temperatura uniforme,
+convección predominantemente natural, potencia del calentador proporcional al comando, y
+$T_a \approx T_\infty$ por suponer el equipo y el recinto inicialmente en equilibrio térmico. Las
+temperaturas del término radiativo se manejaron en kelvin.
+
+La no linealidad de \eqref{eq:nolineal} proviene exclusivamente del término $T^4$. Linealizando
+alrededor de un punto de operación $(\bar T, \bar Q)$ y definiendo las variables de desviación
+$\Delta T = T - \bar T$ y $\Delta Q = Q - \bar Q$, se obtiene \cite{hedengren_linearize}
+
+\begin{equation}
+\frac{d\,\Delta T}{dt} = \gamma\,\Delta T + \beta\,\Delta Q,
+\label{eq:lineal}
+\end{equation}
+
+\vspace{-3mm}
+\begin{equation}
+\gamma = -\frac{UA + 4\epsilon\sigma A \bar T^{3}}{m c_p},
+\qquad
+\beta = \frac{\alpha}{m c_p},
+\label{eq:gammabeta}
+\end{equation}
+
+cuya función de transferencia es de primer orden,
+
+\begin{equation}
+G(s) = \frac{K}{\tau s + 1},
+\qquad \tau = -\frac{1}{\gamma},
+\qquad K = -\frac{\beta}{\gamma}.
+\label{eq:g1orden}
+\end{equation}
+
+En \eqref{eq:lineal} el coeficiente $\gamma$, dado por \eqref{eq:gammabeta}, reúne las dos vías de
+pérdida, y es el término radiativo el que lo hace depender del punto de operación. El punto empleado fue
+$\bar Q = \SI{50}{\percent}$; los valores de $\tau$ y $K$ que resultan de \eqref{eq:g1orden} se
+resumen en la Tabla~\ref{tab:fisico}.
+
+\begin{table}[!t]
+\caption{Modelo físico linealizado en $\bar Q = \SI{50}{\percent}$ y error de la aproximación
+lineal frente al modelo no lineal.}
+\label{tab:fisico}
+\centering
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Magnitud} & \textbf{Valor} \\
+\midrule
+Temperatura de equilibrio $\bar T$        & \SI{60.47}{\celsius} \\
+Pérdida por convección en equilibrio      & \SI{0.2188}{\watt} (\SI{43.8}{\percent}) \\
+Pérdida por radiación en equilibrio       & \SI{0.2811}{\watt} (\SI{56.2}{\percent}) \\
+$\gamma$                                  & \SI{-7.548e-3}{\per\second} \\
+$\beta$                                   & \SI{5.000e-3}{\celsius\per\percent\per\second} \\
+Constante de tiempo $\tau$                & \SI{132.5}{\second} \\
+Ganancia estática $K$                     & \SI{0.6625}{\celsius\per\percent} \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Error del modelo lineal frente al no lineal}} \\
+$\Delta Q = \SI{5}{\percent}$: error final / RMSE   & \SI{0.029}{\celsius} / \SI{0.022}{\celsius} \\
+$\Delta Q = \SI{40}{\percent}$: error final / RMSE  & \SI{1.744}{\celsius} / \SI{1.337}{\celsius} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los dos últimos renglones de la Tabla~\ref{tab:fisico} delimitan el alcance de la aproximación
+lineal. Ante una perturbación de \SI{5}{\percent} el error no llega a \SI{0.03}{\celsius}, mientras
+que al multiplicar la amplitud por ocho el error crece casi sesenta veces. Este crecimiento no es
+proporcional porque el término omitido es de cuarto orden en la temperatura, y en el punto de
+operación la radiación ya aporta el \SI{56.2}{\percent} de las pérdidas totales. Es decir, el
+modelo lineal es útil para excursiones pequeñas alrededor del punto de operación, pero no para
+describir el calentamiento completo desde temperatura ambiente, que es justamente el transitorio
+que debe manejar el controlador. Esta limitación motivó obtener el modelo de diseño de forma
+experimental en lugar de usar los parámetros físicos.
+
+\subsection{Identificación experimental}
+
+Se realizaron dos experimentos sobre la unidad TCLab n.\textsuperscript{o}~4, con temperatura
+ambiente de \SI{24}{\celsius} y periodo de muestreo $T_s = \SI{1}{\second}$. El primero aplicó un
+escalón de $Q_1$ de \SIrange{0}{50}{\percent} y se registró durante \SI{1860}{\second}
+(\num{1861} muestras), partiendo de $T_1 = \SI{24.78}{\celsius}$. El segundo aplicó una secuencia
+multinivel con escalones sucesivos de \SIrange{10}{50}{\percent} durante \SI{3520}{\second}
+(\num{3521} muestras), partiendo de $T_1 = \SI{25.27}{\celsius}$. El ensayo escalón concentra la
+información en una sola transición amplia, mientras que el multinivel recorre varios niveles de
+potencia y permite observar si la ganancia del proceso depende de la región de operación.
+
+Ambos conjuntos se ajustaron a un modelo de primer orden con tiempo muerto (FOPDT)
+\cite{hedengren_fopdt},
+
+\begin{equation}
+G_p(s) = \frac{K\,e^{-\theta s}}{\tau s + 1},
+\label{eq:fopdt}
+\end{equation}
+
+expresado en variables de desviación, con $[K] = \si{\celsius\per\percent}$ y
+$[\tau] = [\theta] = \si{\second}$. Los parámetros de \eqref{eq:fopdt} se obtuvieron por dos vías: el procedimiento de
+mínimos cuadrados sobre la respuesta simulada empleado en la práctica, y la función
+\texttt{procest} de \emph{System Identification Toolbox} con estructura \texttt{P1D}. La
+Tabla~\ref{tab:fopdt} recoge los cuatro modelos y la Fig.~\ref{fig:experimentos} muestra las
+señales experimentales junto con la respuesta de los modelos identificados.
+
+\begin{table}[!t]
+\caption{Parámetros FOPDT identificados por ensayo y por método.}
+\label{tab:fopdt}
+\centering
+\footnotesize
+\begin{tabular}{@{}llS[table-format=1.3]S[table-format=3.1]S[table-format=1.2]S[table-format=2.1]@{}}
+\toprule
+\textbf{Ensayo} & \textbf{Método} & {$K$ (\si{\celsius\per\percent})} & {$\tau$ (\si{\second})}
+& {$\theta$ (\si{\second})} & {Ajuste (\si{\percent})} \\
+\midrule
+Escalón    & Práctica              & 0.979 & 179.1 & 8.00 & 93.0 \\
+Escalón    & \texttt{procest} P1D  & 0.979 & 178.7 & 8.36 & 93.0 \\
+Multinivel & Práctica              & 1.036 & 189.5 & 2.00 & 94.5 \\
+Multinivel & \texttt{procest} P1D  & 1.036 & 189.2 & 2.80 & 94.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 2, horizontal sep=1.3cm, vertical sep=0.9cm},
+                  estilo, ancho]
+\nextgroupplot[ylabel={$Q_1$ (\si{\percent})}, xticklabels={}, ymin=-5, ymax=60,
+               title={\scriptsize Ensayo escalón}, title style={yshift=-2pt}]
+  \addplot[cNaranja, aligera=3] table[col sep=comma, x=Tiempo_s, y=Q1_pct] {\G/IdentificacionSE.csv};
+\nextgroupplot[ylabel={$Q_1$ (\si{\percent})}, xticklabels={}, ymin=-5, ymax=60,
+               title={\scriptsize Ensayo multinivel}, title style={yshift=-2pt}]
+  \addplot[cNaranja, aligera=5] table[col sep=comma, x=Tiempo_s, y=Q1_pct] {\G/IdentificacionSM.csv};
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, xlabel={Tiempo (\si{\second})}, legend pos=south east]
+  \addplot[cAzul, aligera=3] table[col sep=comma, x=Tiempo_s, y=T1_experimental_C] {\G/IdentificacionSE.csv};
+  \addplot[cVerde, dashed, aligera=3] table[col sep=comma, x=Tiempo_s, y=T1_modelo_C] {\G/IdentificacionSE.csv};
+  \legend{Experimental, FOPDT}
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, xlabel={Tiempo (\si{\second})}, legend pos=south east]
+  \addplot[cAzul, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_experimental_C] {\G/IdentificacionSM.csv};
+  \addplot[cVerde, dashed, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_modelo_C] {\G/IdentificacionSM.csv};
+  \legend{Experimental, FOPDT}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Señales de los dos experimentos de identificación y respuesta de los modelos FOPDT
+ajustados a cada uno. Izquierda: escalón de $Q_1$ a \SI{50}{\percent}. Derecha: secuencia
+multinivel de \SIrange{10}{50}{\percent}.}
+\label{fig:experimentos}
+\end{figure*}
+
+Los dos métodos coinciden en $K$ y $\tau$ hasta la tercera cifra significativa, lo que respalda la
+identificación. La única diferencia apreciable está en $\theta$: el procedimiento de la práctica
+cuantiza el tiempo muerto a un número entero de periodos de muestreo, mientras que
+\texttt{procest} lo estima como variable continua. Las diferencias resultantes, \SI{0.36}{\second}
+y \SI{0.80}{\second}, son menores que un periodo de muestreo y por tanto no distinguibles con los
+datos disponibles.
+
+La coincidencia entre ambos métodos depende de entregar los datos en variables de desviación: con
+las señales absolutas la estimación converge a $K \approx \SI{1.47}{\celsius\per\percent}$ y
+$\theta = 0$, valor que no es la ganancia del proceso sino el cociente
+$T_1(\infty)/\Delta Q_1$, porque el estimador debe explicar también el nivel inicial de
+temperatura.
+
+\subsection{Validación cruzada y selección del modelo}
+
+Cada modelo se simuló con la entrada del experimento que no se usó para identificarlo, manteniendo
+fijos $K$, $\tau$ y $\theta$. La Tabla~\ref{tab:validacion} reporta las métricas calculadas desde
+el primer cambio de $Q_1$, que es el intervalo que evalúa la respuesta dinámica, y la
+Fig.~\ref{fig:validacion} muestra el cruce del modelo seleccionado junto con su residuo.
+
+\begin{table}[!t]
+\caption{Validación cruzada. Métricas calculadas desde el primer cambio de $Q_1$.}
+\label{tab:validacion}
+\centering
+\footnotesize
+\begin{tabular}{@{}lS[table-format=1.2]S[table-format=1.2]S[table-format=+1.2]S[table-format=1.3]S[table-format=2.1]@{}}
+\toprule
+\textbf{Modelo $\rightarrow$ datos} & {RMSE} & {MAE} & {Sesgo} & {$R^2$} & {Ajuste} \\
+ & {(\si{\celsius})} & {(\si{\celsius})} & {(\si{\celsius})} & & {(\si{\percent})} \\
+\midrule
+Escalón $\rightarrow$ multinivel & 1.62 & 1.51 & +1.50 & 0.987 & 88.7 \\
+Multinivel $\rightarrow$ escalón & 2.63 & 2.41 & -2.41 & 0.934 & 74.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.6cm]
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, xticklabels={}, legend pos=south east]
+  \addplot[cAzul, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_experimental_C] {\G/validacionEscEnMul.csv};
+  \addplot[cVerde, dashed, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_modelo_C] {\G/validacionEscEnMul.csv};
+  \legend{Experimental, Modelo escalón}
+\nextgroupplot[ylabel={Residuo (\si{\celsius})}, xlabel={Tiempo (\si{\second})}]
+  \addplot[cRojo, aligera=5] table[col sep=comma, x=Tiempo_s, y=Residuo_C] {\G/validacionEscEnMul.csv};
+  \addplot[cGris, dashed, domain=0:3520, samples=2] {0};
+\end{groupplot}
+\end{tikzpicture}
+\caption{Validación del modelo identificado con el ensayo escalón sobre los datos multinivel, y
+residuo de predicción $e(k) = T_{1,\mathrm{exp}}(k) - T_{1,\mathrm{mod}}(k)$.}
+\label{fig:validacion}
+\end{figure}
+
+El modelo del ensayo escalón predice claramente mejor los datos independientes: su RMSE es un
+\SI{38}{\percent} menor y su ajuste es \num{14.3} puntos porcentuales mayor. Ninguno de los dos
+cruces está libre de sesgo. El modelo escalón subestima la temperatura en promedio
+\SI{1.50}{\celsius}, y el residuo de la Fig.~\ref{fig:validacion} crece de forma ordenada con el
+nivel de potencia: \num{+1.29}, \num{+0.88}, \num{+1.23}, \num{+1.85} y \SI{+2.20}{\celsius} para
+$Q_1$ de \num{10} a \SI{50}{\percent}. El modelo multinivel presenta el sesgo opuesto,
+\SI{-2.41}{\celsius}, es decir, sobreestima la temperatura del ensayo escalón. Ambos patrones
+apuntan al mismo origen: la ganancia efectiva de la planta no es constante, de modo que un modelo
+identificado en una región tiende a errar sistemáticamente en la otra. Esto es coherente con lo
+observado en la Sección~II-A, donde el peso creciente del término radiativo hacía que una única
+recta no describiera todo el rango.
+
+Dado que ninguno de los dos modelos es válido en todo el rango, el criterio de selección fue la
+región de operación prevista para el controlador. La referencia de trabajo es \SI{60}{\celsius},
+que corresponde aproximadamente a $Q_1 = \SI{50}{\percent}$, justamente la condición del ensayo
+escalón. Ese modelo además tuvo mejor capacidad predictiva sobre datos independientes. Su tiempo
+muerto, $\theta = \SI{8.00}{\second}$, equivale a ocho periodos de muestreo, lo que permite
+representar el retardo de forma exacta en la implementación discreta. El modelo nominal adoptado es
+entonces
+
+\begin{equation}
+\Gpnom(s) = \frac{0{,}979\;e^{-8{,}00\,s}}{179{,}1\,s + 1}
+\quad \left[\si{\celsius\per\percent}\right].
+\label{eq:gpnom}
+\end{equation}
+
+%% ===== 03_control_mil.tex =====================================
+\section{Diseño del controlador y evaluación MIL}
+
+\subsection{Diseño del controlador PI}
+
+Se empleó un controlador PI en forma paralela continua,
+
+\begin{equation}
+G_c(s) = \Kp + \frac{\Ki}{s} = \Kp\left(1 + \frac{1}{\Ti s}\right),
+\qquad \Ki = \frac{\Kp}{\Ti},
+\label{eq:pi}
+\end{equation}
+
+empleada en ambos diseños, con $e = \Tref - T_1$ en \si{\celsius} y salida en porcentaje de
+potencia, de modo que
+$[\Kp] = \si{\percent\per\celsius}$, $[\Ti] = \si{\second}$ y
+$[\Ki] = \si{\percent\per\celsius\per\second}$. La acción integral es necesaria porque la planta no
+tiene integrador propio y se requiere error estacionario nulo ante una referencia constante.
+
+El primer diseño utilizó las reglas SIMC \cite{skogestad2003}, que para un modelo FOPDT dan
+
+\begin{equation}
+\Kp = \frac{1}{K}\,\frac{\tau}{\tau_c + \theta},
+\qquad
+\Ti = \min\{\tau,\; 4(\tau_c + \theta)\},
+\label{eq:simc}
+\end{equation}
+
+donde $\tau_c$ es la constante de tiempo deseada en lazo cerrado. Se fijó $\tau_c = 2\theta$, un
+valor conservador que prioriza robustez frente a rapidez. Con los parámetros de \eqref{eq:gpnom}
+resulta $\tau_c = \SI{16}{\second}$ y $\tau_c + \theta = \SI{24}{\second}$; como
+$4(\tau_c+\theta) = \SI{96}{\second} < \tau$, el tiempo integral queda truncado por la segunda rama
+de \eqref{eq:simc}.
+
+El segundo diseño se obtuvo con \emph{Control System Designer} sobre la misma planta nominal,
+usando una estrategia distinta: en lugar de aplicar una fórmula de sintonización se moldeó la
+respuesta en frecuencia del lazo abierto añadiendo un integrador y un cero real, y ajustando la
+ganancia hasta cumplir dos criterios propios más exigentes que los de SIMC, margen de fase mayor a
+\SI{70}{\degree} y margen de ganancia mayor a \SI{20}{\decibel}. La herramienta aproxima el retardo
+mediante Padé para trazar el lugar de las raíces; los márgenes y las métricas reportadas se
+recalcularon con el retardo exacto para evitar que esa aproximación contaminara la comparación.
+
+Los dos controladores resultantes, en la forma \eqref{eq:pi}, son
+
+\begin{equation}
+G_{c,\mathrm{SIMC}}(s) = 7{,}62 + \frac{0{,}0794}{s},
+\quad
+G_{c,\mathrm{CSD}}(s) = 3{,}00 + \frac{0{,}0200}{s},
+\label{eq:gc}
+\end{equation}
+
+con $\Kp$ en \si{\percent\per\celsius} y $\Ki$ en \si{\percent\per\celsius\per\second}. La
+Tabla~\ref{tab:controladores} resume ambos diseños y su comportamiento sobre el modelo nominal.
+
+\begin{table}[!t]
+\caption{Controladores diseñados y su comportamiento sobre el modelo lineal nominal.}
+\label{tab:controladores}
+\centering
+\footnotesize
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Parámetro} & \textbf{PI--SIMC} & \textbf{PI--CSD} \\
+\midrule
+$\Kp$ (\si{\percent\per\celsius})                & 7,62   & 3,00 \\
+$\Ki$ (\si{\percent\per\celsius\per\second})    & 0,0794 & 0,0200 \\
+$\Ti$ (\si{\second})                             & 96     & 150 \\
+\midrule
+Frecuencia de cruce (\si{\radian\per\second})    & 0,0425 & 0,0168 \\
+Margen de fase (\si{\degree})                     & 64,2   & 79,1 \\
+Margen de ganancia (\si{\decibel})                & 13,3   & 21,5 \\
+\midrule
+$t_s$ lineal (\si{\second})                       & 202,3  & 161,9 \\
+$M_p$ lineal (\si{\percent})                      & 7,76   & 1,67 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sobre el modelo lineal, sin restricciones de actuador, el controlador obtenido con
+\emph{Control System Designer} se ve mejor en ambas métricas y además tiene márgenes mayores. Ese
+resultado, sin embargo, no considera el límite de potencia, que es precisamente lo que evalúa la
+etapa siguiente.
+
+\subsection{Evaluación Model-in-the-Loop}
+
+El controlador PI--SIMC de \eqref{eq:gc} se implementó de forma discreta con $T_s = \SI{1}{\second}$ e
+integración por Euler hacia adelante,
+
+\begin{equation}
+I[k+1] = I[k] + \Ki T_s\, e[k],
+\qquad
+\Qcmd[k] = \Kp\, e[k] + I[k],
+\label{eq:pidiscreto}
+\end{equation}
+
+distinguiendo la ganancia integral continua $\Ki$ del incremento por muestra $\Ki T_s$. La planta se
+representó con \eqref{eq:gpnom} discretizada, con el retardo como ocho muestras de atraso. Se
+simularon tres configuraciones bajo idénticas condiciones ---misma referencia, misma planta, misma
+condición inicial, $\Tamb = \SI{24}{\celsius}$, $\Tref = \SI{60}{\celsius}$ y
+\SI{1800}{\second} de simulación---: PI ideal sin restricciones, PI con saturación
+$Q_1 \in [0,90]\,\si{\percent}$ sin anti-windup, y PI con saturación y anti-windup por
+\emph{clamping}, que congela el integrador mientras la salida está saturada y el error empuja en
+la dirección de la saturación \cite{mw_antiwindup}. Los resultados se muestran en la
+Fig.~\ref{fig:mil} y la Tabla~\ref{tab:mil}; las métricas se calcularon con \texttt{stepinfo}
+\cite{mw_stepinfo}.
+
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.3cm}, estilo, ancho,
+                  xlabel={Tiempo (\si{\second})}, xmin=0, xmax=800]
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, legend pos=south east, ymin=20, ymax=75]
+  \addplot[cGris, dashed, domain=0:800, samples=2] {60};
+  \addplot[cRojo]  table[col sep=comma, x index=0, y index=2] {\G/GRAFControladoresTemperatura.csv};
+  \addplot[cVerde] table[col sep=comma, x index=0, y index=3] {\G/GRAFControladoresTemperatura.csv};
+  \addplot[cAzul]  table[col sep=comma, x index=0, y index=1] {\G/GRAFControladoresTemperatura.csv};
+  \legend{$\Tref$, Saturado sin AW, PI ideal, Saturado con AW}
+\nextgroupplot[ylabel={Potencia (\si{\percent})}, legend pos=north east, ymin=-20, ymax=320]
+  \addplot[cVerde]        table[col sep=comma, x index=0, y index=4] {\G/GRAFControladores.csv};
+  \addplot[cRojo, dotted] table[col sep=comma, x index=0, y index=3] {\G/GRAFControladores.csv};
+  \addplot[cRojo]         table[col sep=comma, x index=0, y index=2] {\G/GRAFControladores.csv};
+  \addplot[cAzul]         table[col sep=comma, x index=0, y index=1] {\G/GRAFControladores.csv};
+  \legend{$\Qcmd$ ideal, $\Qcmd$ sin AW, $Q_1$ sin AW, $Q_1$ con AW}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Evaluación MIL del PI--SIMC en tres configuraciones. Izquierda: temperatura. Derecha:
+potencia comandada $\Qcmd$ y potencia aplicada $Q_1$. Se muestran los primeros
+\SI{800}{\second} de los \SI{1800}{\second} simulados.}
+\label{fig:mil}
+\end{figure*}
+
+\begin{table}[!t]
+\caption{Métricas MIL. Las tres primeras columnas corresponden al PI--SIMC; la última, al PI--CSD
+bajo idénticas condiciones de simulación.}
+\label{tab:mil}
+\centering
+\footnotesize
+\begin{tabular}{@{}lS[table-format=3.1]S[table-format=3.1]S[table-format=3.1]S[table-format=3.1]@{}}
+\toprule
+\textbf{Métrica} & {\textbf{Ideal}} & {\textbf{Sin AW}} & {\textbf{Con AW}} & {\textbf{CSD}} \\
+\midrule
+Tiempo de subida (\si{\second})        & 25.2  & 74.6  & 84.5  & 133.7 \\
+$t_s$ (\si{\second})                   & 202.3 & 391.7 & 205.0 & 251.9 \\
+$M_p$ (\si{\percent})                  & 7.76  & 30.1  & 0.00  & 0.00 \\
+$e_{ss}$ (\si{\celsius})               & 0.00  & 0.00  & 0.00  & 0.00 \\
+$T_{1,\max}$ (\si{\celsius})           & 62.8  & 70.8  & 60.0  & 60.0 \\
+$Q_1$ mínimo aplicado (\si{\percent})  & 34.7  & 28.7  & 36.8  & 36.8 \\
+$Q_1$ máximo aplicado (\si{\percent})  & 297.4 & 90.0  & 90.0  & 90.0  \\
+Tiempo con $Q_1$ saturada (\si{\second}) & {---} & 127   & 66    & 21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El PI ideal cumple los requisitos en simulación, pero exige un máximo de \SI{297}{\percent} de
+potencia. Ese resultado es físicamente irrealizable y muestra que evaluar el controlador sin las
+restricciones del actuador no permite concluir nada sobre su comportamiento real.
+
+Al introducir la saturación sin anti-windup el desempeño se degrada de forma marcada: el
+sobreimpulso pasa de \SI{7.76}{\percent} a \SI{30.1}{\percent} y el tiempo de establecimiento casi
+se duplica. El mecanismo es visible en la Fig.~\ref{fig:mil}. Durante los primeros
+\SI{127}{\second} el comando permanece por encima del límite, de modo que el error sigue
+integrándose aunque la potencia aplicada ya no pueda aumentar. Cuando $T_1$ cruza la referencia en
+$t = \SI{103}{\second}$ el integrador acumula un excedente que el error negativo debe descargar
+antes de que el comando vuelva al rango útil, lo que ocurre \SI{24}{\second} después. La planta
+entretanto sigue recibiendo el \SI{90}{\percent} de potencia y alcanza \SI{70.8}{\celsius}. Para
+recuperarse, el controlador debe reducir la potencia hasta el \SI{28.7}{\percent} en
+$t = \SI{186}{\second}$, por debajo del \SI{36.8}{\percent} que la planta necesita en régimen.
+
+Con \emph{clamping} el integrador deja de acumular mientras la salida está saturada, la saturación
+dura \SI{66}{\second} en lugar de \SI{127}{\second} y la respuesta llega a la referencia sin
+sobrepasarla. De las tres configuraciones, solo esta cumple simultáneamente
+$t_s \leq \SI{600}{\second}$ y $M_p \leq \SI{5}{\percent}$; la configuración sin anti-windup falla
+el requisito de sobreimpulso por un factor de seis. Conviene notar que el anti-windup cuesta
+\SI{10}{\second} de tiempo de subida frente al caso sin protección, un precio bajo comparado con lo
+que evita.
+
+La última columna de la Tabla~\ref{tab:mil} incorpora el PI--CSD con saturación y anti-windup, bajo
+la misma planta, el mismo $T_s$, los mismos límites, la misma condición inicial y el mismo tiempo de
+simulación.\footnote{En esa corrida la columna PI--SIMC da $t_r = \SI{84.56}{\second}$ y
+$t_s = \SI{205.18}{\second}$; la diferencia respecto de la tercera columna es de interpolación
+sub-muestra de \texttt{stepinfo} y no de comportamiento.} Ambos controladores cumplen los
+requisitos y ambos alcanzan la referencia sin sobreimpulso y sin error estacionario, de modo que la
+comparación se decide por rapidez y por esfuerzo de control. El PI--SIMC establece \SI{47}{\second}
+antes, pero pide un comando inicial de \SI{274}{\percent} y mantiene el actuador saturado
+\SI{66}{\second}; el PI--CSD pide \SI{108}{\percent} y satura solo \SI{21}{\second}, a cambio de un
+tiempo de subida \SI{57}{\percent} mayor. Es decir, el PI--CSD opera mucho más cerca de la
+capacidad real del actuador y tiene márgenes de estabilidad mayores, mientras que el PI--SIMC
+aprovecha mejor la autoridad disponible.
+
+Ninguno de los dos domina al otro. Como ambos satisfacen las especificaciones con holgura y el
+tiempo de establecimiento no es crítico en esta planta, un criterio de robustez favorecería al
+PI--CSD. Para las etapas de generación y verificación de código se utilizó el PI--SIMC con
+saturación y anti-windup, según lo establecido en la guía de laboratorio, y el PI--CSD se conservó
+como contraste metodológico.
+
+%% ===== 04_codigo_sil.tex =====================================
+\section{Generación de código y verificación de software}
+
+\subsection{Implementación del controlador}
+
+El sistema bajo prueba (\emph{System Under Test}, SUT) es el modelo \texttt{Controller.slx}, que
+contiene únicamente el algoritmo de control. Su interfaz es
+$\Tref,\,T_1 \rightarrow Q_1$: recibe la referencia y la temperatura medida, ambas en
+\si{\celsius}, y entrega la potencia comandada en porcentaje. Internamente ejecuta la ley discreta
+\eqref{eq:pidiscreto} con $T_s = \SI{1}{\second}$, aplica la saturación
+$Q_1 \in [0,90]\,\si{\percent}$ y el anti-windup por \emph{clamping}. La Fig.~\ref{fig:controller}
+muestra su estructura.
+
+\pendiente{Insertar aquí la captura de \texttt{Controller.slx} (Simulink) como
+\texttt{figuras/controller.png}. Es la única captura que el instructivo pide explícitamente.}
+
+\begin{figure}[!t]
+\centering
+% \includegraphics[width=\columnwidth]{figuras/controller.png}
+\framebox[0.95\columnwidth][c]{\rule{0pt}{3.2cm}\scriptsize Figura de \texttt{Controller.slx}}
+\caption{Modelo \texttt{Controller.slx}: implementación discreta del PI--SIMC con saturación y
+anti-windup por \emph{clamping}.}
+\label{fig:controller}
+\end{figure}
+
+La planta no forma parte de este modelo. Esa separación es deliberada: es lo que permite generar
+código solo del algoritmo, instanciarlo varias veces dentro de un banco de pruebas y sustituir una
+instancia por su versión compilada sin alterar el resto del lazo. Para ello el modelo se configuró
+con \texttt{Code interface packaging = Reusable function} y se habilitaron múltiples instancias por
+modelo de nivel superior.
+
+De la configuración de generación de código solo interesan aquí tres decisiones. La primera es el
+uso de \texttt{ert.tlc} con lenguaje C bajo el estándar C99, que produce código orientado a sistemas
+embebidos \cite{mw_codegen}. La segunda es el solver de paso fijo discreto con paso $T_s$, coherente
+con \eqref{eq:pidiscreto}. La tercera es \texttt{Default parameter behavior = Inlined} combinado con
+la clase de almacenamiento \texttt{ExportedGlobal} para $Kp_{SIMC}$ y $Ki_{SIMC}$: el resto de las
+constantes se incrusta en el código, pero las dos ganancias permanecen como variables globales y por
+tanto siguen siendo calibrables sin regenerar. Para la etapa SIL el hardware objetivo fue la propia
+computadora (Intel x86-64), no todavía el Arduino.
+
+Las comprobaciones previas a la generación ---\emph{Code Generation Advisor} con los objetivos
+\emph{Execution efficiency} y \emph{Traceability}, y \emph{Model Advisor}--- no reportaron ningún
+fallo. La única advertencia relevante se refiere al soporte de valores no finitos en el entorno de
+software, que no afecta al algoritmo implementado; no se aplicaron correcciones automáticas para
+eliminarla.
+
+\subsection{Inspección del código generado}
+
+La revisión del código C verificó que las características esenciales del controlador sobrevivieran
+a la generación. La Tabla~\ref{tab:codigo} resume la correspondencia encontrada.
+
+\begin{table}[!t]
+\caption{Correspondencia entre el modelo y el código generado.}
+\label{tab:codigo}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.27\columnwidth}p{0.63\columnwidth}@{}}
+\toprule
+\textbf{Característica} & \textbf{Evidencia en el código} \\
+\midrule
+Interfaz &
+\texttt{void Controller(const real\_T *rtu\_T\_ref, const real\_T *rtu\_T1, real\_T *rty\_Q1,
+DW\_Controller\_f\_T *localDW)} \\
+\addlinespace
+Estado del integrador &
+Campo único \texttt{Integrator\_DSTATE} dentro de la estructura de estado \texttt{DW\_Controller\_f\_T} \\
+\addlinespace
+Parámetros calibrables &
+\texttt{real\_T Kp\_SIMC = 7.620337;} y \texttt{real\_T Ki\_SIMC = 0.079379;} definidos como
+variables globales \\
+\addlinespace
+Saturación &
+Ramas explícitas con los límites \texttt{90.0} y \texttt{0.0} sobre la salida \\
+\addlinespace
+Anti-windup &
+Condición que anula el incremento integral cuando hay exceso y su signo coincide con el del error \\
+\addlinespace
+Tipo de dato &
+\texttt{typedef double real\_T} \\
+\addlinespace
+Separación controlador--planta &
+El archivo generado no contiene ningún modelo de la planta \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El punto menos evidente es el anti-windup, porque en el código no aparece como un bloque sino como
+una condición aritmética. El fragmento correspondiente es
+
+\begin{lstlisting}
+if ((rtb_DeadZone != 0.0) && (tmp == tmp_0)) {
+  rtb_IntegralGain = 0.0;
+}
+localDW->Integrator_DSTATE += rtb_IntegralGain;
+\end{lstlisting}
+
+La variable \texttt{rtb\_DeadZone} mide cuánto excede el comando el rango permitido y vale cero
+mientras no hay saturación; \texttt{tmp} y \texttt{tmp\_0} codifican los signos del exceso y del
+término integral. Cuando hay saturación y ambos signos coinciden, el incremento se fuerza a cero y
+el estado del integrador no cambia. Esa es exactamente la lógica de \emph{clamping} evaluada en
+MIL.
+
+\subsection{Verificación Software-in-the-Loop}
+
+En SIL el código generado se compila y ejecuta sobre la computadora dentro de la misma simulación
+\cite{mw_sil}. El banco \texttt{TCLab\_Test\_SIL.slx} contiene dos ramas que comparten referencia,
+temperatura ambiente, modelo de planta, condición inicial, periodo de muestreo y tiempo de
+simulación; la única diferencia es que una instancia del controlador se ejecuta en modo Normal y la
+otra en modo SIL. La comparación es por tanto \emph{back-to-back}: misma entrada, dos
+implementaciones del mismo algoritmo.
+
+Las diferencias evaluadas fueron
+
+\begin{equation}
+\Delta Q_1 = Q_{1,\mathrm{SIL}} - Q_{1,\mathrm{Normal}},
+\qquad
+\Delta T_1 = T_{1,\mathrm{SIL}} - T_{1,\mathrm{Normal}},
+\label{eq:difsil}
+\end{equation}
+
+sobre las \num{1801} muestras de los \SI{1800}{\second} simulados. Ambas resultaron idénticamente
+nulas, como se observa en la Fig.~\ref{fig:diferencias} y se cuantifica en la
+Tabla~\ref{tab:silpil}, de modo que la prueba satisface el criterio de equivalencia con igualdad
+exacta y no solo dentro de una tolerancia.
+
+Este resultado verifica que la traducción de modelo a código C no introdujo diferencias numéricas:
+el orden de las operaciones, la actualización del estado y la lógica de saturación y anti-windup se
+conservaron. No verifica, en cambio, nada relacionado con el procesador final, porque el código se
+compiló para la arquitectura del computador anfitrión y con aritmética \texttt{double}. Tampoco
+dice nada sobre la planta, que sigue siendo un modelo.
+
+%% ===== 05_pil.tex =====================================
+\section{Verificación Processor-in-the-Loop}
+
+En PIL el código del controlador se compila para el procesador objetivo, se descarga a la tarjeta y
+se ejecuta allí, mientras Simulink intercambia con ella las señales de entrada y salida en cada
+periodo de muestreo \cite{mw_pil}. El procesador empleado fue un Arduino Uno R4 Minima, utilizado
+exclusivamente como plataforma de verificación y no como el destino final del controlador.
+
+El reparto entre lo que se ejecuta físicamente y lo que permanece simulado es el punto clave de esta
+etapa. Sobre el Arduino se ejecuta únicamente el algoritmo de control: la ley PI discreta, la
+saturación y el anti-windup, con el estado del integrador residiendo en la memoria del
+microcontrolador. Todo lo demás sigue siendo un modelo dentro de Simulink: la planta FOPDT, el
+tiempo muerto, la temperatura ambiente y la referencia. No intervienen el sensor ni el calentador de
+la TCLab.
+
+El banco \texttt{TCLab\_Test\_PIL.slx} emplea de nuevo dos ramas que referencian
+\texttt{Controller.slx}, una en modo Normal y otra en modo PIL. A diferencia del banco SIL, las dos
+ramas comparten solo las fuentes $\Tref$ y $\Tamb$, y cada una conserva su propia copia del retardo
+y de la planta. Esa separación es necesaria porque, si las ramas compartieran la planta, cualquier
+discrepancia entre las acciones de control produciría trayectorias de temperatura distintas y
+dejaría de poder atribuirse la diferencia a una sola causa. Tampoco se mantuvieron simultáneamente
+una instancia SIL y una PIL referenciando el mismo modelo.
+
+Las diferencias evaluadas fueron las análogas a \eqref{eq:difsil},
+$\Delta Q_1 = Q_{1,\mathrm{PIL}} - Q_{1,\mathrm{Normal}}$ y
+$\Delta T_1 = T_{1,\mathrm{PIL}} - T_{1,\mathrm{Normal}}$, sobre las mismas \num{1801} muestras. El
+resultado fue también de igualdad exacta (Fig.~\ref{fig:diferencias} y Tabla~\ref{tab:silpil}). No
+se observó ninguna diferencia que analizar, lo cual es consistente con haber conservado el tipo
+\texttt{double} y la misma estructura algorítmica en las tres ejecuciones.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.3cm,
+                  xmin=0, xmax=1800, legend pos=north east]
+\nextgroupplot[ylabel={$\Delta Q_1$ (\si{\percent})}, xticklabels={}, ymin=-1, ymax=1]
+  \addplot[cAzul, line width=1.4pt, opacity=0.45] table[col sep=comma, x index=0,
+    y expr=\thisrowno{2}-\thisrowno{1}] {\G/GRAFComparacionNormalSIL.csv};
+  \addplot[cNaranja, dashed] table[col sep=comma, x index=0,
+    y expr=\thisrowno{2}-\thisrowno{1}] {\G/GRAFComparacionNormalPIL.csv};
+  \legend{SIL, PIL}
+\nextgroupplot[ylabel={$\Delta T_1$ (\si{\celsius})}, xlabel={Tiempo (\si{\second})},
+               ymin=-1, ymax=1]
+  \addplot[cAzul, line width=1.4pt, opacity=0.45] table[col sep=comma, x index=0,
+    y expr=\thisrowno{4}-\thisrowno{3}] {\G/GRAFComparacionNormalSIL.csv};
+  \addplot[cNaranja, dashed] table[col sep=comma, x index=0,
+    y expr=\thisrowno{4}-\thisrowno{3}] {\G/GRAFComparacionNormalPIL.csv};
+  \legend{SIL, PIL}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Diferencias \emph{back-to-back} respecto de la ejecución Normal. Las cuatro trazas son
+idénticamente nulas en las \num{1801} muestras; la escala vertical se fijó en
+$\pm\num{1}$ para hacer visible que no hay desviación alguna.}
+\label{fig:diferencias}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Resultados cuantitativos de las verificaciones SIL y PIL, sobre \num{1801} muestras
+($T_s = \SI{1}{\second}$, \SI{1800}{\second} de simulación).}
+\label{tab:silpil}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{SIL}} & \multicolumn{2}{c}{\textbf{PIL}} & \multicolumn{2}{c}{\textbf{Igualdad exacta}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+\textbf{Señal} & Máx.\ abs. & RMSE & Máx.\ abs. & RMSE & SIL & PIL \\
+\midrule
+$Q_1$ (\si{\percent})   & 0 & 0 & 0 & 0 & Sí & Sí \\
+$T_1$ (\si{\celsius})   & 0 & 0 & 0 & 0 & Sí & Sí \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{Resultado}} & \textbf{PASS} & \textbf{PASS} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La evidencia que aporta PIL es distinta de la de SIL. SIL comprueba la traducción de modelo a código
+usando el compilador y la aritmética del computador anfitrión; PIL añade que ese mismo código se
+compila con la cadena de herramientas del procesador objetivo, cabe en su memoria y produce los
+mismos resultados ejecutándose sobre él. Es decir, PIL cubre los efectos del compilador cruzado, de
+los tamaños de palabra y del comportamiento aritmético del dispositivo, que SIL no puede detectar.
+
+Aun así, un PASS en PIL no constituye una validación del controlador sobre la TCLab. Durante la
+prueba la planta y el retardo siguen siendo modelos, $\Tamb$ es una señal de Simulink, no se mide
+temperatura con el sensor real ni se acciona el calentador, no se ejercitan los canales físicos de
+entrada y salida, y la ejecución no se realiza en tiempo real contra un proceso físico. Lo que PIL
+verifica es el código y su ejecución sobre el procesador, no el lazo cerrado sobre la planta.
+
+%% ===== 06_experimental.tex =====================================
+\section{Implementación experimental}
+
+\subsection{Arquitectura del lazo físico}
+
+En esta etapa desaparece el modelo de la planta. El lazo implementado es
+
+\begin{center}
+$\Tref \rightarrow$ controlador (Arduino Leonardo) $\rightarrow Q_1 \rightarrow$ calentador
+$\rightarrow T_1 \rightarrow$ controlador,
+\end{center}
+
+y se ejecutó sobre el Arduino Leonardo integrado en la TCLab mediante Monitor \& Tune
+\cite{mw_arduino}. El algoritmo del controlador se copió a
+\texttt{Controller\_implementacion.slx} para no alterar \texttt{Controller.slx}, que se conservó
+como referencia de las etapas de verificación. La única diferencia entre ambos es la representación
+numérica: en la versión de implementación las entradas, las ganancias, los límites y el estado del
+integrador se resolvieron en \texttt{single}, adecuado para el microcontrolador de 8 bits, mientras
+que la ley de control, la saturación, el anti-windup y $T_s = \SI{1}{\second}$ se mantuvieron sin
+cambios.
+
+La cadena de señal es la siguiente. La temperatura se lee del canal analógico \texttt{A0}, se
+convierte a \texttt{single} y se escala mediante una ganancia $500/1023$ seguida de un
+desplazamiento de \SI{-50}{\celsius}, correspondientes al rango del sensor y a la resolución del
+convertidor de 10 bits. La medición pasa por un filtro de media móvil con $\lambda = 0{,}5$ antes de
+entrar al controlador. La salida se satura, se escala a la resolución del PWM y se convierte a
+\texttt{uint8} para el pin \texttt{D3}, que comanda el calentador.
+
+Es importante precisar el papel de Monitor \& Tune. Al iniciarlo, Simulink genera el código del
+modelo y sus modelos referenciados, lo compila y lo descarga al Arduino
+\cite{mw_arduino_workflows}. Todas las operaciones del lazo ---adquisición de $T_1$, conversión,
+filtrado, ejecución del PI, cálculo y limitación de $Q_1$ y generación del PWM--- se ejecutan sobre
+el Arduino Leonardo. La computadora no participa en el cálculo del lazo de control: el enlace de
+\emph{External Mode} sirve para monitorizar señales, registrar resultados y ajustar parámetros
+durante la ejecución.
+
+\subsection{Resultados experimentales}
+
+Tras una ejecución previa con $\Tref = \SI{25}{\celsius}$ para comprobar la lectura del sensor y
+los límites del actuador, el experimento definitivo se realizó con $\Tref = \SI{60}{\celsius}$
+durante \SI{607}{\second} (\num{608} muestras), partiendo de $T_1 = \SI{26.25}{\celsius}$. La Fig.~\ref{fig:experimental} presenta las señales registradas junto
+con la respuesta MIL, y la Tabla~\ref{tab:experimental} compara ambas cuantitativamente.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.6cm,
+                  xmin=0, xmax=607]
+\nextgroupplot[ylabel={Temperatura (\si{\celsius})}, xticklabels={}, ymin=22, ymax=66,
+               legend pos=south east]
+  \addplot[cGris, dashed] table[col sep=comma, x index=0, y index=1] {\G/ImplementacionA12.csv};
+  \addplot[cAzul]         table[col sep=comma, x index=0, y index=2] {\G/ImplementacionA12.csv};
+  \addplot[cVerde, dotted, line width=1pt]
+    table[col sep=comma, x index=0, y index=1] {\G/GRAFControladoresTemperatura.csv};
+  \legend{$\Tref$, $T_1$ experimental, $T_1$ MIL}
+\nextgroupplot[ylabel={$Q_1$ (\si{\percent})}, xlabel={Tiempo (\si{\second})}, ymin=0, ymax=100,
+               legend pos=north east]
+  \addplot[cNaranja] table[col sep=comma, x index=0, y index=3] {\G/ImplementacionA12.csv};
+  \addplot[cVerde, dotted, line width=1pt]
+    table[col sep=comma, x index=0, y index=1] {\G/GRAFControladores.csv};
+  \legend{Experimental, MIL}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Implementación sobre la TCLab con $\Tref = \SI{60}{\celsius}$, superpuesta a la respuesta
+MIL del mismo controlador.}
+\label{fig:experimental}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Desempeño experimental frente al obtenido en MIL. Las etapas SIL y PIL reprodujeron
+exactamente el resultado MIL.}
+\label{tab:experimental}
+\centering
+\footnotesize
+\begin{tabular}{@{}lS[table-format=3.1]S[table-format=3.2]@{}}
+\toprule
+\textbf{Métrica} & {\textbf{MIL}} & {\textbf{Experimental}} \\
+\midrule
+Tiempo de subida (\si{\second})           & 84.5  & 74 \\
+$t_s$ (\si{\second})                      & 205.0 & 298 \\
+$M_p$ (\si{\percent})                     & 0.00  & 1.96 \\
+$e_{ss}$ (\si{\celsius})                  & 0.00  & 0.04 \\
+$T_{1,\max}$ (\si{\celsius})              & 60.0  & 60.66 \\
+$Q_1$ mínimo aplicado (\si{\percent})     & 36.8  & 25.42 \\
+$Q_1$ en régimen (\si{\percent})          & 36.8  & 40.3 \\
+Tiempo con $Q_1$ saturada (\si{\second})  & 66    & 69 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El controlador cumple su función sobre la planta real: alcanza la referencia, la mantiene y respeta
+en todo momento el intervalo de potencia permitido, con un máximo del \SI{90}{\percent} durante el
+calentamiento inicial y sin saturación sostenida injustificada. El error estacionario, calculado como la diferencia entre la
+referencia y la temperatura media para $t \geq \SI{300}{\second}$, es de \SI{0.04}{\celsius}.
+Ese valor equivale a menos de una décima parte del escalón mínimo del convertidor,
+$500/1023 = \SI{0.489}{\celsius}$; es decir, el error queda muy por debajo de la resolución con que
+el sistema puede medir la temperatura.
+
+Las diferencias respecto de MIL son sistemáticas y admiten interpretación. El sobreimpulso de
+\SI{1.96}{\percent} merece una precisión: el máximo absoluto del registro,
+\SI{60.66}{\celsius}, no ocurre durante el transitorio sino en $t = \SI{520}{\second}$, ya en
+régimen permanente, mientras que el máximo alcanzado antes de que la respuesta se
+establezca, en $t = \SI{273}{\second}$, es de \SI{59.80}{\celsius}, por debajo de la referencia. Lo que la métrica está recogiendo es la
+oscilación de baja amplitud alrededor del punto de operación ---la desviación típica de $T_1$ para
+$t \geq \SI{300}{\second}$ es de \SI{0.245}{\celsius}--- y no un sobredisparo de la respuesta al
+escalón.
+
+La discrepancia más informativa está en el régimen permanente. En MIL el lazo se estabiliza con
+$Q_1 = \SI{36.8}{\percent}$, mientras que la planta real necesita \SI{40.3}{\percent} para sostener
+la misma temperatura. La ganancia estática aparente durante el experimento resulta entonces de
+aproximadamente \SI{0.84}{\celsius\per\percent}, cerca de un \SI{15}{\percent} por debajo del
+$K = \SI{0.979}{\celsius\per\percent}$ del modelo nominal. Este error de ganancia explica también el
+tiempo de establecimiento mayor: con menos ganancia efectiva de planta, el lazo cierra más lento,
+y el sistema tarda \SI{298}{\second} en lugar de \SI{205}{\second} en entrar en la banda del
+\SI{2}{\percent}. El tiempo de subida, en cambio, resultó menor que en MIL (\SI{74}{\second} frente
+a \SI{84.5}{\second}), lo que es coherente con haber partido de \SI{26.25}{\celsius} en lugar de
+\SI{24}{\celsius}: el escalón real fue un \SI{6}{\percent} más pequeño.
+
+Otras diferencias visibles en la Fig.~\ref{fig:experimental} no aparecen en MIL por construcción.
+La señal $Q_1$ experimental es ruidosa en régimen (desviación típica de \SI{1.81}{\percent}) porque
+el controlador amplifica el ruido de medición por $\Kp = \SI{7.62}{\percent\per\celsius}$, de modo
+que un solo escalón del convertidor produce una variación de casi cuatro puntos porcentuales de
+potencia. El descenso hasta el \SI{25.4}{\percent} en $t = \SI{115}{\second}$, más
+profundo que el \SI{36.8}{\percent} de MIL, corresponde a la corrección tras la saturación inicial
+sobre una planta cuya dinámica real no coincide exactamente con el FOPDT identificado.
+
+%% ===== 07_discusion.tex =====================================
+\section{Discusión}
+
+El recorrido completo deja ver que cada etapa del flujo responde una pregunta distinta, y que
+ninguna sustituye a las demás.
+
+El modelo obtenido del balance de energía resultó útil para entender el sistema pero no para
+diseñar. Su linealización es válida solo en un entorno reducido del punto de operación, como
+cuantifica la Tabla~\ref{tab:fisico}, mientras que el transitorio que debe manejar el controlador
+es precisamente un calentamiento desde temperatura ambiente. Por eso el modelo de diseño tuvo que
+obtenerse de forma experimental. El FOPDT identificado con el ensayo escalón cumple
+esa función, pero la validación cruzada mostró también su límite: los residuos no son ruido
+alrededor de cero sino un patrón que crece con el nivel de potencia. Esto significa que el modelo no
+falla al azar, sino que subestima la temperatura de forma creciente a medida que se aleja de la
+región donde fue identificado, y que un solo modelo lineal con retardo no describe la planta en todo
+el rango. La elección del modelo nominal fue, en ese sentido, una elección de región de operación
+más que de calidad absoluta.
+
+El efecto de la saturación resultó ser el factor de diseño más relevante de toda la práctica. El PI
+sintonizado con SIMC demanda un \SI{274}{\percent} de potencia en el primer instante, casi tres
+veces lo que el actuador puede entregar. Con el actuador limitado pero sin protección del
+integrador, el controlador sintonizado correctamente incumple el requisito de sobreimpulso por un
+factor de seis. La causa no está en la sintonización sino en que el integrador sigue acumulando
+mientras la potencia ya no puede crecer, de modo que el estado del controlador deja de corresponder
+a lo que realmente ocurre en la planta. El \emph{clamping} corrige eso deteniendo la acumulación
+durante la saturación, y el costo es de apenas \SI{10}{\second} de tiempo de subida. La lección es
+que el desempeño de un controlador no puede evaluarse sin las restricciones del actuador: el caso
+ideal de la Tabla~\ref{tab:mil} cumple los requisitos y a la vez es irrealizable.
+
+La comparación entre los dos diseños refuerza esa idea. Sobre el modelo lineal sin restricciones el
+PI--CSD parece claramente superior, con mejor tiempo de establecimiento, menor sobreimpulso y
+márgenes mayores. Al incorporar el límite de potencia el orden cambia parcialmente: el PI--SIMC
+resulta más rápido porque aprovecha toda la autoridad disponible, mientras que el PI--CSD se
+mantiene mucho más cerca de la capacidad real del actuador. Ambos cumplen, y decidir entre ellos
+exige un criterio explícito ---rapidez frente a robustez y esfuerzo de control--- que no se deduce
+de las métricas por sí solas.
+
+Las verificaciones SIL y PIL cumplieron un papel distinto del de MIL. MIL evalúa si el algoritmo
+resuelve el problema de control; SIL y PIL no evalúan desempeño en absoluto, sino conservación de
+comportamiento al cambiar de representación. Que ambas dieran igualdad exacta y no solo equivalencia
+dentro de una tolerancia da confianza en que las diferencias observadas después, sobre la planta
+real, no provienen del código ni del procesador. Ese es su valor práctico: al llegar a la
+implementación física, el conjunto de causas posibles de una discrepancia ya está acotado al modelo
+de la planta y al hardware de entrada y salida. Al mismo tiempo, conviene no sobreinterpretar el
+resultado: durante PIL la planta, el retardo y la temperatura ambiente siguen siendo señales de
+Simulink, y no se ejercita ningún canal físico.
+
+Efectivamente, las diferencias aparecieron al cerrar el lazo sobre la TCLab, y son del tipo que las
+etapas anteriores no podían revelar. La más significativa es el error de ganancia: la planta
+necesita en régimen más potencia que la prevista (Tabla~\ref{tab:experimental}), lo que equivale a
+una ganancia estática aparente cerca de un \SI{15}{\percent} menor que la nominal. Esa
+diferencia es coherente con el sesgo detectado en la validación cruzada y con la dependencia de la
+ganancia respecto de la región de operación, y se traduce en un lazo más lento que el simulado. A
+ello se suman efectos ausentes del modelo: el ruido de medición amplificado por
+$\Kp = \SI{7.62}{\percent\per\celsius}$, la cuantización del convertidor, y variaciones ambientales
+durante los \SI{607}{\second} del experimento. Ninguno de estos efectos invalida el diseño ---el
+controlador cumple los requisitos sobre la planta real--- pero sí muestran que el margen con que se
+cumplen es menor que el que sugería la simulación, y que ese margen proviene en buena medida de
+haber elegido un $\tau_c$ conservador.
+
+%% ===== 08_conclusiones.tex =====================================
+\section{Conclusiones}
+
+\begin{enumerate}[leftmargin=*]
+
+\item El modelo FOPDT identificado con el ensayo escalón,
+$\Gpnom(s) = 0{,}979\,e^{-8{,}00 s}/(179{,}1 s + 1)$, representa adecuadamente la planta en la
+región de operación del controlador, con un ajuste del \SI{88.7}{\percent} sobre datos no empleados
+en su identificación, frente al \SI{74.4}{\percent} del modelo multinivel. Su limitación es
+igualmente clara: el residuo de validación no es aleatorio sino creciente con el nivel de potencia,
+de \SI{+0.88}{\celsius} a \SI{+2.20}{\celsius} entre $Q_1 = \SI{20}{\percent}$ y
+\SI{50}{\percent}, lo que indica que una sola ganancia no describe todo el rango de la planta.
+
+\item El anti-windup, y no la sintonización, fue lo que determinó el cumplimiento de las
+especificaciones. Con el mismo $\Kp$ y el mismo $\Ti$ obtenidos por SIMC, la configuración sin
+protección del integrador produce $M_p = \SI{30.1}{\percent}$ e incumple el requisito
+$M_p \leq \SI{5}{\percent}$ por un factor de seis, mientras que con \emph{clamping} se obtiene
+$M_p = \SI{0}{\percent}$ y $t_s = \SI{205}{\second}$. Haber aplicado correctamente las reglas SIMC
+no demuestra por sí mismo que el controlador cumpla los requisitos.
+
+\item Los dos diseños PI cumplen las especificaciones en MIL, pero con compromisos opuestos y sin
+que ninguno domine al otro: el PI--SIMC establece \SI{47}{\second} antes, y el PI--CSD demanda un
+comando inicial de \SI{108}{\percent} frente a \SI{274}{\percent} y mantiene el actuador saturado
+\SI{21}{\second} frente a \SI{66}{\second}, además de contar con márgenes de estabilidad mayores.
+La selección depende del criterio que se privilegie y no se deduce de las métricas de desempeño por
+sí solas.
+
+\item Las verificaciones SIL y PIL resultaron en igualdad exacta de $Q_1$ y $T_1$ sobre
+\num{1801} muestras, lo que acredita que ni la generación de código ni su ejecución sobre el
+Arduino Uno R4 Minima alteraron el comportamiento del controlador validado en MIL. Ese resultado no
+constituye una validación del sistema completo: durante ambas pruebas la planta, el retardo y la
+temperatura ambiente permanecen simulados y no se ejercitan los canales físicos de la TCLab, de
+modo que el valor de estas etapas está en acotar las causas posibles de una discrepancia
+posterior, no en anticiparla.
+
+\item La implementación sobre la TCLab cumple los requisitos ---$t_s = \SI{298}{\second}$ y
+$M_p = \SI{1.96}{\percent}$--- con un error estacionario de \SI{0.04}{\celsius}, muy inferior al
+escalón mínimo del convertidor (\SI{0.489}{\celsius}). Las diferencias respecto de MIL se explican
+principalmente por un error de ganancia del modelo: la planta requiere \SI{40.3}{\percent} de
+potencia en régimen frente al \SI{36.8}{\percent} previsto, lo que corresponde a una ganancia
+estática aparente cerca de un \SI{15}{\percent} menor que la nominal y explica el tiempo de
+establecimiento un \SI{45}{\percent} mayor.
+
+\end{enumerate}
+
+
+\balance
+%% ===== Bibliografia (no requiere BibTeX) =====================
+% Generated by IEEEtran.bst, version: 1.14 (2015/08/26)
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{#1}
+\csname url@samestyle\endcsname
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
+\providecommand{\BIBentryALTinterwordstretchfactor}{4}
+\providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand{\BIBforeignlanguage}[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+\providecommand{\BIBdecl}{\relax}
+\BIBdecl
+
+\bibitem{mw_hil}
+{MathWorks}, ``What is hardware-in-the-loop ({HIL})?'' disponible en:
+  \url{https://www.mathworks.com/discovery/hardware-in-the-loop-hil.html}.
+  Consultado: 1 de septiembre de 2026.
+
+\bibitem{hedengren_modeling}
+J.~D. Hedengren, ``Arduino dynamic temperature modeling,'' APMonitor: Dynamics
+  and Control, disponible en:
+  \url{https://apmonitor.com/pdc/index.php/Main/ArduinoModeling}. Consultado:
+  11 de agosto de 2026.
+
+\bibitem{hedengren_linearize}
+------, ``{TCLab} linearize energy balance,'' APMonitor: Dynamics and Control,
+  disponible en: \url{https://apmonitor.com/pdc/index.php/Main/TCLabLinearize}.
+  Consultado: 11 de agosto de 2026.
+
+\bibitem{hedengren_fopdt}
+------, ``{TCLab} {FOPDT} model,'' APMonitor: Dynamics and Control, disponible
+  en: \url{https://apmonitor.com/pdc/index.php/Main/TCLabFOPDT}. Consultado: 11
+  de agosto de 2026.
+
+\bibitem{skogestad2003}
+S.~Skogestad, ``Simple analytic rules for model reduction and {PID} controller
+  tuning,'' \emph{Journal of Process Control}, vol.~13, no.~4, pp. 291--309,
+  2003.
+
+\bibitem{mw_antiwindup}
+{MathWorks}, ``Anti-windup control using a {PID} controller,'' Simulink
+  Documentation, disponible en:
+  \url{https://www.mathworks.com/help/simulink/slref/anti-windup-control-using-a-pid-controller.html}.
+  Consultado: 12 de agosto de 2026.
+
+\bibitem{mw_stepinfo}
+------, ``stepinfo: Rise time, settling time, and other step-response
+  characteristics,'' Control System Toolbox Documentation, disponible en:
+  \url{https://www.mathworks.com/help/control/ref/dynamicsystem.stepinfo.html}.
+  Consultado: 12 de agosto de 2026.
+
+\bibitem{mw_codegen}
+------, ``Source code generation,'' Embedded Coder Documentation, disponible
+  en:
+  \url{https://www.mathworks.com/help/ecoder/source-code-generation-and-verification.html}.
+  Consultado: 1 de septiembre de 2026.
+
+\bibitem{mw_sil}
+------, ``Software-in-the-loop simulation,'' Embedded Coder Documentation,
+  disponible en:
+  \url{https://www.mathworks.com/help/ecoder/software-in-the-loop-sil-simulation.html}.
+  Consultado: 1 de septiembre de 2026.
+
+\bibitem{mw_pil}
+------, ``Processor-in-the-loop simulation,'' Embedded Coder Documentation,
+  disponible en:
+  \url{https://www.mathworks.com/help/ecoder/processor-in-the-loop.html}.
+  Consultado: 1 de septiembre de 2026.
+
+\bibitem{mw_arduino}
+------, ``Arduino hardware,'' Simulink Support Package for Arduino Hardware
+  Documentation, disponible en:
+  \url{https://www.mathworks.com/help/simulink/supportpkg-arduino.html}.
+  Consultado: 1 de septiembre de 2026.
+
+\bibitem{mw_arduino_workflows}
+------, ``Prepare, configure, and run simulink model for different user
+  workflows on arduino,'' Simulink Support Package for Arduino Hardware
+  Documentation, disponible en:
+  \url{https://www.mathworks.com/help/simulink/supportpkg/arduino_ref/prepare-configure-and-run-simulink-model-for-different-user-workflows-on-arduino.html}.
+  Consultado: 1 de septiembre de 2026.
+
+\end{thebibliography}
+
+\end{document}

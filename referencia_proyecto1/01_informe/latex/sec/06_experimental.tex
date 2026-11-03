@@ -1,0 +1,124 @@
+\section{Implementación experimental}
+
+\subsection{Arquitectura del lazo físico}
+
+En esta etapa desaparece el modelo de la planta. El lazo implementado es
+
+\begin{center}
+$\Tref \rightarrow$ controlador (Arduino Leonardo) $\rightarrow Q_1 \rightarrow$ calentador
+$\rightarrow T_1 \rightarrow$ controlador,
+\end{center}
+
+y se ejecutó sobre el Arduino Leonardo integrado en la TCLab mediante Monitor \& Tune
+\cite{mw_arduino}. El algoritmo del controlador se copió a
+\texttt{Controller\_implementacion.slx} para no alterar \texttt{Controller.slx}, que se conservó
+como referencia de las etapas de verificación. La única diferencia entre ambos es la representación
+numérica: en la versión de implementación las entradas, las ganancias, los límites y el estado del
+integrador se resolvieron en \texttt{single}, adecuado para el microcontrolador de 8 bits, mientras
+que la ley de control, la saturación, el anti-windup y $T_s = \SI{1}{\second}$ se mantuvieron sin
+cambios.
+
+La cadena de señal es la siguiente. La temperatura se lee del canal analógico \texttt{A0}, se
+convierte a \texttt{single} y se escala mediante una ganancia $500/1023$ seguida de un
+desplazamiento de \SI{-50}{\celsius}, correspondientes al rango del sensor y a la resolución del
+convertidor de 10 bits. La medición pasa por un filtro de media móvil con $\lambda = 0{,}5$ antes de
+entrar al controlador. La salida se satura, se escala a la resolución del PWM y se convierte a
+\texttt{uint8} para el pin \texttt{D3}, que comanda el calentador.
+
+Es importante precisar el papel de Monitor \& Tune. Al iniciarlo, Simulink genera el código del
+modelo y sus modelos referenciados, lo compila y lo descarga al Arduino
+\cite{mw_arduino_workflows}. Todas las operaciones del lazo ---adquisición de $T_1$, conversión,
+filtrado, ejecución del PI, cálculo y limitación de $Q_1$ y generación del PWM--- se ejecutan sobre
+el Arduino Leonardo. La computadora no participa en el cálculo del lazo de control: el enlace de
+\emph{External Mode} sirve para monitorizar señales, registrar resultados y ajustar parámetros
+durante la ejecución.
+
+\subsection{Resultados experimentales}
+
+Tras una ejecución previa con $\Tref = \SI{25}{\celsius}$ para comprobar la lectura del sensor y
+los límites del actuador, el experimento definitivo se realizó con $\Tref = \SI{60}{\celsius}$
+durante \SI{607}{\second} (\num{608} muestras), partiendo de $T_1 = \SI{26.25}{\celsius}$. La Fig.~\ref{fig:experimental} presenta las señales registradas junto
+con la respuesta MIL, y la Tabla~\ref{tab:experimental} compara ambas cuantitativamente.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.6cm,
+                  xmin=0, xmax=607]
+\nextgroupplot[ylabel={Temperatura (\si{\celsius})}, xticklabels={}, ymin=22, ymax=66,
+               legend pos=south east]
+  \addplot[cGris, dashed] table[col sep=comma, x index=0, y index=1] {\G/ImplementacionA12.csv};
+  \addplot[cAzul]         table[col sep=comma, x index=0, y index=2] {\G/ImplementacionA12.csv};
+  \addplot[cVerde, dotted, line width=1pt]
+    table[col sep=comma, x index=0, y index=1] {\G/GRAFControladoresTemperatura.csv};
+  \legend{$\Tref$, $T_1$ experimental, $T_1$ MIL}
+\nextgroupplot[ylabel={$Q_1$ (\si{\percent})}, xlabel={Tiempo (\si{\second})}, ymin=0, ymax=100,
+               legend pos=north east]
+  \addplot[cNaranja] table[col sep=comma, x index=0, y index=3] {\G/ImplementacionA12.csv};
+  \addplot[cVerde, dotted, line width=1pt]
+    table[col sep=comma, x index=0, y index=1] {\G/GRAFControladores.csv};
+  \legend{Experimental, MIL}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Implementación sobre la TCLab con $\Tref = \SI{60}{\celsius}$, superpuesta a la respuesta
+MIL del mismo controlador.}
+\label{fig:experimental}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Desempeño experimental frente al obtenido en MIL. Las etapas SIL y PIL reprodujeron
+exactamente el resultado MIL.}
+\label{tab:experimental}
+\centering
+\footnotesize
+\begin{tabular}{@{}lS[table-format=3.1]S[table-format=3.2]@{}}
+\toprule
+\textbf{Métrica} & {\textbf{MIL}} & {\textbf{Experimental}} \\
+\midrule
+Tiempo de subida (\si{\second})           & 84.5  & 74 \\
+$t_s$ (\si{\second})                      & 205.0 & 298 \\
+$M_p$ (\si{\percent})                     & 0.00  & 1.96 \\
+$e_{ss}$ (\si{\celsius})                  & 0.00  & 0.04 \\
+$T_{1,\max}$ (\si{\celsius})              & 60.0  & 60.66 \\
+$Q_1$ mínimo aplicado (\si{\percent})     & 36.8  & 25.42 \\
+$Q_1$ en régimen (\si{\percent})          & 36.8  & 40.3 \\
+Tiempo con $Q_1$ saturada (\si{\second})  & 66    & 69 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El controlador cumple su función sobre la planta real: alcanza la referencia, la mantiene y respeta
+en todo momento el intervalo de potencia permitido, con un máximo del \SI{90}{\percent} durante el
+calentamiento inicial y sin saturación sostenida injustificada. El error estacionario, calculado como la diferencia entre la
+referencia y la temperatura media para $t \geq \SI{300}{\second}$, es de \SI{0.04}{\celsius}.
+Ese valor equivale a menos de una décima parte del escalón mínimo del convertidor,
+$500/1023 = \SI{0.489}{\celsius}$; es decir, el error queda muy por debajo de la resolución con que
+el sistema puede medir la temperatura.
+
+Las diferencias respecto de MIL son sistemáticas y admiten interpretación. El sobreimpulso de
+\SI{1.96}{\percent} merece una precisión: el máximo absoluto del registro,
+\SI{60.66}{\celsius}, no ocurre durante el transitorio sino en $t = \SI{520}{\second}$, ya en
+régimen permanente, mientras que el máximo alcanzado antes de que la respuesta se
+establezca, en $t = \SI{273}{\second}$, es de \SI{59.80}{\celsius}, por debajo de la referencia. Lo que la métrica está recogiendo es la
+oscilación de baja amplitud alrededor del punto de operación ---la desviación típica de $T_1$ para
+$t \geq \SI{300}{\second}$ es de \SI{0.245}{\celsius}--- y no un sobredisparo de la respuesta al
+escalón.
+
+La discrepancia más informativa está en el régimen permanente. En MIL el lazo se estabiliza con
+$Q_1 = \SI{36.8}{\percent}$, mientras que la planta real necesita \SI{40.3}{\percent} para sostener
+la misma temperatura. La ganancia estática aparente durante el experimento resulta entonces de
+aproximadamente \SI{0.84}{\celsius\per\percent}, cerca de un \SI{15}{\percent} por debajo del
+$K = \SI{0.979}{\celsius\per\percent}$ del modelo nominal. Este error de ganancia explica también el
+tiempo de establecimiento mayor: con menos ganancia efectiva de planta, el lazo cierra más lento,
+y el sistema tarda \SI{298}{\second} en lugar de \SI{205}{\second} en entrar en la banda del
+\SI{2}{\percent}. El tiempo de subida, en cambio, resultó menor que en MIL (\SI{74}{\second} frente
+a \SI{84.5}{\second}), lo que es coherente con haber partido de \SI{26.25}{\celsius} en lugar de
+\SI{24}{\celsius}: el escalón real fue un \SI{6}{\percent} más pequeño.
+
+Otras diferencias visibles en la Fig.~\ref{fig:experimental} no aparecen en MIL por construcción.
+La señal $Q_1$ experimental es ruidosa en régimen (desviación típica de \SI{1.81}{\percent}) porque
+el controlador amplifica el ruido de medición por $\Kp = \SI{7.62}{\percent\per\celsius}$, de modo
+que un solo escalón del convertidor produce una variación de casi cuatro puntos porcentuales de
+potencia. El descenso hasta el \SI{25.4}{\percent} en $t = \SI{115}{\second}$, más
+profundo que el \SI{36.8}{\percent} de MIL, corresponde a la corrección tras la saturación inicial
+sobre una planta cuya dinámica real no coincide exactamente con el FOPDT identificado.

@@ -1,0 +1,100 @@
+% ============================================================
+%  Preambulo — Informe IEEE (dos columnas) · Lab 1 EL-5409
+% ============================================================
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{balance}
+\usepackage{xurl}          % permite cortar URLs largas en la bibliografia
+\usepackage[hidelinks,unicode]{hyperref}
+
+% IEEEtran define \IEEEproof etc.; evitamos choques de babel
+\addto\captionsspanish{\renewcommand{\tablename}{TABLA}}
+
+% ---------- Unidades ----------
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  group-separator       = {\,},
+  per-mode              = symbol,
+  detect-all            = true
+}
+
+% ---------- Graficas ----------
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{matrix}
+
+% Ruta a la carpeta de datos
+\newcommand{\G}{../Graficas}
+
+\definecolor{cAzul}   {HTML}{1F4E79}
+\definecolor{cNaranja}{HTML}{C55A11}
+\definecolor{cVerde}  {HTML}{2E7D32}
+\definecolor{cGris}   {HTML}{6E6E6E}
+\definecolor{cRojo}   {HTML}{A61C1C}
+
+% Estilo base: pensado para una columna IEEE
+\pgfplotsset{
+  estilo/.style={
+    width            = \columnwidth,
+    height           = 4.1cm,
+    scale only axis  = false,
+    grid             = major,
+    grid style       = {gray!20, line width=0.25pt},
+    tick label style = {font=\scriptsize},
+    label style      = {font=\scriptsize},
+    legend style     = {font=\scriptsize, draw=gray!45, fill=white,
+                        fill opacity=0.85, text opacity=1,
+                        inner sep=1.5pt, row sep=-1pt},
+    legend cell align = left,
+    every axis plot/.append style = {line width=0.7pt},
+    scaled ticks = false,
+    tick align   = outside,
+    max space between ticks = 40pt,
+  },
+  ancho/.style = {width=0.47\textwidth, height=4.3cm},
+  aligera/.style = {each nth point=#1, filter discard warning=false,
+                    unbounded coords=discard},
+  aligera/.default = 4,
+}
+
+% ---------- Codigo fuente ----------
+\lstdefinestyle{estiloC}{
+  language=C, basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{cAzul}\bfseries,
+  commentstyle=\color{cGris}\itshape,
+  frame=single, rulecolor=\color{gray!40},
+  breaklines=true, showstringspaces=false, columns=fullflexible,
+  xleftmargin=0.6em, aboveskip=4pt, belowskip=2pt
+}
+\lstset{style=estiloC}
+
+% ---------- Marcas de trabajo pendiente ----------
+% Cambie a \mostrarpendientesfalse antes de entregar
+\newif\ifmostrarpendientes
+\mostrarpendientestrue
+\newcommand{\pendiente}[1]{%
+  \ifmostrarpendientes
+    \par\noindent\fcolorbox{cRojo}{red!4}{%
+      \parbox{0.95\columnwidth}{\scriptsize\color{cRojo}\textbf{PENDIENTE:} #1}}\par\smallskip
+  \fi}
+
+% ---------- Atajos ----------
+\newcommand{\Tref}{T_{\mathrm{ref}}}
+\newcommand{\Tamb}{T_{\mathrm{amb}}}
+\newcommand{\Qcmd}{Q_{\mathrm{cmd}}}
+\newcommand{\Gpnom}{G_{p,\mathrm{nom}}}
+\newcommand{\Kp}{K_p}
+\newcommand{\Ki}{K_i}
+\newcommand{\Ti}{T_i}

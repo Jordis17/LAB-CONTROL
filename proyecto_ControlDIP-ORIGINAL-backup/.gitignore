@@ -1,0 +1,21 @@
+# Entornos virtuales
+venv/
+env/
+.env
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# Archivos temporales de Linux/OpenCV
+*.log
+.DS_Store
+calibration_matrix.npy
+hsv_config.json

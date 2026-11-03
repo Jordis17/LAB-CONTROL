@@ -1,0 +1,60 @@
+% ============================================================
+%  Informe tecnico — EL-5409 Laboratorio de Control Automatico
+%  Laboratorio 1: Model-Based Design para la planta termica TCLab
+%  Formato IEEE, dos columnas. Compilar con pdfLaTeX + BibTeX.
+% ============================================================
+\documentclass[conference,a4paper,10pt]{IEEEtran}
+
+\input{preambulo}
+
+\begin{document}
+
+\title{Diseño basado en modelos de un controlador PI\\
+de temperatura para la planta térmica TCLab}
+
+\author{%
+\IEEEauthorblockN{Abner López Méndez, 2022273075 \qquad Jordi Segura Chinchilla, 2022240646}
+\IEEEauthorblockA{Escuela de Ingeniería Electrónica, Tecnológico de Costa Rica\\
+EL-5409 --- Laboratorio de Control Automático, II Semestre 2026\\
+Profesor: Ing. Juan Luis Guerrero Fernández, PhD}}
+
+\maketitle
+
+\begin{abstract}
+Se documenta el desarrollo de un sistema de control de temperatura para la planta térmica TCLab
+siguiendo un flujo de diseño basado en modelos. A partir de un balance de energía se obtuvo un
+modelo no lineal y su linealización alrededor de $Q_1 = \SI{50}{\percent}$. Dos experimentos sobre
+la planta física, un escalón y una secuencia multinivel, permitieron identificar sendos modelos de
+primer orden con tiempo muerto; la validación cruzada seleccionó como nominal el modelo obtenido
+del ensayo escalón, $\Gpnom(s) = 0{,}979\,e^{-8{,}00 s}/(179{,}1 s + 1)$, con un ajuste del
+\SI{88.7}{\percent} sobre datos no empleados en su identificación. Las reglas SIMC con
+$\tau_c = 2\theta$ produjeron un controlador PI con $\Kp = \SI{7.62}{\percent\per\celsius}$ y
+$\Ti = \SI{96}{\second}$, que en simulación Model-in-the-Loop alcanza un tiempo de establecimiento
+de \SI{205}{\second} sin sobreimpulso al incorporar anti-windup por \emph{clamping}, frente a
+\SI{392}{\second} y \SI{30.1}{\percent} de sobreimpulso sin él. El código generado con Embedded
+Coder reprodujo exactamente la respuesta del modelo tanto en Software-in-the-Loop como en
+Processor-in-the-Loop sobre un Arduino Uno R4 Minima. La implementación final sobre la TCLab,
+ejecutada en el Arduino Leonardo mediante Monitor \& Tune, alcanzó la referencia de
+\SI{60}{\celsius} con un error estacionario de \SI{0.04}{\celsius} y un tiempo de establecimiento
+de \SI{298}{\second}, con una ganancia estática aparente cerca de un \SI{15}{\percent} menor que la
+del modelo nominal.
+\end{abstract}
+
+\begin{IEEEkeywords}
+TCLab, diseño basado en modelos, identificación FOPDT, SIMC, anti-windup, SIL, PIL, Embedded Coder.
+\end{IEEEkeywords}
+
+\input{sec/01_introduccion}
+\input{sec/02_modelado}
+\input{sec/03_control_mil}
+\input{sec/04_codigo_sil}
+\input{sec/05_pil}
+\input{sec/06_experimental}
+\input{sec/07_discusion}
+\input{sec/08_conclusiones}
+
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{referencias}
+
+\end{document}

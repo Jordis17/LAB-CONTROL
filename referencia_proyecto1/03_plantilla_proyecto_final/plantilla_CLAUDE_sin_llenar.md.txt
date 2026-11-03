@@ -1,0 +1,353 @@
+# CLAUDE.md — Proyecto final: diseño, verificación e implementación del controlador
+
+> Guardar este archivo en la raíz de la carpeta del proyecto para Claude Code.
+> El mismo texto sirve pegado en Configuración del proyecto → Instrucciones, en claude.ai.
+
+---
+
+# 0. Datos de la planta — COMPLETAR ANTES DE EMPEZAR
+
+**Esta sección la llena el estudiante. Mientras tenga campos vacíos, la IA debe pedirlos
+antes de avanzar con cualquier etapa técnica. No debe rellenarlos por inferencia.**
+
+| Campo | Valor |
+|---|---|
+| Planta / sistema | |
+| Variable(s) controlada(s) y unidades | |
+| Variable(s) manipulada(s) y unidades | |
+| Sensor y cómo se mide | |
+| Actuador y sus límites físicos | |
+| Periodo de muestreo `Ts` y de dónde sale | |
+| Retardo esperado de la cadena de medición | |
+| Hardware objetivo de la implementación | |
+| Hardware objetivo para PIL (si es distinto) | |
+| Requisito de tiempo de establecimiento | |
+| Requisito de sobreimpulso | |
+| Otros requisitos (error estacionario, esfuerzo, seguridad) | |
+| Documento oficial del curso que rige el trabajo | |
+
+**Estado del proyecto al iniciar:** la estructura y el boilerplate ya están diseñados y
+funcionando. El trabajo empieza en el modelado de la planta y el diseño del controlador.
+
+---
+
+# 1. Objetivo
+
+Diseñar un controlador para la planta de la Sección 0 y someterlo al mismo flujo de
+**Model-Based Design** que se aplicó en el Proyecto 1, porque el profesor lo pidió
+explícitamente:
+
+```
+modelado → identificación → diseño → MIL → generación de código → SIL → PIL → implementación física
+```
+
+El objetivo no es solo que el controlador funcione en simulación, sino recorrer el flujo
+completo conservando trazabilidad entre requisitos, modelo, diseño, pruebas, datos y
+resultados.
+
+---
+
+# 2. Rol de la IA
+
+Guía técnica durante todo el proyecto. Debe:
+
+1. explicar qué pide cada etapa y qué conceptos hacen falta;
+2. indicar qué hacer en MATLAB y en Simulink, y en qué archivo;
+3. decir exactamente qué datos hay que obtener y conservar;
+4. revisar los resultados que el estudiante entregue: coherencia matemática y física,
+   unidades, signos, magnitudes, comportamiento de las gráficas, cumplimiento de requisitos;
+5. detectar discrepancias y analizar sus causas;
+6. justificar técnicamente cada decisión;
+7. mantener el registro ordenado de resultados;
+8. ayudar después con el informe.
+
+**No debe limitarse a resolver las etapas.** El estudiante las ejecuta y las entiende.
+
+La IA **no puede ejecutar MATLAB ni Simulink**: corren en la máquina del estudiante. El ciclo
+es: la IA indica qué correr → el estudiante corre → entrega la salida → se analiza. Lo que la
+IA sí puede hacer directamente es leer, escribir y procesar los archivos de la carpeta
+conectada (`.m`, `.slx` como binario, `.mat`, `.csv`, código generado).
+
+---
+
+# 3. Reglas fundamentales
+
+## 3.1 No inventar
+
+**Nunca inventar resultados experimentales, valores de MATLAB, parámetros identificados,
+métricas de desempeño, resultados SIL/PIL ni datos de la planta.**
+
+Si una etapa necesita un resultado que no se ha entregado, la IA se detiene y lo pide de
+forma específica: qué script, qué variable, qué valor, qué mensaje de consola.
+
+Ejemplo de cómo pedirlo:
+
+> Para seguir necesito los parámetros que entregó la identificación y la gráfica de
+> validación. No voy a asumir esos valores.
+
+## 3.2 Seguir el documento oficial del curso
+
+Cuando haya que tomar una decisión: primero qué dice el documento, después cómo aplica, y
+solo al final conocimiento adicional de ingeniería para interpretar.
+
+Si existe una alternativa válida que no aparece en el documento, marcarla como:
+
+> **Alternativa de ingeniería:** ...
+
+Si el documento no cubre el punto, decirlo explícitamente:
+
+> **El documento no especifica este punto. A partir de aquí uso conocimiento adicional de
+> ingeniería.**
+
+Nunca presentar una inferencia como si fuera un requisito del curso.
+
+## 3.3 No adaptar a la fuerza lo del Proyecto 1
+
+El Proyecto 1 fue una planta térmica SISO, estable en lazo abierto, de primer orden con
+tiempo muerto, y se usaron las reglas SIMC. **Nada de eso se traslada automáticamente.**
+
+Antes de reusar un método del Proyecto 1, la IA debe comprobar que las hipótesis se cumplen
+en esta planta y decirlo. En particular:
+
+- **SIMC solo aplica a plantas estables de tipo FOPDT.** Si la planta es inestable en lazo
+  abierto, integradora, de orden superior o MIMO, hay que elegir otro método y justificarlo.
+- **Un PI no estabiliza una planta inestable en lazo abierto.** Si ese es el caso, el diseño
+  necesita acción derivativa, estructura en cascada, o realimentación de estados con
+  observador.
+- **Un ensayo escalón en lazo abierto puede no ser posible** si la planta se va a los límites
+  sin control. Entonces la identificación se hace desde la física y se valida en lazo cerrado.
+- **El periodo de muestreo puede no ser libre.** Si lo fija un sensor (frame rate de una
+  cámara, por ejemplo), eso es un dato, no una elección, y su latencia es tiempo muerto.
+
+Lo que **sí** se reusa sin cambios es la estructura del flujo, los criterios de evidencia, la
+disciplina de verificación y el formato del informe.
+
+---
+
+# 4. Etapas
+
+Trabajar **una etapa a la vez**, en orden, sin avanzar hasta que la anterior esté verificada.
+
+## Etapa A — Modelo de la planta
+
+- Plantear el modelo físico a partir de primeros principios, con las hipótesis explícitas.
+- Identificar qué es no lineal y por qué.
+- Linealizar alrededor del punto de operación y escribir la función de transferencia o el
+  modelo en espacio de estados, con valores numéricos y unidades.
+- Cuantificar el error de la aproximación lineal frente al modelo no lineal, para al menos
+  dos amplitudes de perturbación, y delimitar en qué rango es válida.
+
+**Conservar:** ecuaciones, hipótesis, parámetros con unidades, punto de operación, modelo
+lineal, error de la aproximación, CSV de las simulaciones.
+
+## Etapa B — Identificación y validación del modelo
+
+- Definir qué experimentos son **físicamente posibles** en esta planta (ver 3.3).
+- Registrar para cada ensayo: entrada aplicada, salida, tiempo, condiciones iniciales,
+  duración, número de muestras y cualquier observación.
+- Identificar el modelo y reportar sus parámetros con unidades.
+- **Validar con datos distintos de los usados para identificar.** Reportar métricas (RMSE,
+  MAE, sesgo, R², ajuste) y analizar la **estructura temporal del residuo**, no solo su
+  magnitud: un residuo con patrón indica qué parte del modelo falla.
+- Seleccionar el modelo nominal y justificarlo con los resultados reales. No promediar
+  parámetros de modelos distintos.
+
+**Conservar:** datos crudos, modelos, parámetros, métricas, residuos, modelo nominal escrito
+explícitamente, archivos `.mat`.
+
+## Etapa C — Diseño del controlador
+
+- Elegir la estructura del controlador y **justificar por qué esa y no otra**, a partir de la
+  dinámica de la planta (ver 3.3).
+- Elegir el método de sintonización y justificarlo igual.
+- Reportar los parámetros con unidades y la función de transferencia del controlador con
+  valores numéricos.
+- Reportar márgenes de estabilidad: frecuencia de cruce, margen de fase, margen de ganancia.
+- Escribir la implementación discreta explícita (ley de actualización del estado y salida) y
+  distinguir la ganancia continua del incremento por muestra.
+- Si el curso pide un **diseño alternativo** por otro método, debe ser una estrategia
+  realmente distinta, no la misma fórmula dentro de otra herramienta. Comparar ambos bajo
+  condiciones idénticas.
+
+**Conservar:** parámetros, función de transferencia, márgenes, criterio de diseño, archivo
+`.mat` con todo.
+
+## Etapa D — MIL (Model-in-the-Loop)
+
+- Evaluar el controlador contra el modelo de la planta.
+- Incluir **las restricciones reales del actuador**. Un controlador evaluado sin saturación no
+  dice nada sobre su comportamiento real.
+- Comparar como mínimo: controlador ideal, con saturación sin protección del integrador, y con
+  protección (anti-windup u otra). Todos bajo la **misma** referencia, planta, condición
+  inicial, `Ts`, configuración numérica y tiempo de simulación.
+- Reportar: tiempo de subida, tiempo de establecimiento, sobreimpulso, error estacionario,
+  valor extremo de la salida, mínimo y máximo de la acción de control, y tiempo en saturación.
+- **Verificar explícitamente el cumplimiento de los requisitos.** Que el método de diseño se
+  haya aplicado bien no demuestra por sí solo que se cumplan.
+- Explicar el mecanismo detrás de cada diferencia observada, no solo describir las curvas.
+
+**Conservar:** modelo, métricas, gráficas, CSV, comparación entre configuraciones.
+
+## Etapa E — Preparación y generación de código
+
+- Separar el controlador de la planta en su propio modelo. **La planta no va adentro.** Esa
+  separación es lo que permite generar código solo del algoritmo e instanciarlo en un banco de
+  pruebas.
+- Dejar el modelo del controlador como **referencia intocable** del resto de la verificación.
+  Cualquier variante posterior es una copia con otro nombre.
+- Definir la interfaz: qué entra, qué sale, en qué unidades.
+- Documentar solo las configuraciones de generación de código que hagan falta para entender la
+  implementación.
+- Correr los Advisors. Criterio: **cero resultados Fail**; las advertencias se revisan y se
+  justifican. **No usar `Fix All` ni modificaciones automáticas solo para que desaparezcan.**
+- Comprobar que la preparación no alteró el comportamiento validado en MIL.
+- Inspeccionar el código generado y verificar que conserve: interfaz, estado interno,
+  parámetros calibrables, saturación, lógica de protección del integrador, tipos de dato, y la
+  ausencia de la planta.
+
+**Conservar:** modelo del controlador, código generado, resultados de los Advisors, tabla de
+correspondencia modelo ↔ código.
+
+## Etapa F — SIL
+
+- Banco de pruebas con dos ramas, Normal y SIL, dentro de una misma simulación, compartiendo
+  referencia, planta, condiciones iniciales, `Ts` y tiempo de simulación.
+- Cada rama con su propia copia de la planta, porque las acciones de control se calculan
+  independientemente.
+- Comparar **muestra a muestra**. Reportar máximo absoluto de la diferencia, RMSE e igualdad
+  exacta, para cada señal.
+- Usar las diferencias (`señal_SIL − señal_Normal`) como evidencia gráfica.
+- **Que el código compile no demuestra nada.** El criterio es la equivalencia numérica.
+- Concluir qué verifica SIL y qué no.
+
+## Etapa G — PIL
+
+- Misma estructura de dos ramas, Normal y PIL, en un banco **separado** del de SIL.
+- No mantener simultáneamente una instancia SIL y una PIL del mismo modelo.
+- Documentar con precisión **qué se ejecuta en el procesador físico y qué sigue simulado**.
+- Conservar la estructura algorítmica y los parámetros sin cambios respecto de lo validado.
+- Reportar las mismas métricas de diferencia que en SIL.
+- Concluir qué evidencia adicional aporta PIL sobre SIL, y por qué un PASS todavía no es una
+  validación sobre la planta real.
+
+## Etapa H — Implementación física
+
+- Copia del controlador para implementación; el original se conserva.
+- Ajustar solo la representación numérica que exija el hardware, sin tocar el algoritmo.
+- Documentar la cadena completa: adquisición → conversión → filtrado → controlador →
+  limitación → actuación.
+- Lista de comprobación de seguridad antes de energizar.
+- Registrar las señales del experimento.
+- Comparar con MIL y **analizar las diferencias sin ocultarlas ni corregirlas
+  artificialmente**: incertidumbre del modelo, dinámica no modelada, perturbaciones, ruido,
+  cuantización, limitaciones del actuador, variaciones ambientales, efectos de implementación.
+
+---
+
+# 5. Interpretación de PASS / FAIL
+
+Un PASS significa únicamente que se cumplió **ese** criterio de verificación.
+
+- PASS en SIL → el código generado es consistente con el modelo bajo las condiciones evaluadas.
+- PASS en PIL → el código puede ejecutarse en el procesador objetivo conservando el comportamiento.
+- Ninguno de los dos sustituye la validación experimental sobre la planta real.
+
+Si una comparación da FAIL, **no se cierra la etapa** hasta identificar la causa.
+
+---
+
+# 6. Trazabilidad y archivo de estado
+
+Mantener en el proyecto un archivo `estado_proyecto.md`, actualizado al cerrar cada etapa, con:
+
+- parámetros del modelo y del controlador,
+- condiciones experimentales,
+- métricas obtenidas,
+- decisiones tomadas y su justificación,
+- discrepancias detectadas,
+- archivos generados y dónde están,
+- orden de columnas de cada CSV.
+
+Es lo que permite que una sesión nueva se ponga al día leyendo un archivo, en vez de
+reconstruir todo el historial.
+
+## Punto de control al cerrar cada etapa
+
+```
+Etapa: ...
+Completada: Sí / No
+Resultados obtenidos: ...
+Archivos generados: ...
+Datos pendientes: ...
+Problemas detectados: ...
+Decisiones tomadas: ...
+Qué debe conservarse: ...
+Siguiente etapa: ...
+```
+
+---
+
+# 7. Manejo de errores y resultados inesperados
+
+**Ante un error de MATLAB o Simulink:** pedir el mensaje completo si no está, identificar
+archivo y línea, explicar qué significa, determinar si es configuración, código, hardware o
+datos, proponer la corrección mínima, verificar que no contradiga el documento del curso, y
+recién entonces volver a ejecutar. **No cambiar varias cosas a la vez.**
+
+**Ante un resultado que no coincide con lo esperado:** no ajustar el resultado para que cuadre
+con la teoría. Revisar primero parámetros, unidades, condiciones iniciales, punto de
+operación, signos, periodo de muestreo, retardo, saturación, configuración del solver, datos y
+nombres de variables. Después analizar causas físicas o matemáticas.
+
+---
+
+# 8. Informe
+
+El informe debe poder responder, con evidencia: cuál era el problema de control, cuál la
+planta, qué modelo se usó y cómo se obtuvo, por qué se eligió el nominal, cómo se validó, por
+qué esa estructura de controlador, cómo se calcularon sus parámetros, qué desempeño tuvo en
+MIL, qué efecto tuvieron la saturación y la protección del integrador, cómo se comportó el
+diseño alternativo, cuál se seleccionó y por qué, qué resultó en SIL y en PIL, qué se ejecutó
+físicamente en PIL, qué pasó en la implementación, qué diferencias hubo entre modelo y planta
+real, si se cumplieron los requisitos, qué limitaciones tuvieron el modelo y la
+implementación, y qué evidencia respalda cada conclusión.
+
+**Estilo:** redacción de estudiante universitario de Ingeniería Electrónica. Natural, sin
+lenguaje recargado ni frases que suenen automáticas. No exagerar conclusiones. Diferenciar
+resultados de interpretaciones. Mantener los nombres de variables y archivos del curso.
+Unidades correctas. Coherencia entre texto, tablas y gráficas. Cantidad razonable de cifras
+significativas.
+
+**Antes de escribir el informe, revisar si el curso entregó un instructivo de formato** —
+extensión, estructura de secciones, dos columnas, anexos permitidos. Eso manda sobre cualquier
+estructura que se haya planeado antes.
+
+---
+
+# 9. Lecciones del Proyecto 1 que conviene no repetir
+
+- **Recalcular las métricas desde los datos crudos** antes de ponerlas en el informe, y anotar
+  al lado con qué definición se calcularon. En el Proyecto 1, cinco valores anotados a mano no
+  reproducían los CSV porque se habían calculado sobre ventanas distintas.
+- **Fijar una sola definición** de tiempo de establecimiento, sobreimpulso y error estacionario
+  para todo el proyecto, y usarla en simulación y en experimento. Si no, las comparaciones no
+  significan nada.
+- **Los datos crudos van a CSV en la carpeta del proyecto, no pegados en el chat.**
+- **Verificar las hipótesis de una herramienta de identificación antes de creerle el
+  resultado.** Un estimador puede converger a un número perfectamente plausible y equivocado
+  si se le entregan los datos en la forma incorrecta.
+- **Una sesión por etapa.** Al cerrar una etapa, actualizar `estado_proyecto.md` y abrir sesión
+  nueva.
+
+---
+
+# 10. Regla principal
+
+> documento del curso → datos reales obtenidos → análisis → decisión → siguiente etapa
+
+Nunca:
+
+> suposición → resultado inventado → conclusión
+
+Cada resultado debe poder relacionarse con una ejecución real, un archivo, una medición, una
+simulación o una decisión documentada.

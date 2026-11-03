@@ -1,0 +1,129 @@
+\section{Generación de código y verificación de software}
+
+\subsection{Implementación del controlador}
+
+El sistema bajo prueba (\emph{System Under Test}, SUT) es el modelo \texttt{Controller.slx}, que
+contiene únicamente el algoritmo de control. Su interfaz es
+$\Tref,\,T_1 \rightarrow Q_1$: recibe la referencia y la temperatura medida, ambas en
+\si{\celsius}, y entrega la potencia comandada en porcentaje. Internamente ejecuta la ley discreta
+\eqref{eq:pidiscreto} con $T_s = \SI{1}{\second}$, aplica la saturación
+$Q_1 \in [0,90]\,\si{\percent}$ y el anti-windup por \emph{clamping}. La Fig.~\ref{fig:controller}
+muestra su estructura.
+
+\pendiente{Insertar aquí la captura de \texttt{Controller.slx} (Simulink) como
+\texttt{figuras/controller.png}. Es la única captura que el instructivo pide explícitamente.}
+
+\begin{figure}[!t]
+\centering
+% \includegraphics[width=\columnwidth]{figuras/controller.png}
+\framebox[0.95\columnwidth][c]{\rule{0pt}{3.2cm}\scriptsize Figura de \texttt{Controller.slx}}
+\caption{Modelo \texttt{Controller.slx}: implementación discreta del PI--SIMC con saturación y
+anti-windup por \emph{clamping}.}
+\label{fig:controller}
+\end{figure}
+
+La planta no forma parte de este modelo. Esa separación es deliberada: es lo que permite generar
+código solo del algoritmo, instanciarlo varias veces dentro de un banco de pruebas y sustituir una
+instancia por su versión compilada sin alterar el resto del lazo. Para ello el modelo se configuró
+con \texttt{Code interface packaging = Reusable function} y se habilitaron múltiples instancias por
+modelo de nivel superior.
+
+De la configuración de generación de código solo interesan aquí tres decisiones. La primera es el
+uso de \texttt{ert.tlc} con lenguaje C bajo el estándar C99, que produce código orientado a sistemas
+embebidos \cite{mw_codegen}. La segunda es el solver de paso fijo discreto con paso $T_s$, coherente
+con \eqref{eq:pidiscreto}. La tercera es \texttt{Default parameter behavior = Inlined} combinado con
+la clase de almacenamiento \texttt{ExportedGlobal} para $Kp_{SIMC}$ y $Ki_{SIMC}$: el resto de las
+constantes se incrusta en el código, pero las dos ganancias permanecen como variables globales y por
+tanto siguen siendo calibrables sin regenerar. Para la etapa SIL el hardware objetivo fue la propia
+computadora (Intel x86-64), no todavía el Arduino.
+
+Las comprobaciones previas a la generación ---\emph{Code Generation Advisor} con los objetivos
+\emph{Execution efficiency} y \emph{Traceability}, y \emph{Model Advisor}--- no reportaron ningún
+fallo. La única advertencia relevante se refiere al soporte de valores no finitos en el entorno de
+software, que no afecta al algoritmo implementado; no se aplicaron correcciones automáticas para
+eliminarla.
+
+\subsection{Inspección del código generado}
+
+La revisión del código C verificó que las características esenciales del controlador sobrevivieran
+a la generación. La Tabla~\ref{tab:codigo} resume la correspondencia encontrada.
+
+\begin{table}[!t]
+\caption{Correspondencia entre el modelo y el código generado.}
+\label{tab:codigo}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.27\columnwidth}p{0.63\columnwidth}@{}}
+\toprule
+\textbf{Característica} & \textbf{Evidencia en el código} \\
+\midrule
+Interfaz &
+\texttt{void Controller(const real\_T *rtu\_T\_ref, const real\_T *rtu\_T1, real\_T *rty\_Q1,
+DW\_Controller\_f\_T *localDW)} \\
+\addlinespace
+Estado del integrador &
+Campo único \texttt{Integrator\_DSTATE} dentro de la estructura de estado \texttt{DW\_Controller\_f\_T} \\
+\addlinespace
+Parámetros calibrables &
+\texttt{real\_T Kp\_SIMC = 7.620337;} y \texttt{real\_T Ki\_SIMC = 0.079379;} definidos como
+variables globales \\
+\addlinespace
+Saturación &
+Ramas explícitas con los límites \texttt{90.0} y \texttt{0.0} sobre la salida \\
+\addlinespace
+Anti-windup &
+Condición que anula el incremento integral cuando hay exceso y su signo coincide con el del error \\
+\addlinespace
+Tipo de dato &
+\texttt{typedef double real\_T} \\
+\addlinespace
+Separación controlador--planta &
+El archivo generado no contiene ningún modelo de la planta \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El punto menos evidente es el anti-windup, porque en el código no aparece como un bloque sino como
+una condición aritmética. El fragmento correspondiente es
+
+\begin{lstlisting}
+if ((rtb_DeadZone != 0.0) && (tmp == tmp_0)) {
+  rtb_IntegralGain = 0.0;
+}
+localDW->Integrator_DSTATE += rtb_IntegralGain;
+\end{lstlisting}
+
+La variable \texttt{rtb\_DeadZone} mide cuánto excede el comando el rango permitido y vale cero
+mientras no hay saturación; \texttt{tmp} y \texttt{tmp\_0} codifican los signos del exceso y del
+término integral. Cuando hay saturación y ambos signos coinciden, el incremento se fuerza a cero y
+el estado del integrador no cambia. Esa es exactamente la lógica de \emph{clamping} evaluada en
+MIL.
+
+\subsection{Verificación Software-in-the-Loop}
+
+En SIL el código generado se compila y ejecuta sobre la computadora dentro de la misma simulación
+\cite{mw_sil}. El banco \texttt{TCLab\_Test\_SIL.slx} contiene dos ramas que comparten referencia,
+temperatura ambiente, modelo de planta, condición inicial, periodo de muestreo y tiempo de
+simulación; la única diferencia es que una instancia del controlador se ejecuta en modo Normal y la
+otra en modo SIL. La comparación es por tanto \emph{back-to-back}: misma entrada, dos
+implementaciones del mismo algoritmo.
+
+Las diferencias evaluadas fueron
+
+\begin{equation}
+\Delta Q_1 = Q_{1,\mathrm{SIL}} - Q_{1,\mathrm{Normal}},
+\qquad
+\Delta T_1 = T_{1,\mathrm{SIL}} - T_{1,\mathrm{Normal}},
+\label{eq:difsil}
+\end{equation}
+
+sobre las \num{1801} muestras de los \SI{1800}{\second} simulados. Ambas resultaron idénticamente
+nulas, como se observa en la Fig.~\ref{fig:diferencias} y se cuantifica en la
+Tabla~\ref{tab:silpil}, de modo que la prueba satisface el criterio de equivalencia con igualdad
+exacta y no solo dentro de una tolerancia.
+
+Este resultado verifica que la traducción de modelo a código C no introdujo diferencias numéricas:
+el orden de las operaciones, la actualización del estado y la lógica de saturación y anti-windup se
+conservaron. No verifica, en cambio, nada relacionado con el procesador final, porque el código se
+compiló para la arquitectura del computador anfitrión y con aritmética \texttt{double}. Tampoco
+dice nada sobre la planta, que sigue siendo un modelo.

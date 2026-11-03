@@ -1,0 +1,86 @@
+\section{Verificación Processor-in-the-Loop}
+
+En PIL el código del controlador se compila para el procesador objetivo, se descarga a la tarjeta y
+se ejecuta allí, mientras Simulink intercambia con ella las señales de entrada y salida en cada
+periodo de muestreo \cite{mw_pil}. El procesador empleado fue un Arduino Uno R4 Minima, utilizado
+exclusivamente como plataforma de verificación y no como el destino final del controlador.
+
+El reparto entre lo que se ejecuta físicamente y lo que permanece simulado es el punto clave de esta
+etapa. Sobre el Arduino se ejecuta únicamente el algoritmo de control: la ley PI discreta, la
+saturación y el anti-windup, con el estado del integrador residiendo en la memoria del
+microcontrolador. Todo lo demás sigue siendo un modelo dentro de Simulink: la planta FOPDT, el
+tiempo muerto, la temperatura ambiente y la referencia. No intervienen el sensor ni el calentador de
+la TCLab.
+
+El banco \texttt{TCLab\_Test\_PIL.slx} emplea de nuevo dos ramas que referencian
+\texttt{Controller.slx}, una en modo Normal y otra en modo PIL. A diferencia del banco SIL, las dos
+ramas comparten solo las fuentes $\Tref$ y $\Tamb$, y cada una conserva su propia copia del retardo
+y de la planta. Esa separación es necesaria porque, si las ramas compartieran la planta, cualquier
+discrepancia entre las acciones de control produciría trayectorias de temperatura distintas y
+dejaría de poder atribuirse la diferencia a una sola causa. Tampoco se mantuvieron simultáneamente
+una instancia SIL y una PIL referenciando el mismo modelo.
+
+Las diferencias evaluadas fueron las análogas a \eqref{eq:difsil},
+$\Delta Q_1 = Q_{1,\mathrm{PIL}} - Q_{1,\mathrm{Normal}}$ y
+$\Delta T_1 = T_{1,\mathrm{PIL}} - T_{1,\mathrm{Normal}}$, sobre las mismas \num{1801} muestras. El
+resultado fue también de igualdad exacta (Fig.~\ref{fig:diferencias} y Tabla~\ref{tab:silpil}). No
+se observó ninguna diferencia que analizar, lo cual es consistente con haber conservado el tipo
+\texttt{double} y la misma estructura algorítmica en las tres ejecuciones.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.3cm,
+                  xmin=0, xmax=1800, legend pos=north east]
+\nextgroupplot[ylabel={$\Delta Q_1$ (\si{\percent})}, xticklabels={}, ymin=-1, ymax=1]
+  \addplot[cAzul, line width=1.4pt, opacity=0.45] table[col sep=comma, x index=0,
+    y expr=\thisrowno{2}-\thisrowno{1}] {\G/GRAFComparacionNormalSIL.csv};
+  \addplot[cNaranja, dashed] table[col sep=comma, x index=0,
+    y expr=\thisrowno{2}-\thisrowno{1}] {\G/GRAFComparacionNormalPIL.csv};
+  \legend{SIL, PIL}
+\nextgroupplot[ylabel={$\Delta T_1$ (\si{\celsius})}, xlabel={Tiempo (\si{\second})},
+               ymin=-1, ymax=1]
+  \addplot[cAzul, line width=1.4pt, opacity=0.45] table[col sep=comma, x index=0,
+    y expr=\thisrowno{4}-\thisrowno{3}] {\G/GRAFComparacionNormalSIL.csv};
+  \addplot[cNaranja, dashed] table[col sep=comma, x index=0,
+    y expr=\thisrowno{4}-\thisrowno{3}] {\G/GRAFComparacionNormalPIL.csv};
+  \legend{SIL, PIL}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Diferencias \emph{back-to-back} respecto de la ejecución Normal. Las cuatro trazas son
+idénticamente nulas en las \num{1801} muestras; la escala vertical se fijó en
+$\pm\num{1}$ para hacer visible que no hay desviación alguna.}
+\label{fig:diferencias}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Resultados cuantitativos de las verificaciones SIL y PIL, sobre \num{1801} muestras
+($T_s = \SI{1}{\second}$, \SI{1800}{\second} de simulación).}
+\label{tab:silpil}
+\centering
+\footnotesize
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{SIL}} & \multicolumn{2}{c}{\textbf{PIL}} & \multicolumn{2}{c}{\textbf{Igualdad exacta}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+\textbf{Señal} & Máx.\ abs. & RMSE & Máx.\ abs. & RMSE & SIL & PIL \\
+\midrule
+$Q_1$ (\si{\percent})   & 0 & 0 & 0 & 0 & Sí & Sí \\
+$T_1$ (\si{\celsius})   & 0 & 0 & 0 & 0 & Sí & Sí \\
+\midrule
+\multicolumn{5}{@{}l}{\textbf{Resultado}} & \textbf{PASS} & \textbf{PASS} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La evidencia que aporta PIL es distinta de la de SIL. SIL comprueba la traducción de modelo a código
+usando el compilador y la aritmética del computador anfitrión; PIL añade que ese mismo código se
+compila con la cadena de herramientas del procesador objetivo, cabe en su memoria y produce los
+mismos resultados ejecutándose sobre él. Es decir, PIL cubre los efectos del compilador cruzado, de
+los tamaños de palabra y del comportamiento aritmético del dispositivo, que SIL no puede detectar.
+
+Aun así, un PASS en PIL no constituye una validación del controlador sobre la TCLab. Durante la
+prueba la planta y el retardo siguen siendo modelos, $\Tamb$ es una señal de Simulink, no se mide
+temperatura con el sensor real ni se acciona el calentador, no se ejercitan los canales físicos de
+entrada y salida, y la ejecución no se realiza en tiempo real contra un proceso físico. Lo que PIL
+verifica es el código y su ejecución sobre el procesador, no el lazo cerrado sobre la planta.

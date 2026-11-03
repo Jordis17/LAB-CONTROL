@@ -1,0 +1,32 @@
+\section{Introducción}
+
+La Temperature Control Lab (TCLab) es una planta térmica didáctica montada sobre un Arduino
+Leonardo. Dispone de dos transistores que actúan como calentadores y de dos sensores de temperatura
+adheridos a ellos; la potencia de cada calentador se comanda como un porcentaje de su valor máximo
+y la temperatura se mide en grados Celsius. En este trabajo se utilizó únicamente el primer par
+calentador--sensor, de modo que la variable manipulada es $Q_1$, expresada en porcentaje, y la
+variable controlada es $T_1$.
+
+El problema de control consiste en llevar $T_1$ desde la temperatura ambiente hasta una referencia
+de \SI{60}{\celsius} y mantenerla en ese valor, respetando el límite de potencia
+$Q_1 \in [0, 90]\,\si{\percent}$ impuesto para proteger el equipo. Los requisitos de desempeño
+establecidos fueron un tiempo de establecimiento $t_s \leq \SI{600}{\second}$ y un sobreimpulso
+$M_p \leq \SI{5}{\percent}$.
+
+El objetivo del trabajo no se limita a obtener un controlador que funcione en simulación, sino a
+recorrer un flujo completo de diseño basado en modelos (\emph{Model-Based Design}, MBD). En este
+enfoque el modelo ejecutable es el eje del desarrollo, y entre el diseño matemático y el sistema
+físico se intercalan etapas sucesivas de verificación que comprueban aspectos distintos de la
+solución \cite{mw_hil}. El flujo seguido fue
+
+\begin{center}
+modelado $\rightarrow$ identificación $\rightarrow$ diseño $\rightarrow$ MIL $\rightarrow$
+código $\rightarrow$ SIL $\rightarrow$ PIL $\rightarrow$ implementación física.
+\end{center}
+
+Cada etapa acota el riesgo de la siguiente. La evaluación \emph{Model-in-the-Loop} (MIL) comprueba
+el desempeño del algoritmo contra un modelo de la planta; \emph{Software-in-the-Loop} (SIL)
+verifica que el código generado se comporte como el modelo del que proviene;
+\emph{Processor-in-the-Loop} (PIL) verifica que ese código conserve su comportamiento al ejecutarse
+sobre el procesador objetivo; y solo entonces el controlador se cierra sobre la planta real. El
+documento sigue ese mismo orden.

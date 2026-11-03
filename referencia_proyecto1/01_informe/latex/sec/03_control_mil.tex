@@ -1,0 +1,192 @@
+\section{Diseño del controlador y evaluación MIL}
+
+\subsection{Diseño del controlador PI}
+
+Se empleó un controlador PI en forma paralela continua,
+
+\begin{equation}
+G_c(s) = \Kp + \frac{\Ki}{s} = \Kp\left(1 + \frac{1}{\Ti s}\right),
+\qquad \Ki = \frac{\Kp}{\Ti},
+\label{eq:pi}
+\end{equation}
+
+empleada en ambos diseños, con $e = \Tref - T_1$ en \si{\celsius} y salida en porcentaje de
+potencia, de modo que
+$[\Kp] = \si{\percent\per\celsius}$, $[\Ti] = \si{\second}$ y
+$[\Ki] = \si{\percent\per\celsius\per\second}$. La acción integral es necesaria porque la planta no
+tiene integrador propio y se requiere error estacionario nulo ante una referencia constante.
+
+El primer diseño utilizó las reglas SIMC \cite{skogestad2003}, que para un modelo FOPDT dan
+
+\begin{equation}
+\Kp = \frac{1}{K}\,\frac{\tau}{\tau_c + \theta},
+\qquad
+\Ti = \min\{\tau,\; 4(\tau_c + \theta)\},
+\label{eq:simc}
+\end{equation}
+
+donde $\tau_c$ es la constante de tiempo deseada en lazo cerrado. Se fijó $\tau_c = 2\theta$, un
+valor conservador que prioriza robustez frente a rapidez. Con los parámetros de \eqref{eq:gpnom}
+resulta $\tau_c = \SI{16}{\second}$ y $\tau_c + \theta = \SI{24}{\second}$; como
+$4(\tau_c+\theta) = \SI{96}{\second} < \tau$, el tiempo integral queda truncado por la segunda rama
+de \eqref{eq:simc}.
+
+El segundo diseño se obtuvo con \emph{Control System Designer} sobre la misma planta nominal,
+usando una estrategia distinta: en lugar de aplicar una fórmula de sintonización se moldeó la
+respuesta en frecuencia del lazo abierto añadiendo un integrador y un cero real, y ajustando la
+ganancia hasta cumplir dos criterios propios más exigentes que los de SIMC, margen de fase mayor a
+\SI{70}{\degree} y margen de ganancia mayor a \SI{20}{\decibel}. La herramienta aproxima el retardo
+mediante Padé para trazar el lugar de las raíces; los márgenes y las métricas reportadas se
+recalcularon con el retardo exacto para evitar que esa aproximación contaminara la comparación.
+
+Los dos controladores resultantes, en la forma \eqref{eq:pi}, son
+
+\begin{equation}
+G_{c,\mathrm{SIMC}}(s) = 7{,}62 + \frac{0{,}0794}{s},
+\quad
+G_{c,\mathrm{CSD}}(s) = 3{,}00 + \frac{0{,}0200}{s},
+\label{eq:gc}
+\end{equation}
+
+con $\Kp$ en \si{\percent\per\celsius} y $\Ki$ en \si{\percent\per\celsius\per\second}. La
+Tabla~\ref{tab:controladores} resume ambos diseños y su comportamiento sobre el modelo nominal.
+
+\begin{table}[!t]
+\caption{Controladores diseñados y su comportamiento sobre el modelo lineal nominal.}
+\label{tab:controladores}
+\centering
+\footnotesize
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Parámetro} & \textbf{PI--SIMC} & \textbf{PI--CSD} \\
+\midrule
+$\Kp$ (\si{\percent\per\celsius})                & 7,62   & 3,00 \\
+$\Ki$ (\si{\percent\per\celsius\per\second})    & 0,0794 & 0,0200 \\
+$\Ti$ (\si{\second})                             & 96     & 150 \\
+\midrule
+Frecuencia de cruce (\si{\radian\per\second})    & 0,0425 & 0,0168 \\
+Margen de fase (\si{\degree})                     & 64,2   & 79,1 \\
+Margen de ganancia (\si{\decibel})                & 13,3   & 21,5 \\
+\midrule
+$t_s$ lineal (\si{\second})                       & 202,3  & 161,9 \\
+$M_p$ lineal (\si{\percent})                      & 7,76   & 1,67 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sobre el modelo lineal, sin restricciones de actuador, el controlador obtenido con
+\emph{Control System Designer} se ve mejor en ambas métricas y además tiene márgenes mayores. Ese
+resultado, sin embargo, no considera el límite de potencia, que es precisamente lo que evalúa la
+etapa siguiente.
+
+\subsection{Evaluación Model-in-the-Loop}
+
+El controlador PI--SIMC de \eqref{eq:gc} se implementó de forma discreta con $T_s = \SI{1}{\second}$ e
+integración por Euler hacia adelante,
+
+\begin{equation}
+I[k+1] = I[k] + \Ki T_s\, e[k],
+\qquad
+\Qcmd[k] = \Kp\, e[k] + I[k],
+\label{eq:pidiscreto}
+\end{equation}
+
+distinguiendo la ganancia integral continua $\Ki$ del incremento por muestra $\Ki T_s$. La planta se
+representó con \eqref{eq:gpnom} discretizada, con el retardo como ocho muestras de atraso. Se
+simularon tres configuraciones bajo idénticas condiciones ---misma referencia, misma planta, misma
+condición inicial, $\Tamb = \SI{24}{\celsius}$, $\Tref = \SI{60}{\celsius}$ y
+\SI{1800}{\second} de simulación---: PI ideal sin restricciones, PI con saturación
+$Q_1 \in [0,90]\,\si{\percent}$ sin anti-windup, y PI con saturación y anti-windup por
+\emph{clamping}, que congela el integrador mientras la salida está saturada y el error empuja en
+la dirección de la saturación \cite{mw_antiwindup}. Los resultados se muestran en la
+Fig.~\ref{fig:mil} y la Tabla~\ref{tab:mil}; las métricas se calcularon con \texttt{stepinfo}
+\cite{mw_stepinfo}.
+
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.3cm}, estilo, ancho,
+                  xlabel={Tiempo (\si{\second})}, xmin=0, xmax=800]
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, legend pos=south east, ymin=20, ymax=75]
+  \addplot[cGris, dashed, domain=0:800, samples=2] {60};
+  \addplot[cRojo]  table[col sep=comma, x index=0, y index=2] {\G/GRAFControladoresTemperatura.csv};
+  \addplot[cVerde] table[col sep=comma, x index=0, y index=3] {\G/GRAFControladoresTemperatura.csv};
+  \addplot[cAzul]  table[col sep=comma, x index=0, y index=1] {\G/GRAFControladoresTemperatura.csv};
+  \legend{$\Tref$, Saturado sin AW, PI ideal, Saturado con AW}
+\nextgroupplot[ylabel={Potencia (\si{\percent})}, legend pos=north east, ymin=-20, ymax=320]
+  \addplot[cVerde]        table[col sep=comma, x index=0, y index=4] {\G/GRAFControladores.csv};
+  \addplot[cRojo, dotted] table[col sep=comma, x index=0, y index=3] {\G/GRAFControladores.csv};
+  \addplot[cRojo]         table[col sep=comma, x index=0, y index=2] {\G/GRAFControladores.csv};
+  \addplot[cAzul]         table[col sep=comma, x index=0, y index=1] {\G/GRAFControladores.csv};
+  \legend{$\Qcmd$ ideal, $\Qcmd$ sin AW, $Q_1$ sin AW, $Q_1$ con AW}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Evaluación MIL del PI--SIMC en tres configuraciones. Izquierda: temperatura. Derecha:
+potencia comandada $\Qcmd$ y potencia aplicada $Q_1$. Se muestran los primeros
+\SI{800}{\second} de los \SI{1800}{\second} simulados.}
+\label{fig:mil}
+\end{figure*}
+
+\begin{table}[!t]
+\caption{Métricas MIL. Las tres primeras columnas corresponden al PI--SIMC; la última, al PI--CSD
+bajo idénticas condiciones de simulación.}
+\label{tab:mil}
+\centering
+\footnotesize
+\begin{tabular}{@{}lS[table-format=3.1]S[table-format=3.1]S[table-format=3.1]S[table-format=3.1]@{}}
+\toprule
+\textbf{Métrica} & {\textbf{Ideal}} & {\textbf{Sin AW}} & {\textbf{Con AW}} & {\textbf{CSD}} \\
+\midrule
+Tiempo de subida (\si{\second})        & 25.2  & 74.6  & 84.5  & 133.7 \\
+$t_s$ (\si{\second})                   & 202.3 & 391.7 & 205.0 & 251.9 \\
+$M_p$ (\si{\percent})                  & 7.76  & 30.1  & 0.00  & 0.00 \\
+$e_{ss}$ (\si{\celsius})               & 0.00  & 0.00  & 0.00  & 0.00 \\
+$T_{1,\max}$ (\si{\celsius})           & 62.8  & 70.8  & 60.0  & 60.0 \\
+$Q_1$ mínimo aplicado (\si{\percent})  & 34.7  & 28.7  & 36.8  & 36.8 \\
+$Q_1$ máximo aplicado (\si{\percent})  & 297.4 & 90.0  & 90.0  & 90.0  \\
+Tiempo con $Q_1$ saturada (\si{\second}) & {---} & 127   & 66    & 21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El PI ideal cumple los requisitos en simulación, pero exige un máximo de \SI{297}{\percent} de
+potencia. Ese resultado es físicamente irrealizable y muestra que evaluar el controlador sin las
+restricciones del actuador no permite concluir nada sobre su comportamiento real.
+
+Al introducir la saturación sin anti-windup el desempeño se degrada de forma marcada: el
+sobreimpulso pasa de \SI{7.76}{\percent} a \SI{30.1}{\percent} y el tiempo de establecimiento casi
+se duplica. El mecanismo es visible en la Fig.~\ref{fig:mil}. Durante los primeros
+\SI{127}{\second} el comando permanece por encima del límite, de modo que el error sigue
+integrándose aunque la potencia aplicada ya no pueda aumentar. Cuando $T_1$ cruza la referencia en
+$t = \SI{103}{\second}$ el integrador acumula un excedente que el error negativo debe descargar
+antes de que el comando vuelva al rango útil, lo que ocurre \SI{24}{\second} después. La planta
+entretanto sigue recibiendo el \SI{90}{\percent} de potencia y alcanza \SI{70.8}{\celsius}. Para
+recuperarse, el controlador debe reducir la potencia hasta el \SI{28.7}{\percent} en
+$t = \SI{186}{\second}$, por debajo del \SI{36.8}{\percent} que la planta necesita en régimen.
+
+Con \emph{clamping} el integrador deja de acumular mientras la salida está saturada, la saturación
+dura \SI{66}{\second} en lugar de \SI{127}{\second} y la respuesta llega a la referencia sin
+sobrepasarla. De las tres configuraciones, solo esta cumple simultáneamente
+$t_s \leq \SI{600}{\second}$ y $M_p \leq \SI{5}{\percent}$; la configuración sin anti-windup falla
+el requisito de sobreimpulso por un factor de seis. Conviene notar que el anti-windup cuesta
+\SI{10}{\second} de tiempo de subida frente al caso sin protección, un precio bajo comparado con lo
+que evita.
+
+La última columna de la Tabla~\ref{tab:mil} incorpora el PI--CSD con saturación y anti-windup, bajo
+la misma planta, el mismo $T_s$, los mismos límites, la misma condición inicial y el mismo tiempo de
+simulación.\footnote{En esa corrida la columna PI--SIMC da $t_r = \SI{84.56}{\second}$ y
+$t_s = \SI{205.18}{\second}$; la diferencia respecto de la tercera columna es de interpolación
+sub-muestra de \texttt{stepinfo} y no de comportamiento.} Ambos controladores cumplen los
+requisitos y ambos alcanzan la referencia sin sobreimpulso y sin error estacionario, de modo que la
+comparación se decide por rapidez y por esfuerzo de control. El PI--SIMC establece \SI{47}{\second}
+antes, pero pide un comando inicial de \SI{274}{\percent} y mantiene el actuador saturado
+\SI{66}{\second}; el PI--CSD pide \SI{108}{\percent} y satura solo \SI{21}{\second}, a cambio de un
+tiempo de subida \SI{57}{\percent} mayor. Es decir, el PI--CSD opera mucho más cerca de la
+capacidad real del actuador y tiene márgenes de estabilidad mayores, mientras que el PI--SIMC
+aprovecha mejor la autoridad disponible.
+
+Ninguno de los dos domina al otro. Como ambos satisfacen las especificaciones con holgura y el
+tiempo de establecimiento no es crítico en esta planta, un criterio de robustez favorecería al
+PI--CSD. Para las etapas de generación y verificación de código se utilizó el PI--SIMC con
+saturación y anti-windup, según lo establecido en la guía de laboratorio, y el PI--CSD se conservó
+como contraste metodológico.

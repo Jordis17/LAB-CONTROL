@@ -1,0 +1,236 @@
+\section{Modelado e identificación del sistema}
+
+\subsection{Modelo físico}
+
+El conjunto formado por el transistor calentador y el sensor se representó como una única masa a
+temperatura uniforme. Bajo esa hipótesis, y considerando pérdidas por convección natural y por
+radiación hacia el entorno, el balance de energía conduce a \cite{hedengren_modeling}
+
+\begin{equation}
+m c_p \frac{dT}{dt} = \alpha Q - UA\,(T - T_a) - \epsilon\sigma A\,(T^4 - T_\infty^4),
+\label{eq:nolineal}
+\end{equation}
+
+donde $\alpha$ convierte el porcentaje de potencia comandado en vatios entregados al sistema, $UA$
+es el coeficiente global de convección, y $\epsilon$ y $\sigma$ son la emisividad y la constante de
+Stefan--Boltzmann. Las hipótesis adoptadas fueron masa concentrada y temperatura uniforme,
+convección predominantemente natural, potencia del calentador proporcional al comando, y
+$T_a \approx T_\infty$ por suponer el equipo y el recinto inicialmente en equilibrio térmico. Las
+temperaturas del término radiativo se manejaron en kelvin.
+
+La no linealidad de \eqref{eq:nolineal} proviene exclusivamente del término $T^4$. Linealizando
+alrededor de un punto de operación $(\bar T, \bar Q)$ y definiendo las variables de desviación
+$\Delta T = T - \bar T$ y $\Delta Q = Q - \bar Q$, se obtiene \cite{hedengren_linearize}
+
+\begin{equation}
+\frac{d\,\Delta T}{dt} = \gamma\,\Delta T + \beta\,\Delta Q,
+\label{eq:lineal}
+\end{equation}
+
+\vspace{-3mm}
+\begin{equation}
+\gamma = -\frac{UA + 4\epsilon\sigma A \bar T^{3}}{m c_p},
+\qquad
+\beta = \frac{\alpha}{m c_p},
+\label{eq:gammabeta}
+\end{equation}
+
+cuya función de transferencia es de primer orden,
+
+\begin{equation}
+G(s) = \frac{K}{\tau s + 1},
+\qquad \tau = -\frac{1}{\gamma},
+\qquad K = -\frac{\beta}{\gamma}.
+\label{eq:g1orden}
+\end{equation}
+
+En \eqref{eq:lineal} el coeficiente $\gamma$, dado por \eqref{eq:gammabeta}, reúne las dos vías de
+pérdida, y es el término radiativo el que lo hace depender del punto de operación. El punto empleado fue
+$\bar Q = \SI{50}{\percent}$; los valores de $\tau$ y $K$ que resultan de \eqref{eq:g1orden} se
+resumen en la Tabla~\ref{tab:fisico}.
+
+\begin{table}[!t]
+\caption{Modelo físico linealizado en $\bar Q = \SI{50}{\percent}$ y error de la aproximación
+lineal frente al modelo no lineal.}
+\label{tab:fisico}
+\centering
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Magnitud} & \textbf{Valor} \\
+\midrule
+Temperatura de equilibrio $\bar T$        & \SI{60.47}{\celsius} \\
+Pérdida por convección en equilibrio      & \SI{0.2188}{\watt} (\SI{43.8}{\percent}) \\
+Pérdida por radiación en equilibrio       & \SI{0.2811}{\watt} (\SI{56.2}{\percent}) \\
+$\gamma$                                  & \SI{-7.548e-3}{\per\second} \\
+$\beta$                                   & \SI{5.000e-3}{\celsius\per\percent\per\second} \\
+Constante de tiempo $\tau$                & \SI{132.5}{\second} \\
+Ganancia estática $K$                     & \SI{0.6625}{\celsius\per\percent} \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Error del modelo lineal frente al no lineal}} \\
+$\Delta Q = \SI{5}{\percent}$: error final / RMSE   & \SI{0.029}{\celsius} / \SI{0.022}{\celsius} \\
+$\Delta Q = \SI{40}{\percent}$: error final / RMSE  & \SI{1.744}{\celsius} / \SI{1.337}{\celsius} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Los dos últimos renglones de la Tabla~\ref{tab:fisico} delimitan el alcance de la aproximación
+lineal. Ante una perturbación de \SI{5}{\percent} el error no llega a \SI{0.03}{\celsius}, mientras
+que al multiplicar la amplitud por ocho el error crece casi sesenta veces. Este crecimiento no es
+proporcional porque el término omitido es de cuarto orden en la temperatura, y en el punto de
+operación la radiación ya aporta el \SI{56.2}{\percent} de las pérdidas totales. Es decir, el
+modelo lineal es útil para excursiones pequeñas alrededor del punto de operación, pero no para
+describir el calentamiento completo desde temperatura ambiente, que es justamente el transitorio
+que debe manejar el controlador. Esta limitación motivó obtener el modelo de diseño de forma
+experimental en lugar de usar los parámetros físicos.
+
+\subsection{Identificación experimental}
+
+Se realizaron dos experimentos sobre la unidad TCLab n.\textsuperscript{o}~4, con temperatura
+ambiente de \SI{24}{\celsius} y periodo de muestreo $T_s = \SI{1}{\second}$. El primero aplicó un
+escalón de $Q_1$ de \SIrange{0}{50}{\percent} y se registró durante \SI{1860}{\second}
+(\num{1861} muestras), partiendo de $T_1 = \SI{24.78}{\celsius}$. El segundo aplicó una secuencia
+multinivel con escalones sucesivos de \SIrange{10}{50}{\percent} durante \SI{3520}{\second}
+(\num{3521} muestras), partiendo de $T_1 = \SI{25.27}{\celsius}$. El ensayo escalón concentra la
+información en una sola transición amplia, mientras que el multinivel recorre varios niveles de
+potencia y permite observar si la ganancia del proceso depende de la región de operación.
+
+Ambos conjuntos se ajustaron a un modelo de primer orden con tiempo muerto (FOPDT)
+\cite{hedengren_fopdt},
+
+\begin{equation}
+G_p(s) = \frac{K\,e^{-\theta s}}{\tau s + 1},
+\label{eq:fopdt}
+\end{equation}
+
+expresado en variables de desviación, con $[K] = \si{\celsius\per\percent}$ y
+$[\tau] = [\theta] = \si{\second}$. Los parámetros de \eqref{eq:fopdt} se obtuvieron por dos vías: el procedimiento de
+mínimos cuadrados sobre la respuesta simulada empleado en la práctica, y la función
+\texttt{procest} de \emph{System Identification Toolbox} con estructura \texttt{P1D}. La
+Tabla~\ref{tab:fopdt} recoge los cuatro modelos y la Fig.~\ref{fig:experimentos} muestra las
+señales experimentales junto con la respuesta de los modelos identificados.
+
+\begin{table}[!t]
+\caption{Parámetros FOPDT identificados por ensayo y por método.}
+\label{tab:fopdt}
+\centering
+\footnotesize
+\begin{tabular}{@{}llS[table-format=1.3]S[table-format=3.1]S[table-format=1.2]S[table-format=2.1]@{}}
+\toprule
+\textbf{Ensayo} & \textbf{Método} & {$K$ (\si{\celsius\per\percent})} & {$\tau$ (\si{\second})}
+& {$\theta$ (\si{\second})} & {Ajuste (\si{\percent})} \\
+\midrule
+Escalón    & Práctica              & 0.979 & 179.1 & 8.00 & 93.0 \\
+Escalón    & \texttt{procest} P1D  & 0.979 & 178.7 & 8.36 & 93.0 \\
+Multinivel & Práctica              & 1.036 & 189.5 & 2.00 & 94.5 \\
+Multinivel & \texttt{procest} P1D  & 1.036 & 189.2 & 2.80 & 94.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 2, horizontal sep=1.3cm, vertical sep=0.9cm},
+                  estilo, ancho]
+\nextgroupplot[ylabel={$Q_1$ (\si{\percent})}, xticklabels={}, ymin=-5, ymax=60,
+               title={\scriptsize Ensayo escalón}, title style={yshift=-2pt}]
+  \addplot[cNaranja, aligera=3] table[col sep=comma, x=Tiempo_s, y=Q1_pct] {\G/IdentificacionSE.csv};
+\nextgroupplot[ylabel={$Q_1$ (\si{\percent})}, xticklabels={}, ymin=-5, ymax=60,
+               title={\scriptsize Ensayo multinivel}, title style={yshift=-2pt}]
+  \addplot[cNaranja, aligera=5] table[col sep=comma, x=Tiempo_s, y=Q1_pct] {\G/IdentificacionSM.csv};
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, xlabel={Tiempo (\si{\second})}, legend pos=south east]
+  \addplot[cAzul, aligera=3] table[col sep=comma, x=Tiempo_s, y=T1_experimental_C] {\G/IdentificacionSE.csv};
+  \addplot[cVerde, dashed, aligera=3] table[col sep=comma, x=Tiempo_s, y=T1_modelo_C] {\G/IdentificacionSE.csv};
+  \legend{Experimental, FOPDT}
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, xlabel={Tiempo (\si{\second})}, legend pos=south east]
+  \addplot[cAzul, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_experimental_C] {\G/IdentificacionSM.csv};
+  \addplot[cVerde, dashed, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_modelo_C] {\G/IdentificacionSM.csv};
+  \legend{Experimental, FOPDT}
+\end{groupplot}
+\end{tikzpicture}
+\caption{Señales de los dos experimentos de identificación y respuesta de los modelos FOPDT
+ajustados a cada uno. Izquierda: escalón de $Q_1$ a \SI{50}{\percent}. Derecha: secuencia
+multinivel de \SIrange{10}{50}{\percent}.}
+\label{fig:experimentos}
+\end{figure*}
+
+Los dos métodos coinciden en $K$ y $\tau$ hasta la tercera cifra significativa, lo que respalda la
+identificación. La única diferencia apreciable está en $\theta$: el procedimiento de la práctica
+cuantiza el tiempo muerto a un número entero de periodos de muestreo, mientras que
+\texttt{procest} lo estima como variable continua. Las diferencias resultantes, \SI{0.36}{\second}
+y \SI{0.80}{\second}, son menores que un periodo de muestreo y por tanto no distinguibles con los
+datos disponibles.
+
+La coincidencia entre ambos métodos depende de entregar los datos en variables de desviación: con
+las señales absolutas la estimación converge a $K \approx \SI{1.47}{\celsius\per\percent}$ y
+$\theta = 0$, valor que no es la ganancia del proceso sino el cociente
+$T_1(\infty)/\Delta Q_1$, porque el estimador debe explicar también el nivel inicial de
+temperatura.
+
+\subsection{Validación cruzada y selección del modelo}
+
+Cada modelo se simuló con la entrada del experimento que no se usó para identificarlo, manteniendo
+fijos $K$, $\tau$ y $\theta$. La Tabla~\ref{tab:validacion} reporta las métricas calculadas desde
+el primer cambio de $Q_1$, que es el intervalo que evalúa la respuesta dinámica, y la
+Fig.~\ref{fig:validacion} muestra el cruce del modelo seleccionado junto con su residuo.
+
+\begin{table}[!t]
+\caption{Validación cruzada. Métricas calculadas desde el primer cambio de $Q_1$.}
+\label{tab:validacion}
+\centering
+\footnotesize
+\begin{tabular}{@{}lS[table-format=1.2]S[table-format=1.2]S[table-format=+1.2]S[table-format=1.3]S[table-format=2.1]@{}}
+\toprule
+\textbf{Modelo $\rightarrow$ datos} & {RMSE} & {MAE} & {Sesgo} & {$R^2$} & {Ajuste} \\
+ & {(\si{\celsius})} & {(\si{\celsius})} & {(\si{\celsius})} & & {(\si{\percent})} \\
+\midrule
+Escalón $\rightarrow$ multinivel & 1.62 & 1.51 & +1.50 & 0.987 & 88.7 \\
+Multinivel $\rightarrow$ escalón & 2.63 & 2.41 & -2.41 & 0.934 & 74.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.6cm]
+\nextgroupplot[ylabel={$T_1$ (\si{\celsius})}, xticklabels={}, legend pos=south east]
+  \addplot[cAzul, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_experimental_C] {\G/validacionEscEnMul.csv};
+  \addplot[cVerde, dashed, aligera=5] table[col sep=comma, x=Tiempo_s, y=T1_modelo_C] {\G/validacionEscEnMul.csv};
+  \legend{Experimental, Modelo escalón}
+\nextgroupplot[ylabel={Residuo (\si{\celsius})}, xlabel={Tiempo (\si{\second})}]
+  \addplot[cRojo, aligera=5] table[col sep=comma, x=Tiempo_s, y=Residuo_C] {\G/validacionEscEnMul.csv};
+  \addplot[cGris, dashed, domain=0:3520, samples=2] {0};
+\end{groupplot}
+\end{tikzpicture}
+\caption{Validación del modelo identificado con el ensayo escalón sobre los datos multinivel, y
+residuo de predicción $e(k) = T_{1,\mathrm{exp}}(k) - T_{1,\mathrm{mod}}(k)$.}
+\label{fig:validacion}
+\end{figure}
+
+El modelo del ensayo escalón predice claramente mejor los datos independientes: su RMSE es un
+\SI{38}{\percent} menor y su ajuste es \num{14.3} puntos porcentuales mayor. Ninguno de los dos
+cruces está libre de sesgo. El modelo escalón subestima la temperatura en promedio
+\SI{1.50}{\celsius}, y el residuo de la Fig.~\ref{fig:validacion} crece de forma ordenada con el
+nivel de potencia: \num{+1.29}, \num{+0.88}, \num{+1.23}, \num{+1.85} y \SI{+2.20}{\celsius} para
+$Q_1$ de \num{10} a \SI{50}{\percent}. El modelo multinivel presenta el sesgo opuesto,
+\SI{-2.41}{\celsius}, es decir, sobreestima la temperatura del ensayo escalón. Ambos patrones
+apuntan al mismo origen: la ganancia efectiva de la planta no es constante, de modo que un modelo
+identificado en una región tiende a errar sistemáticamente en la otra. Esto es coherente con lo
+observado en la Sección~II-A, donde el peso creciente del término radiativo hacía que una única
+recta no describiera todo el rango.
+
+Dado que ninguno de los dos modelos es válido en todo el rango, el criterio de selección fue la
+región de operación prevista para el controlador. La referencia de trabajo es \SI{60}{\celsius},
+que corresponde aproximadamente a $Q_1 = \SI{50}{\percent}$, justamente la condición del ensayo
+escalón. Ese modelo además tuvo mejor capacidad predictiva sobre datos independientes. Su tiempo
+muerto, $\theta = \SI{8.00}{\second}$, equivale a ocho periodos de muestreo, lo que permite
+representar el retardo de forma exacta en la implementación discreta. El modelo nominal adoptado es
+entonces
+
+\begin{equation}
+\Gpnom(s) = \frac{0{,}979\;e^{-8{,}00\,s}}{179{,}1\,s + 1}
+\quad \left[\si{\celsius\per\percent}\right].
+\label{eq:gpnom}
+\end{equation}

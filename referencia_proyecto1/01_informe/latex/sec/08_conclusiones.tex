@@ -1,0 +1,43 @@
+\section{Conclusiones}
+
+\begin{enumerate}[leftmargin=*]
+
+\item El modelo FOPDT identificado con el ensayo escalón,
+$\Gpnom(s) = 0{,}979\,e^{-8{,}00 s}/(179{,}1 s + 1)$, representa adecuadamente la planta en la
+región de operación del controlador, con un ajuste del \SI{88.7}{\percent} sobre datos no empleados
+en su identificación, frente al \SI{74.4}{\percent} del modelo multinivel. Su limitación es
+igualmente clara: el residuo de validación no es aleatorio sino creciente con el nivel de potencia,
+de \SI{+0.88}{\celsius} a \SI{+2.20}{\celsius} entre $Q_1 = \SI{20}{\percent}$ y
+\SI{50}{\percent}, lo que indica que una sola ganancia no describe todo el rango de la planta.
+
+\item El anti-windup, y no la sintonización, fue lo que determinó el cumplimiento de las
+especificaciones. Con el mismo $\Kp$ y el mismo $\Ti$ obtenidos por SIMC, la configuración sin
+protección del integrador produce $M_p = \SI{30.1}{\percent}$ e incumple el requisito
+$M_p \leq \SI{5}{\percent}$ por un factor de seis, mientras que con \emph{clamping} se obtiene
+$M_p = \SI{0}{\percent}$ y $t_s = \SI{205}{\second}$. Haber aplicado correctamente las reglas SIMC
+no demuestra por sí mismo que el controlador cumpla los requisitos.
+
+\item Los dos diseños PI cumplen las especificaciones en MIL, pero con compromisos opuestos y sin
+que ninguno domine al otro: el PI--SIMC establece \SI{47}{\second} antes, y el PI--CSD demanda un
+comando inicial de \SI{108}{\percent} frente a \SI{274}{\percent} y mantiene el actuador saturado
+\SI{21}{\second} frente a \SI{66}{\second}, además de contar con márgenes de estabilidad mayores.
+La selección depende del criterio que se privilegie y no se deduce de las métricas de desempeño por
+sí solas.
+
+\item Las verificaciones SIL y PIL resultaron en igualdad exacta de $Q_1$ y $T_1$ sobre
+\num{1801} muestras, lo que acredita que ni la generación de código ni su ejecución sobre el
+Arduino Uno R4 Minima alteraron el comportamiento del controlador validado en MIL. Ese resultado no
+constituye una validación del sistema completo: durante ambas pruebas la planta, el retardo y la
+temperatura ambiente permanecen simulados y no se ejercitan los canales físicos de la TCLab, de
+modo que el valor de estas etapas está en acotar las causas posibles de una discrepancia
+posterior, no en anticiparla.
+
+\item La implementación sobre la TCLab cumple los requisitos ---$t_s = \SI{298}{\second}$ y
+$M_p = \SI{1.96}{\percent}$--- con un error estacionario de \SI{0.04}{\celsius}, muy inferior al
+escalón mínimo del convertidor (\SI{0.489}{\celsius}). Las diferencias respecto de MIL se explican
+principalmente por un error de ganancia del modelo: la planta requiere \SI{40.3}{\percent} de
+potencia en régimen frente al \SI{36.8}{\percent} previsto, lo que corresponde a una ganancia
+estática aparente cerca de un \SI{15}{\percent} menor que la nominal y explica el tiempo de
+establecimiento un \SI{45}{\percent} mayor.
+
+\end{enumerate}
