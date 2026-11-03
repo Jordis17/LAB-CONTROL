@@ -1,7 +1,7 @@
 # Estado del proyecto — Ball on Plate (EL5409, II Sem 2026)
 
 > Archivo vivo (CLAUDE.md, sección 6). Se actualiza al cerrar cada etapa.
-> Última actualización: **2026-11-03**, sesión 1 (Etapas A, C y D escritas y probadas en Octave; B aplazada).
+> Última actualización: **2026-11-03**, sesión 1 (Etapas A, C, D y E escritas y probadas en Octave hasta donde se puede sin Simulink; B aplazada).
 
 ---
 
@@ -23,7 +23,7 @@
 | B — Identificación y validación | **Aplazada** hasta tener el prototipo (decisión del equipo, 2026-11-03). |
 | C — Diseño del controlador | **En curso.** Diseño hecho sobre el modelo **del diseño** (sin Etapa B). Probado en Octave (preliminar). Falta correr en MATLAB. Ver `etapaC/LEEME_etapaC.md`. |
 | D — MIL | **En curso.** Simulador y casos escritos; en Octave el ensayo de requisitos cumple R1–R4. Falta correr en MATLAB. Ver `etapaD/LEEME_etapaD.md`. |
-| E — Preparación y generación de código | No iniciada |
+| E — Preparación y generación de código | **En curso.** Scripts E0 (construcción de `Controller_BoP.slx`), E1 (equivalencia con el MIL) y E2 (código e inspección) escritos. E1 Parte A en PASS en Octave (diferencia 0). **Falta correr todo en MATLAB**, más el Code Generation Advisor. Ver `etapaE/LEEME_etapaE.md`. |
 | F — SIL | No iniciada |
 | G — PIL | No iniciada |
 | H — Implementación física | No iniciada |
@@ -73,6 +73,8 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | Sin prototipo disponible por ahora: la Etapa A usa la geometría del **diseño** (artefacto "Ensamble Ball on Plate" + `docs/`) y 4,8 V para los servos. | Indicación del equipo. Las mediciones reemplazan estos valores cuando haya prototipo. | 2026-11-03 |
 | **Avanzar a C y D sin cerrar A ni hacer B**, con el modelo del diseño. Todo lo de C y D queda como provisional y se rehace después de B. | Indicación del equipo ("sigamos con las que se pueden realizar"). Es una excepción a la regla de una etapa a la vez (CLAUDE.md 4). | 2026-11-03 |
 | Requisitos R1–R4 y criterios PM ≥ 40°, GM ≥ 6 dB (ver tabla de parámetros). | Propuestos por la IA, aceptados por el equipo. | 2026-11-03 |
+| Etapa E: `Controller_BoP.slx` de **un eje**, código *Reusable function* (el firmware lo instancia dos veces), double, parámetros `Simulink.Parameter` ExportedGlobal, entrada `habilitado` (arranque, sin bola, watchdog), hardware "Generic → 32-bit Embedded Processor" hasta conocer la placa. | Separación del algoritmo y de la planta, como en el Proyecto 1; la placa ESP32 exacta está PENDIENTE. | 2026-11-03 |
+| Ley de control en una sola función (`etapaC/funciones/bop_ley_control.m`) que usan el MIL y el bloque del modelo. | Una sola fuente del algoritmo. El cambio en el MIL se verificó en Octave: resultados idénticos bit a bit (diferencia 0 en θ, I y trayectoria) en dos casos. | 2026-11-03 |
 | El controlador usa la velocidad del Kalman (v̂) como término derivativo. | Ya la calcula el pipeline y no agrega otro filtro ni más atraso. Interfaz por eje: entra (r, x̂, v̂), sale θ_cmd. | 2026-11-03 |
 | Estructura: PD por asignación de polos + integral con **integración condicional** (4 cuadros con \|v̂\| < 25 mm/s), error recortado a ±30 mm, clamping y saturación a ±12°. | El PD no corrige el desnivel y el PID clásico da ~38 % de sobreimpulso (`etapaC/LEEME_etapaC.md`). | 2026-11-03 |
 
@@ -109,6 +111,11 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | `etapaC/funciones/` | `bop_controlador_paso` (ley discreta, es la referencia para la Etapa E), `bop_controlador_estado0`, `bop_lazo_lineal`, `kalman_estacionario`, `disenar_pd_asignacion`, `bop_param_con` |
 | `etapaD/D1_MIL_BoP.m` | Casos MIL D1 a D6 |
 | `etapaD/funciones/` | Simulador MIL (`bop_mil_simular`, `bop_mil_config`), métricas y utilidades |
+| `etapaC/funciones/bop_ley_control.m` | **Única fuente** de la ley de control (MIL y modelo) |
+| `etapaE/E0_build_Controller_BoP.m`, `init_Controller_BoP.m`, `ley_control_BoP_bloque.m` | Construcción del modelo del controlador, parámetros calibrables y función del bloque |
+| `etapaE/E1_verificar_equivalencia_BoP.m` | Modelo vs MIL, muestra a muestra (Parte A sin Simulink, Parte B con `sim`) |
+| `etapaE/E2_generar_codigo_BoP.m` | Generación de código e inspección automática |
+| `etapaE/Controller_BoP.slx`, `etapaE/codigo_generado/` | **Todavía no existen.** Los generan E0 y E2 en MATLAB. |
 
 El contenido del zip `Proyecto_FINAL_LAB_Control_para_ClaudeCode.zip` se copió a la raíz del repo sin cambios (sesión 1).
 
@@ -157,4 +164,16 @@ Datos pendientes: corrida en MATLAB; los mismos de C.
 Problemas detectados: observaciones 11 a 13 de la sección 5.
 Qué debe conservarse: etapaD/ completa y resultados/ cuando los genere MATLAB.
 Siguiente paso: Etapa E (Controller.slx por script, Advisors, generación de código para ESP32).
+```
+
+```
+Etapa: E — Preparación y generación de código (sesión 1, 2026-11-03)
+Completada: No
+Resultados obtenidos: E1 Parte A (función del bloque vs MIL, Octave): diferencia exacta 0 en
+  th_cmd, I y saturado en 5 ensayos (D1, D2 con saturación, D3, D4 con dos ejes).
+Archivos generados: etapaE/ (E0, E1, E2, init, función del bloque, LEEME, verificacion_octave)
+Datos pendientes: correr E0, E1 (Parte B), Code Generation Advisor y E2 en MATLAB; salida de `ver`.
+Problemas detectados: ninguno todavía (no hay corrida en MATLAB).
+Qué debe conservarse: Controller_BoP.slx (intocable), codigo_generado/, resultados/ y el reporte del Advisor.
+Siguiente paso: con el código generado, completar la tabla modelo <-> código; después, Etapa F (banco SIL).
 ```

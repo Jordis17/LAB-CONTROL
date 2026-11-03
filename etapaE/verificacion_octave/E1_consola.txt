@@ -1,0 +1,21 @@
+ETAPA E - E1_verificar_equivalencia_BoP   (2026-11-03 23:37:44)
+Version: 8.4.0
+Caso D1_requisitos  eje 1: 194 cuadros, saturado en 0, habilitado desde el cuadro 16
+Caso D2_sat_con_AW  eje 1: 179 cuadros, saturado en 7, habilitado desde el cuadro 1
+Caso D3_desnivel    eje 1: 299 cuadros, saturado en 0, habilitado desde el cuadro 1
+Caso D4_dos_ejes    eje 1: 269 cuadros, saturado en 0, habilitado desde el cuadro 16
+Caso D4_dos_ejes    eje 2: 269 cuadros, saturado en 0, habilitado desde el cuadro 16
+
+=== Parte A: ley_control_BoP_bloque.m (fuera de Simulink) vs MIL ===
+  D1_requisitos  eje 1: th max|dif| = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  D2_sat_con_AW  eje 1: th max|dif| = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  D3_desnivel    eje 1: th max|dif| = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  D4_dos_ejes    eje 1: th max|dif| = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  D4_dos_ejes    eje 2: th max|dif| = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  Parte A: PASS
+
+=== Parte B: Controller_BoP.slx (sim) vs MIL ===
+  Simulink no disponible en esta instalacion: se omite la Parte B.
+
+Resultado: Parte A PASS, Parte B NO EJECUTADA
+FIN E1
