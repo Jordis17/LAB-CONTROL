@@ -48,6 +48,7 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | Altura del centro de la bola sobre el pivote de la junta, h | 69 mm (215,4 + 3 + 20 − 169,4) | DISEÑO; el propio ensamble supone el pivote a media altura de la junta | `docs/`, artefacto del ensamble |
 | Periodo de muestreo Ts | 33,3 ms nominal (30 fps, piso del hardware) | PENDIENTE medir (`run_benchmark.py --period`) | CLAUDE.md 0 |
 | Latencia de extremo a extremo | estimación a priori de 60 a 90 ms + dinámica del servo | PENDIENTE medir (`run_benchmark.py --latency`) | CLAUDE.md 0 |
+| Cámara | **Redragon Fobos GW600** (corregido por el equipo, 2026-11-03): 720p, 30 fps máx., FOV diagonal 68,6°, foco fijo 50 cm–∞ (fichas de tiendas) | Dato del equipo | CLAUDE.md 0 |
 | Ruido de medición σ | 1 mm en `config.py` es un marcador | PENDIENTE medir (`medir_ruido.py`) | `config.py` |
 | Signo de Y (`INVERT_Y`) | — | PENDIENTE verificar | `config.py` |
 | Fricción de rodadura, holguras, desnivel del plato en reposo | — | PENDIENTE medir | CLAUDE.md 0.1 |
@@ -93,6 +94,7 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 9. El mecanismo es asimétrico con las cotas de diseño: ±45° de servo dan −13,45° y +14,07° de plato (Octave, preliminar).
 11. **Robustez (D5, Octave):** con retardo de 120 ms o ruido de 2 mm, ts pasa de 3 s (3,9 s). En los dos casos el sobreimpulso (~5,5–7 %) queda apenas fuera de la banda de 5 mm. Medir la latencia y el ruido reales es prioritario.
 12. **Cambios de 50–60 mm (D4):** ts de 3 a 4 s y Mp de 5 a 15 %, por la banda relativa del 5 % (2,5–3 mm), que es comparable al ruido de x̂. No es acople entre ejes: el eje Y solo da lo mismo. R1 está definido para 100 mm y no se cambió a posteriori.
+14. **Campo de visión de la cámara GW600 muy justo:** a 450 mm cubre unos 535 × 301 mm (16:9, sensor completo), o sea medio milímetro de margen vertical sobre el plato. Si 640×480 es un recorte central, el plato no entra (≈268 × 201 mm). Hay que verificarlo antes de calibrar. Si no entra, subir la cámara a ~500 mm (cambia `CAMERA_HEIGHT_MM`, `P.H_cam` y la corrección de paralaje). No afecta a Ts ni a las Etapas A–E.
 13. **La saturación (12°) solo aparece con perturbaciones que llevan la bola casi al borde** (empujón ≥ 400 mm/s). Con la integración condicional, el anti-windup no cambia nada en esos casos; con un PID clásico sí (D2b).
 
 ## 6. Archivos generados
