@@ -1,0 +1,84 @@
+ETAPA D - D1_MIL_BoP   (2026-11-03 07:26:50)
+MATLAB 8.4.0
+
+=== Parametros de la planta (A0_parametros_BoP) ===
+  g            =   9810.0 mm/s^2
+  r_bola       =    20.00 mm      MEDIDO
+  c_rod        =   0.7143 -       NOMINAL 5/7 (identificar en la Etapa B)
+  k = J/(m r^2)=   0.4000 -       derivado de c
+  h_sup        =    49.00 mm      cara superior del plato sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  h            =    69.00 mm      centro de la bola sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  d            =    70.00 mm      DISENO
+  r_brazo      =    24.00 mm      DISENO
+  z_rot        =    26.20 mm      DISENO (derivado)
+  H_serv       =   136.00 mm      DISENO (derivado)
+  L_var        =   162.20 mm      DISENO
+  sigma_brazo  =       -1         DISENO (artefacto del ensamble)
+  phi_max      =    45.00 deg     HOJA_DATOS
+  omega_srv    =    600.0 deg/s   HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+  T_pwm        =   0.0200 s
+  Ts           =   0.0333 s       PENDIENTE medir (nominal 30 fps)
+  retardo      =   0.0750 s       ESTIMADO a priori, no medido
+  H_cam        =    450.0 mm      MEDIDO
+  x_max        =    127.0 mm
+
+Controlador (C1, 2026-11-03 07:20:07): Kp = 0.03412 deg/mm, Kd = 0.02588 deg/(mm/s), Ki = 0.02275 deg/(mm s),
+  th_lim = 12.0 deg, e_clip = 30 mm, v_int = 25 mm/s, Nq = 4, Kalman sigma_a = 500, sigma_m = 1
+Simulacion: dt = Ts/33, retardo total 0.075 s (medicion 0.065 s + PWM), servo omega_n = 50 rad/s,
+  ruido de camara 1.00 mm (semilla 1), velocidad del servo 600 deg/s.
+
+=== D1. Ensayo de requisitos: x0 = 100 mm, r = 0 ===
+    x0 = 100.1 mm, r = 0.0 mm: tr = 0.83 s, ts = 1.37 s, Mp = 4.4 %, ess = 0.11 mm
+    max|x_hat| = 100.2 mm, max|x| plato = 102.7 mm, th_cmd en [-2.32, 3.62] deg, saturado 0.0 % (0.00 s), std th en reposo 0.308 deg
+  Verificacion de requisitos:
+    R1 ts  =  1.37 s   <= 3.0 s   -> CUMPLE
+    R2 Mp  =   4.4 %   <= 20 %    -> CUMPLE
+    R3 ess =  0.11 mm  <= 3.0 mm  -> CUMPLE
+    R4 max|x| (plato) = 102.7 mm <= 127 mm -> CUMPLE
+
+=== D2. Saturacion y anti-windup: empujon de 420 mm/s desde el centro, desnivel 1 deg ===
+  (1) actuador ideal, sin saturacion
+    max|x_hat| = 113.9 mm, max|x| plato = 124.0 mm, th_cmd en [-4.24, 12.92] deg, u en [-4.24, 12.92] deg
+    saturado 0.0 % del tiempo (0.00 s); integrador en [-0.995, 0.000] deg; |x_hat| < 3 mm desde 5.37 s; ess = 2.07 mm
+  (2) saturado, sin anti-windup
+    max|x_hat| = 116.6 mm, max|x| plato = 126.3 mm, th_cmd en [-4.25, 12.00] deg, u en [-4.25, 12.92] deg
+    saturado 3.9 % del tiempo (0.23 s); integrador en [-0.995, 0.000] deg; |x_hat| < 3 mm desde 5.37 s; ess = 2.10 mm
+  (3) saturado, con anti-windup
+    max|x_hat| = 116.6 mm, max|x| plato = 126.3 mm, th_cmd en [-4.25, 12.00] deg, u en [-4.25, 12.92] deg
+    saturado 3.9 % del tiempo (0.23 s); integrador en [-0.995, 0.000] deg; |x_hat| < 3 mm desde 5.37 s; ess = 2.10 mm
+  (2b) PID clasico, saturado, sin anti-windup
+    max|x_hat| = 116.5 mm, max|x| plato = 126.5 mm, th_cmd en [-4.22, 12.00] deg, u en [-4.22, 12.95] deg
+    saturado 3.9 % del tiempo (0.23 s); integrador en [-1.152, 1.566] deg; |x_hat| < 3 mm desde 5.90 s; ess = 3.48 mm
+  (3b) PID clasico, saturado, con anti-windup
+    max|x_hat| = 116.6 mm, max|x| plato = 126.3 mm, th_cmd en [-4.07, 12.00] deg, u en [-4.07, 12.92] deg
+    saturado 3.9 % del tiempo (0.23 s); integrador en [-1.138, 1.314] deg; |x_hat| < 3 mm desde 5.90 s; ess = 3.17 mm
+
+=== D3. Perturbacion: desnivel de 1 deg en X, bola en el centro ===
+  max|x_hat| = 30.5 mm, ess (ultimo s) = 0.88 mm, recupera |x_hat| < 3 mm a los 5.17 s
+  Error que dejaria un PD: desnivel/Kp = 29.3 mm
+
+=== D4. Dos ejes: (80, -60) -> (0, 0) y a los 4,5 s -> (50, 50) ===
+  Eje X, tramo 1 (x0 = 80 -> 0):  tr = 0.80 s, ts = 2.97 s, Mp = 5.2 %, ess = 2.03 mm, th en [-2.0, 2.9] deg
+  Eje X, tramo 2 (0 -> 50):         tr = 0.77 s, ts = 3.70 s, Mp = 8.8 %, ess = 0.80 mm, th en [-2.3, 1.3] deg
+  Eje Y, tramo 1 (x0 = -60 -> 0):  tr = 0.67 s, ts = 3.83 s, Mp = 10.5 %, ess = 3.70 mm, th en [-2.3, 1.7] deg
+  Eje Y, tramo 2 (0 -> 50):         tr = 0.67 s, ts = 4.00 s, Mp = 14.7 %, ess = 1.24 mm, th en [-2.3, 1.5] deg
+  max distancia al centro (marco del plato): 102.7 mm
+
+=== D5. Robustez: ensayo D1 con un parametro cambiado a la vez ===
+  caso                     ts[s]   Mp[%]  ess[mm]  max|x|[mm]  std th ss[deg]  cumple
+  nominal                   1.37     4.4    0.11      102.7         0.308      CUMPLE
+  retardo 120 ms            3.90     5.5    1.93      102.7         0.301      NO CUMPLE
+  c = 0,685                 1.30     4.0    0.24      102.6         0.308      CUMPLE
+  h_sup = 40 mm             1.37     4.4    0.12      102.3         0.307      CUMPLE
+  h_sup = 60 mm             1.37     4.3    0.11      103.1         0.309      CUMPLE
+  servos a 6 V              1.37     4.4    0.11      102.7         0.308      CUMPLE
+  servo lento (wn = 30)     1.20     4.7    0.02      102.2         0.304      CUMPLE
+  ruido 0,3 mm              1.30     3.5    0.08      102.7         0.092      CUMPLE
+  ruido 2 mm                3.90     7.0    0.97      102.7         0.616      NO CUMPLE
+
+=== D6. Planta lineal vs no lineal en lazo cerrado ===
+  Ensayo D1: lineal ts = 1.30 s, Mp = 4.3 %, max|x| = 102.5 mm | no lineal ts = 1.37 s, Mp = 4.4 %, max|x| = 102.7 mm | max|x_nl - x_lin| = 1.64 mm
+  Ensayo D2: lineal ts = NaN s, Mp = NaN %, max|x| = 119.1 mm | no lineal ts = NaN s, Mp = NaN %, max|x| = 126.3 mm | max|x_nl - x_lin| = 10.66 mm
+
+Resultados en /home/user/LAB-CONTROL/etapaD/resultados
+FIN D1

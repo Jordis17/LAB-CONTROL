@@ -1,0 +1,195 @@
+ETAPA A - A2_linealizar_BoP   (2026-11-03 07:30:04)
+MATLAB 8.4.0
+
+=== Parametros de la planta (A0_parametros_BoP) ===
+  g            =   9810.0 mm/s^2
+  r_bola       =    20.00 mm      MEDIDO
+  c_rod        =   0.7143 -       NOMINAL 5/7 (identificar en la Etapa B)
+  k = J/(m r^2)=   0.4000 -       derivado de c
+  h_sup        =    49.00 mm      cara superior del plato sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  h            =    69.00 mm      centro de la bola sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  d            =    70.00 mm      DISENO
+  r_brazo      =    24.00 mm      DISENO
+  z_rot        =    26.20 mm      DISENO (derivado)
+  H_serv       =   136.00 mm      DISENO (derivado)
+  L_var        =   162.20 mm      DISENO
+  sigma_brazo  =       -1         DISENO (artefacto del ensamble)
+  phi_max      =    45.00 deg     HOJA_DATOS
+  omega_srv    =    600.0 deg/s   HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+  T_pwm        =   0.0200 s
+  Ts           =   0.0333 s       PENDIENTE medir (nominal 30 fps)
+  retardo      =   0.0750 s       ESTIMADO a priori, no medido
+  H_cam        =    450.0 mm      MEDIDO
+  x_max        =    127.0 mm
+
+=== 1. Modelo lineal de un eje (x = 0, th = 0, thd = 0) ===
+  Hipotesis: rodadura sin deslizamiento, sin friccion, plato rigido,
+  actuador ideal (th es la entrada), camara fija sobre la junta.
+
+  h_ef = h + k*r_b       =   77.000 mm
+  c*g                    =  7007.14 mm/(s^2 rad)  (= 122.298 mm/(s^2 deg))
+  c*h_ef                 =   55.000 mm/rad
+  c*h_ef - h             =  -14.000 mm/rad  (= -(1-c)*h_sup = -14.000)
+
+  Posicion sobre el plato (restriccion |x| <= 127 mm):
+               55.000 s^2 -   7007.14
+    X/TH = -------------------------   [mm/rad]
+                     s^2
+
+  Posicion medida por la camara (realimentacion):
+              -14.000 s^2 -   7007.14
+    Xm/TH = ------------------------   [mm/rad]
+                     s^2
+
+  Polos: s = 0 (doble). Doble integrador: no es estable en lazo abierto.
+  Cero de X/TH : s =   +11.287    +0.000j rad/s   (|s| = 11.287 rad/s = 1.796 Hz)
+  Cero de X/TH : s =   -11.287    +0.000j rad/s   (|s| = 11.287 rad/s = 1.796 Hz)
+  Cero de Xm/TH: s =    +0.000   +22.372j rad/s   (|s| = 22.372 rad/s = 3.561 Hz)
+  Cero de Xm/TH: s =    -0.000   -22.372j rad/s   (|s| = 22.372 rad/s = 3.561 Hz)
+
+  Espacio de estados (estados xi = x - c*h_ef*th [mm], xid [mm/s]; entrada th [rad]):
+    A = [0 1; 0 0]
+    B = [0; -7007.14]
+    C = [1 0; 1 0]   (salidas: x, Xm)
+    D = [55.000; -14.000]
+
+  Control System Toolbox no detectado: se omiten los objetos tf/ss.
+
+=== 2. Jacobiano numerico del modelo no lineal en el punto de operacion ===
+  Jacobiano numerico de [xdd; ydd] respecto de [x y xd yd thx thy thxd thyd thxdd thydd]:
+        0.0000     0.0000     0.0000     0.0000 -7007.1429     0.0000     0.0000     0.0000    55.0000     0.0000
+        0.0000     0.0000     0.0000     0.0000     0.0000 -7007.1429     0.0000     0.0000     0.0000    55.0000
+  Diferencia relativa maxima con el analitico: 1.67e-13
+  Terminos cruzados (x <-> y) en el punto de operacion: 0.00e+00 (0 => ejes desacoplados a primer orden)
+  Jacobiano de [Xm; Ym] respecto de [x y thx thy]:
+        1.0000     0.0000   -69.0000     0.0000
+        0.0000     1.0000     0.0000   -69.0000
+  Esperado: [1 0 -h 0; 0 1 0 -h] con h = 69.000 mm
+
+=== 3. Modelo discreto (ZOH, Ts = 0.0333 s) ===
+  Sin retardo (salida Xm):
+    Orden 2 (2 estados de la planta + 0 de retardo)
+    Ad =
+         1.000000    0.033333 
+         0.000000    1.000000 
+    Bd = [ -3.89286 -233.571]'
+    Cd = [ 1 0]
+    Dd = -14
+    Polos z: 1.0000+0.0000j  1.0000+0.0000j  
+    Ceros z: 0.8610+0.7327j  0.8610-0.7327j  
+    |ceros z|: 1.1305  1.1305  
+  Con retardo 0.0750 s (ESTIMADO a priori, no medido) = (3 - 1)*Ts + 0.0083 s:
+    Orden 5 (2 estados de la planta + 3 de retardo)
+    Ad =
+         1.000000    0.033333   -1.703125   -2.189732    0.000000 
+         0.000000    1.000000  -58.392857 -175.178571    0.000000 
+         0.000000    0.000000    0.000000    1.000000    0.000000 
+         0.000000    0.000000    0.000000    0.000000    1.000000 
+         0.000000    0.000000    0.000000    0.000000    0.000000 
+    Bd = [ 0 0 0 0 1]'
+    Cd = [ 1 0 -14 0 0]
+    Dd = 0
+    Polos z: 1.0000+0.0000j  1.0000+0.0000j  0.0000+0.0000j  0.0000+0.0000j  0.0000+0.0000j  
+    Ceros z: 0.6994+0.6250j  0.6994-0.6250j  
+    |ceros z|: 0.9380  0.9380  
+
+=== 4. Comparacion modelo lineal vs no lineal ===
+  Entrada: triplete +A (T), -A (2T), +A (T), transiciones de coseno alzado.
+  T se elige para que el doble integrador ideal llegue a 60 % de x_max = 76.2 mm.
+  Velocidad maxima del plato = 0.3429 (pendiente servo-plato) x 600.0 deg/s = 205.7 deg/s
+  Dos tipos de transicion:
+    rapida: tr = max(T_pwm, pi*A/omega_plato), el plato se mueve a la velocidad maxima del servo;
+    lenta : tr = 0.8*T, velocidad angular baja.
+  Error = lineal - no lineal; metricas sobre todo el perfil mas 0.5 s.
+  Ademas se descompone el error de aceleracion del modelo (no lineal - lineal, evaluado sobre
+  la trayectoria no lineal) en: seno (sin th vs th), centrifugo (x*thd^2) y resto.
+  Se expresa como inclinacion equivalente th_eq = error/(c*g).
+
+  Caso A =  1.0 deg, transicion rapida (T = 0.789 s, tr = 0.020 s, max|thd| = 157.1 deg/s):
+    x  (plato) : max|ref| =    78.78 mm, max|err| =   8.829 mm ( 11.21 %), RMSE =   3.800 mm, sesgo =  +2.673 mm
+    Xm (camara): max|ref| =    77.81 mm, max|err| =   8.829 mm ( 11.35 %), RMSE =   3.826 mm, sesgo =  +2.735 mm
+    Al final: x_nl = -8.83 mm, xd_nl = -4.34 mm/s (el lineal vuelve a 0)
+    Error de aceleracion (max |.|, y como inclinacion equivalente):
+      total         221.90 mm/s^2  (1.8144 deg)
+      seno            0.01 mm/s^2  (0.0001 deg)
+      centrifugo    221.90 mm/s^2  (1.8144 deg)
+      resto           0.00 mm/s^2  (0.0000 deg)
+  Caso A =  1.0 deg, transicion lenta (T = 0.789 s, tr = 0.631 s, max|thd| = 5.0 deg/s):
+    x  (plato) : max|ref| =    76.06 mm, max|err| =   0.357 mm (  0.47 %), RMSE =   0.156 mm, sesgo =  +0.108 mm
+    Xm (camara): max|ref| =    75.07 mm, max|err| =   0.357 mm (  0.48 %), RMSE =   0.192 mm, sesgo =  +0.152 mm
+    Al final: x_nl = -0.36 mm, xd_nl = -0.13 mm/s (el lineal vuelve a 0)
+    Error de aceleracion (max |.|, y como inclinacion equivalente):
+      total           0.22 mm/s^2  (0.0018 deg)
+      seno            0.01 mm/s^2  (0.0001 deg)
+      centrifugo      0.22 mm/s^2  (0.0018 deg)
+      resto           0.00 mm/s^2  (0.0000 deg)
+  Caso A = 10.0 deg, transicion rapida (T = 0.250 s, tr = 0.153 s, max|thd| = 205.7 deg/s):
+    x  (plato) : max|ref| =    91.64 mm, max|err| =  72.469 mm ( 79.08 %), RMSE =  31.488 mm, sesgo = +21.332 mm
+    Xm (camara): max|ref| =    81.07 mm, max|err| =  72.469 mm ( 89.40 %), RMSE =  31.483 mm, sesgo = +21.465 mm
+    Al final: x_nl = -72.47 mm, xd_nl = -67.10 mm/s (el lineal vuelve a 0)
+    Error de aceleracion (max |.|, y como inclinacion equivalente):
+      total         491.29 mm/s^2  (4.0172 deg)
+      seno            6.20 mm/s^2  (0.0507 deg)
+      centrifugo    491.25 mm/s^2  (4.0169 deg)
+      resto           0.00 mm/s^2  (0.0000 deg)
+  Caso A = 10.0 deg, transicion lenta (T = 0.250 s, tr = 0.200 s, max|thd| = 156.9 deg/s):
+    x  (plato) : max|ref| =    89.56 mm, max|err| =  55.900 mm ( 62.42 %), RMSE =  24.500 mm, sesgo = +16.650 mm
+    Xm (camara): max|ref| =    78.88 mm, max|err| =  55.900 mm ( 70.87 %), RMSE =  24.506 mm, sesgo = +16.785 mm
+    Al final: x_nl = -55.90 mm, xd_nl = -48.96 mm/s (el lineal vuelve a 0)
+    Error de aceleracion (max |.|, y como inclinacion equivalente):
+      total         273.99 mm/s^2  (2.2404 deg)
+      seno            6.20 mm/s^2  (0.0507 deg)
+      centrifugo    273.93 mm/s^2  (2.2399 deg)
+      resto           0.00 mm/s^2  (0.0000 deg)
+
+  Caso dos ejes A = 10.0 deg en X y en Y, transicion rapida (Y desfasado T/2 = 0.125 s):
+    x       : max|ref| =    88.08 mm, max|err| =  67.316 mm ( 76.43 %), RMSE =  28.461 mm, sesgo = +18.752 mm
+    y       : max|ref| =    99.56 mm, max|err| =  99.557 mm (100.00 %), RMSE =  43.710 mm, sesgo = +30.177 mm
+    Efecto del acople (no lineal 2 ejes - no lineal 1 eje): max|dx| = 13.542 mm, max|dy| = 27.096 mm
+
+=== 5. Barrido de amplitud (un eje) ===
+  modo    A[deg]  T[s]   tr[s] thd[deg/s] max|x|[mm] max|e_x|[mm] e_x[%] e_Xm[%]  th_eq_sen[deg] th_eq_cf[deg]
+  rapida    0.5   1.116  0.020     78.5      77.25       2.840    3.68    3.70       0.0000        0.4305
+  rapida    1.0   0.789  0.020    157.1      78.78       8.829   11.21   11.35       0.0001        1.8144
+  rapida    2.0   0.558  0.031    205.7      81.12      18.670   23.01   23.58       0.0004        3.3129
+  rapida    3.0   0.456  0.046    205.7      82.74      25.184   30.44   31.56       0.0014        3.4229
+  rapida    4.0   0.395  0.061    205.7      84.23      31.534   37.44   39.28       0.0032        3.5172
+  rapida    5.0   0.353  0.076    205.7      85.63      37.936   44.30   47.04       0.0063        3.6047
+  rapida    6.0   0.323  0.092    205.7      86.96      44.424   51.09   54.91       0.0110        3.6898
+  rapida    7.0   0.299  0.107    205.7      88.22      51.097   57.92   63.02       0.0174        3.7720
+  rapida    8.0   0.280  0.122    205.7      89.42      57.953   64.81   71.40       0.0260        3.8535
+  rapida    9.0   0.264  0.137    205.7      90.56      65.036   71.82   80.13       0.0370        3.9349
+  rapida   10.0   0.250  0.153    205.7      91.64      72.469   79.08   89.40       0.0507        4.0169
+  rapida   11.0   0.239  0.168    205.7      92.66      80.113   86.46   99.06       0.0674        4.0987
+  rapida   12.0   0.229  0.183    205.7      93.62      88.183   94.19  100.00       0.0875        4.1808
+  rapida   13.0   0.220  0.199    205.7      96.67      96.667  100.00  100.00       0.1113        4.2636
+  lenta     0.5   1.116  0.893      1.8      75.54       0.084    0.11    0.17       0.0000        0.0002
+  lenta     1.0   0.789  0.631      5.0      76.06       0.357    0.47    0.48       0.0001        0.0018
+  lenta     2.0   0.558  0.447     14.1      77.17       1.537    1.99    2.04       0.0004        0.0143
+  lenta     3.0   0.456  0.365     25.8      78.38       3.662    4.67    4.86       0.0014        0.0490
+  lenta     4.0   0.395  0.316     39.8      79.68       6.842    8.59    9.05       0.0032        0.1185
+  lenta     5.0   0.353  0.283     55.6      81.09      11.190   13.80   14.73       0.0063        0.2372
+  lenta     6.0   0.323  0.258     73.0      82.59      16.851   20.40   22.06       0.0110        0.4213
+  lenta     7.0   0.299  0.239     92.0      84.19      23.963   28.46   31.16       0.0174        0.6900
+  lenta     8.0   0.280  0.224    112.4      85.88      32.700   38.08   42.21       0.0260        1.0651
+  lenta     9.0   0.264  0.211    134.0      87.67      43.287   49.37   55.40       0.0370        1.5720
+  lenta    10.0   0.250  0.200    156.9      89.56      55.900   62.42   70.87       0.0507        2.2399
+  lenta    11.0   0.239  0.191    180.9      91.55      70.825   77.36   88.86       0.0674        3.1018
+  lenta    12.0   0.229  0.183    206.0      93.64      88.360   94.37  100.00       0.0875        4.1959
+  lenta    13.0   0.220  0.176    232.2     108.79     108.791  100.00  100.00       0.1113        5.5652
+
+  Umbral de validez: error relativo < 5.0 % de max|x| sobre el triplete completo.
+  Transicion rapida : valido para x hasta A = 0.5 deg; para Xm hasta A = 0.5 deg
+  Transicion lenta  : valido para x hasta A = 3 deg; para Xm hasta A = 3 deg
+
+=== 6. Termino centrifugo x*thd^2 expresado como inclinacion equivalente ===
+  th_eq = x*thd^2/g (lo que habria que inclinar el plato para producir la misma aceleracion)
+   x[mm] \ thd[rad/s]:      0.50      1.00      2.00      3.59
+       25                 0.037     0.146     0.584     1.882   [deg]
+       50                 0.073     0.292     1.168     3.764   [deg]
+      100                 0.146     0.584     2.336     7.529   [deg]
+      127                 0.185     0.742     2.967     9.562   [deg]
+  (la ultima columna es la velocidad maxima del plato con el servo a 4,8 V)
+
+Resultados guardados en /home/user/LAB-CONTROL/etapaA/resultados
+FIN A2

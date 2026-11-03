@@ -1,0 +1,6 @@
+Salidas de consola de GNU Octave 8.4, corridas por Claude Code en la nube el 2026-11-03,
+con los parametros de diseno vigentes en el commit donde aparecen.
+
+Son PRELIMINARES: sirven para revisar sintaxis, coherencia y ordenes de magnitud y para que
+cada numero citado en los LEEME tenga una ejecucion detras. NO reemplazan la corrida en
+MATLAB: los resultados oficiales son los que genere MATLAB en la carpeta resultados/.

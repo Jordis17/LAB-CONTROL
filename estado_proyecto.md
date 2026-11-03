@@ -1,7 +1,7 @@
 # Estado del proyecto — Ball on Plate (EL5409, II Sem 2026)
 
 > Archivo vivo (CLAUDE.md, sección 6). Se actualiza al cerrar cada etapa.
-> Última actualización: **2026-11-03**, sesión 1 (puesta al día, plan y scripts de la Etapa A).
+> Última actualización: **2026-11-03**, sesión 1 (Etapas A, C y D escritas y probadas en Octave; B aplazada).
 
 ---
 
@@ -20,9 +20,9 @@
 | Etapa | Estado |
 |---|---|
 | A — Modelo de la planta | **En curso.** Scripts escritos y probados en Octave 8.4 (preliminar). **Falta correrlos en MATLAB** y medir en el prototipo los datos de `etapaA/LEEME_etapaA.md` sección 5. |
-| B — Identificación y validación | No iniciada |
-| C — Diseño del controlador | No iniciada |
-| D — MIL | No iniciada |
+| B — Identificación y validación | **Aplazada** hasta tener el prototipo (decisión del equipo, 2026-11-03). |
+| C — Diseño del controlador | **En curso.** Diseño hecho sobre el modelo **del diseño** (sin Etapa B). Probado en Octave (preliminar). Falta correr en MATLAB. Ver `etapaC/LEEME_etapaC.md`. |
+| D — MIL | **En curso.** Simulador y casos escritos; en Octave el ensayo de requisitos cumple R1–R4. Falta correr en MATLAB. Ver `etapaD/LEEME_etapaD.md`. |
 | E — Preparación y generación de código | No iniciada |
 | F — SIL | No iniciada |
 | G — PIL | No iniciada |
@@ -51,15 +51,15 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | Ruido de medición σ | 1 mm en `config.py` es un marcador | PENDIENTE medir (`medir_ruido.py`) | `config.py` |
 | Signo de Y (`INVERT_Y`) | — | PENDIENTE verificar | `config.py` |
 | Fricción de rodadura, holguras, desnivel del plato en reposo | — | PENDIENTE medir | CLAUDE.md 0.1 |
-| Requisitos (ts, Mp, ess, perturbaciones, seguimiento) | — | **PENDIENTE** (enunciado o equipo) | CLAUDE.md 0 |
+| Requisitos | R1 ts ≤ 3 s, R2 Mp ≤ 20 %, R3 ess ≤ 3 mm (ensayo 100 mm → 0); R4 \|x\| ≤ 127 mm; diseño PM ≥ 40°, GM ≥ 6 dB | **DECISIÓN DE INGENIERÍA** (propuestos por la IA, aceptados por el equipo; no hay enunciado) | `etapaC/C0_requisitos_BoP.m` |
 | Placa ESP32 exacta | — | PENDIENTE | CLAUDE.md 0 |
 
 ## 4. Decisiones pendientes
 
 | Decisión | Afecta a | Notas |
 |---|---|---|
-| Uso de la velocidad del Kalman (vx, vy) en el controlador o derivada propia | C, D, E | No bloquea la Etapa A. |
-| Requisitos de desempeño | C, D | Bloquean la Etapa C, no la A. |
+| Cambiar `PROCESS_ACCEL_STD` de 1500 a 500 en `proyecto_ControlDIP-develop/src/config.py` | Pipeline, C, D, H | Lo pide el diseño de la Etapa C (con 1500 el plato tiembla 0,67° en reposo). **No se tocó `config.py`**: decide el equipo, idealmente después de medir el ruido. |
+| Dinámica real del servo (ωn = 50 rad/s es un supuesto) | C, D | Medir con el prototipo (escalón de comando, registro de la cámara). |
 | Ruta PIL si el paquete de soporte no habilita PIL para ESP32 | G | Comprobar con una prueba PIL mínima antes de la Etapa G. |
 
 **Decisiones tomadas**
@@ -71,6 +71,10 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | Etapa A sin toolboxes: modelo lineal y discretización escritos a mano (`bop_discretizar`). | Todavía no se conoce la instalación de MATLAB; si está Control System Toolbox, A2 compara con `c2d`. | 2026-11-03 |
 | Umbral de validez del modelo lineal: error de trayectoria < 5 % de max\|x\| (decisión de ingeniería). | Ningún documento lo fija. | 2026-11-03 |
 | Sin prototipo disponible por ahora: la Etapa A usa la geometría del **diseño** (artefacto "Ensamble Ball on Plate" + `docs/`) y 4,8 V para los servos. | Indicación del equipo. Las mediciones reemplazan estos valores cuando haya prototipo. | 2026-11-03 |
+| **Avanzar a C y D sin cerrar A ni hacer B**, con el modelo del diseño. Todo lo de C y D queda como provisional y se rehace después de B. | Indicación del equipo ("sigamos con las que se pueden realizar"). Es una excepción a la regla de una etapa a la vez (CLAUDE.md 4). | 2026-11-03 |
+| Requisitos R1–R4 y criterios PM ≥ 40°, GM ≥ 6 dB (ver tabla de parámetros). | Propuestos por la IA, aceptados por el equipo. | 2026-11-03 |
+| El controlador usa la velocidad del Kalman (v̂) como término derivativo. | Ya la calcula el pipeline y no agrega otro filtro ni más atraso. Interfaz por eje: entra (r, x̂, v̂), sale θ_cmd. | 2026-11-03 |
+| Estructura: PD por asignación de polos + integral con **integración condicional** (4 cuadros con \|v̂\| < 25 mm/s), error recortado a ±30 mm, clamping y saturación a ±12°. | El PD no corrige el desnivel y el PID clásico da ~38 % de sobreimpulso (`etapaC/LEEME_etapaC.md`). | 2026-11-03 |
 
 ## 5. Discrepancias y observaciones
 
@@ -85,6 +89,9 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 7. **La cámara no mide la posición sobre el plato cuando el plato está inclinado.** Con la homografía fija, mide la proyección horizontal: a primer orden Xm = x − h·θ. Con 14° la diferencia llega a unos 14 mm en el borde (A1, sección 5, Octave). Esto cambia los ceros del modelo que se realimenta. Verificarlo en la Etapa B dejando la bola quieta contra el borde con el plato a ángulos conocidos.
 8. **El término no lineal dominante es el centrífugo x·θ̇²**, no el seno. El modelo lineal es bueno con velocidades de inclinación bajas y empeora rápido con la velocidad máxima del servo (Octave, preliminar). Esto pesa en la Etapa C: conviene limitar la velocidad de inclinación que pide el controlador.
 9. El mecanismo es asimétrico con las cotas de diseño: ±45° de servo dan −13,45° y +14,07° de plato (Octave, preliminar).
+11. **Robustez (D5, Octave):** con retardo de 120 ms o ruido de 2 mm, ts pasa de 3 s (3,9 s). En los dos casos el sobreimpulso (~5,5–7 %) queda apenas fuera de la banda de 5 mm. Medir la latencia y el ruido reales es prioritario.
+12. **Cambios de 50–60 mm (D4):** ts de 3 a 4 s y Mp de 5 a 15 %, por la banda relativa del 5 % (2,5–3 mm), que es comparable al ruido de x̂. No es acople entre ejes: el eje Y solo da lo mismo. R1 está definido para 100 mm y no se cambió a posteriori.
+13. **La saturación (12°) solo aparece con perturbaciones que llevan la bola casi al borde** (empujón ≥ 400 mm/s). Con la integración condicional, el anti-windup no cambia nada en esos casos; con un PID clásico sí (D2b).
 
 ## 6. Archivos generados
 
@@ -96,12 +103,18 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | `etapaA/A2_linealizar_BoP.m` | Modelo lineal, jacobiano, discretización, comparación lineal vs no lineal y barrido de amplitud |
 | `etapaA/funciones/` | Dinámica, medición, cinemáticas, perfil de prueba, discretización, métricas y CSV |
 | `etapaA/resultados/` | **Todavía no existe en el repo.** Lo genera MATLAB al correr A1 y A2. |
+| `etapaA/verificacion_octave/`, `etapaC/verificacion_octave/`, `etapaD/verificacion_octave/` | Consolas de Octave 8.4 (preliminares) que respaldan los números citados en los LEEME |
+| `etapaC/C0_requisitos_BoP.m` | Requisitos y definiciones únicas de las métricas |
+| `etapaC/C1_disenar_controlador_BoP.m` | Diseño: Kalman, asignación de polos, integral, márgenes, robustez, comparación de estructuras |
+| `etapaC/funciones/` | `bop_controlador_paso` (ley discreta, es la referencia para la Etapa E), `bop_controlador_estado0`, `bop_lazo_lineal`, `kalman_estacionario`, `disenar_pd_asignacion`, `bop_param_con` |
+| `etapaD/D1_MIL_BoP.m` | Casos MIL D1 a D6 |
+| `etapaD/funciones/` | Simulador MIL (`bop_mil_simular`, `bop_mil_config`), métricas y utilidades |
 
 El contenido del zip `Proyecto_FINAL_LAB_Control_para_ClaudeCode.zip` se copió a la raíz del repo sin cambios (sesión 1).
 
 ## 7. Orden de columnas de los CSV
 
-En `etapaA/orden_csv.md`.
+En `etapaA/orden_csv.md`, `etapaC/orden_csv.md` y `etapaD/orden_csv.md`.
 
 ## 8. Punto de control
 
@@ -118,4 +131,30 @@ Problemas detectados: discrepancias 1 a 9 de la sección 5.
 Decisiones tomadas: ver sección 4.
 Qué debe conservarse: etapaA/ completa, resultados de MATLAB en etapaA/resultados/.
 Siguiente paso: analizar la salida de MATLAB, actualizar con las mediciones y cerrar la Etapa A.
+```
+
+```
+Etapa: C — Diseño del controlador (sesión 1, 2026-11-03)
+Completada: No (provisional: sin Etapa B ni corrida en MATLAB)
+Resultados obtenidos (Octave): Kp = 0,0341 °/mm, Kd = 0,0259 °/(mm/s), Ki = 0,0228 °/(mm s);
+  Kalman σa = 500; wc = 3,30 rad/s, PM = 40,9°, GM +11,8 / −12,6 dB; estable.
+Archivos generados: etapaC/ (C0, C1, funciones, verificacion_octave)
+Datos pendientes: corrida en MATLAB; retardo, ruido y Ts medidos; c identificado; dinámica del servo.
+Problemas detectados: con 120 ms de retardo el PM baja a 32° (no cumple el criterio de 40°).
+Decisiones tomadas: ver sección 4.
+Qué debe conservarse: etapaC/ completa y resultados/C1_controlador.mat cuando lo genere MATLAB.
+Siguiente paso: correr C1 en MATLAB; después la Etapa E (controlador separado en Simulink).
+```
+
+```
+Etapa: D — MIL (sesión 1, 2026-11-03)
+Completada: No (provisional)
+Resultados obtenidos (Octave): D1 cumple R1–R4 (ts 1,37 s, Mp 4,4 %, ess 0,11 mm, max|x| 102,7 mm);
+  desnivel de 1° corregido en 5,2 s; saturación solo con empujones ≥ 400 mm/s; robustez con fallas
+  de ts con retardo de 120 ms y ruido de 2 mm.
+Archivos generados: etapaD/ (D1, funciones, verificacion_octave)
+Datos pendientes: corrida en MATLAB; los mismos de C.
+Problemas detectados: observaciones 11 a 13 de la sección 5.
+Qué debe conservarse: etapaD/ completa y resultados/ cuando los genere MATLAB.
+Siguiente paso: Etapa E (Controller.slx por script, Advisors, generación de código para ESP32).
 ```

@@ -1,0 +1,99 @@
+ETAPA C - C1_disenar_controlador_BoP   (2026-11-03 07:18:57)
+MATLAB 8.4.0
+
+=== Parametros de la planta (A0_parametros_BoP) ===
+  g            =   9810.0 mm/s^2
+  r_bola       =    20.00 mm      MEDIDO
+  c_rod        =   0.7143 -       NOMINAL 5/7 (identificar en la Etapa B)
+  k = J/(m r^2)=   0.4000 -       derivado de c
+  h_sup        =    49.00 mm      cara superior del plato sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  h            =    69.00 mm      centro de la bola sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  d            =    70.00 mm      DISENO
+  r_brazo      =    24.00 mm      DISENO
+  z_rot        =    26.20 mm      DISENO (derivado)
+  H_serv       =   136.00 mm      DISENO (derivado)
+  L_var        =   162.20 mm      DISENO
+  sigma_brazo  =       -1         DISENO (artefacto del ensamble)
+  phi_max      =    45.00 deg     HOJA_DATOS
+  omega_srv    =    600.0 deg/s   HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+  T_pwm        =   0.0200 s
+  Ts           =   0.0333 s       PENDIENTE medir (nominal 30 fps)
+  retardo      =   0.0750 s       ESTIMADO a priori, no medido
+  H_cam        =    450.0 mm      MEDIDO
+  x_max        =    127.0 mm
+
+=== 1. Datos de diseno ===
+  Planta por eje (Etapa A): Xm/TH = (-14.000 s^2 - 7007.14)/s^2 [mm/rad], doble integrador.
+  Retardo total (estimado): 0.0750 s; Ts = 0.0333 s; servo omega_n = 50 rad/s (supuesto)
+  Retardo equivalente de diseno te = retardo + Ts/2 + 2/omega_n = 0.1317 s
+
+=== 2. Kalman del pipeline: efecto de PROCESS_ACCEL_STD ===
+  R = sigma_m^2 = 1.00 mm^2 (marcador). Se comparan candidatos de sigma_a.
+  sigma_a[mm/s^2]   K1      K2[1/s]   std(x_hat)[mm]  std(v_hat)[mm/s]  std(th)[deg]  PM[deg]  GMsup[dB]
+      1500       0.8293    20.660       0.871           24.96           0.666     45.3      15.8
+      1000       0.7673    16.078       0.828           18.69           0.504     44.0      14.3
+       500       0.6473     9.897       0.747           11.29           0.311     40.9      11.8
+       300       0.5556     6.667       0.683            7.75           0.219     37.5       9.8
+  Eleccion: sigma_a = 500 mm/s^2. Con 1500 (valor actual de config.py) la velocidad
+  sale tan ruidosa que el plato tiembla; con 300 el atraso del filtro se come el margen.
+  ** Implica cambiar PROCESS_ACCEL_STD en proyecto_ControlDIP-develop/src/config.py **
+  (y repetir esta tabla cuando se mida MEAS_NOISE_STD_MM).
+
+=== 3. Asignacion de polos (modelo -c*g/(s^2 (te s + 1))) ===
+  Polinomio deseado: te*(s + a*w)*(s^2 + 2*zeta*w*s + w^2), zeta = 0.70, a = 1.00
+  w = 1/(te*(a + 2*zeta)) = 3.1646 rad/s
+  Polos de diseno: -3.165+0.000j  -2.215+2.260j  -2.215-2.260j  
+  Kp = 0.000595 rad/mm   = 0.03412 deg/mm
+  Kd = 0.000452 rad/(mm/s) = 0.02588 deg/(mm/s)
+  Ki = Kp/Ti = 0.000397 rad/(mm s) = 0.02275 deg/(mm s)  (Ti = 1.50 s)
+
+=== 4-5. Controlador ===
+  Continuo equivalente (parte lineal), con eps = x - r y v = dx/dt:
+    TH(s) = (Kp + Ki/s)*EPS(s) + Kd*V(s)
+    C(s)  = Kd*s + Kp + Ki/s = (0.000452 s^2 + 0.000595 s + 0.000397)/s  [rad/mm]
+    Ceros del controlador: -0.659+0.667j  -0.659-0.667j   rad/s
+  Ley discreta (cada cuadro, Ts = 0.0333 s), por eje:
+    eps[k]    = x_hat[k] - r[k]                          [mm]
+    u[k]      = Kp*eps[k] + I[k] + Kd*v_hat[k]              [rad]
+    th_cmd[k] = min(max(u[k], -th_lim), th_lim),  th_lim = 12.0 deg
+    nq[k]     = nq[k-1] + 1 si |v_hat[k]| < 25 mm/s; si no, 0
+    I[k+1]    = I[k] + Ki*Ts*sat(eps[k], +-30 mm)  si nq[k] >= 4
+                y no (th_cmd saturado y sign(eps) == sign(u))   (clamping)
+                I[k+1] = I[k] en otro caso
+    Incremento por muestra de la integral: Ki*Ts = 1.323e-05 rad/(mm muestra) = 7.582e-04 deg/(mm muestra)
+    (la ganancia continua es Ki = 3.970e-04 rad/(mm s); no confundir con el incremento por muestra)
+  Kalman estacionario (sigma_a = 500, sigma_m = 1.0): K = [0.6473; 9.897 1/s]
+  th_lim = 12.0 deg: el mecanismo alcanza +-13.45 deg (A1); se deja margen por la asimetria y holguras.
+
+=== 6. Lazo discreto nominal (planta ZOH + retardo 0.075 s + Kalman + controlador lineal) ===
+  Frecuencia de cruce wc = 3.296 rad/s (0.524 Hz)
+  Margen de fase        PM = 40.9 deg   (criterio >= 40)
+  Margen de ganancia superior = +11.8 dB (la ganancia puede subir eso)
+  Margen de ganancia inferior = -12.6 dB (la ganancia puede bajar eso; la planta es
+    condicionalmente estable: con poca ganancia el doble integrador se desestabiliza)
+  Margen de retardo = PM/wc = 216.5 ms adicionales
+  Polos de lazo cerrado: radio maximo 0.9730 -> ESTABLE
+
+=== 7. Robustez: margenes con variaciones (una a la vez) ===
+  caso                          PM[deg]  GMsup[dB]  GMinf[dB]  wc[rad/s]  radio_max
+  nominal                         40.9       11.8      -12.6      3.296     0.9730
+  retardo 60 ms                   43.6       12.8      -12.8      3.296     0.9732
+  retardo 90 ms                   38.0       10.1      -12.4      3.295     0.9728
+  retardo 120 ms                  32.3        8.0      -12.0      3.295     0.9727
+  c = 0,685                       41.0       12.5      -12.2      3.158     0.9726
+  h_sup = 40 mm                   40.9       11.3      -12.6      3.308     0.9730
+  h_sup = 60 mm                   40.9       12.4      -12.6      3.280     0.9730
+  Casos: nominal | retardo 60 ms | retardo 90 ms | retardo 120 ms | c = 0,685 | h_sup = 40 mm | h_sup = 60 mm
+
+=== 8. Por que esta estructura: PD vs PID clasico vs PID con integracion condicional ===
+  Mismo simulador (Etapa D), misma planta no lineal, Kp y Kd iguales; solo cambia la integral.
+  PD (sin integral)          regulacion 100 mm: ts =  1.53 s, Mp =   2.6 %, ess =  0.27 mm | desnivel 1 deg: max|x| =  32.1 mm, ess = 30.12 mm
+  PID clasico                regulacion 100 mm: ts =  3.93 s, Mp =  38.1 %, ess =  2.04 mm | desnivel 1 deg: max|x| =  29.2 mm, ess =  0.97 mm
+  PID integ. condicional     regulacion 100 mm: ts =  1.37 s, Mp =   4.4 %, ess =  0.11 mm | desnivel 1 deg: max|x| =  30.5 mm, ess =  0.88 mm
+  Lectura: el PD no corrige el desnivel (error = desnivel/Kp); el PID clasico lo corrige
+  pero su integral se carga durante todo el recorrido y da sobreimpulso grande; la
+  integracion condicional (solo con la bola quieta 4 cuadros) conserva la respuesta
+  del PD y corrige el desnivel.
+
+Controlador guardado en /home/user/LAB-CONTROL/etapaC/resultados/C1_controlador.mat (variable Ctrl)
+FIN C1

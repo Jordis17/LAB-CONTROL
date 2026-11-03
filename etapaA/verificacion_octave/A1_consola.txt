@@ -1,0 +1,55 @@
+ETAPA A - A1_modelo_no_lineal_BoP   (2026-11-03 07:30:04)
+MATLAB 8.4.0
+
+=== Parametros de la planta (A0_parametros_BoP) ===
+  g            =   9810.0 mm/s^2
+  r_bola       =    20.00 mm      MEDIDO
+  c_rod        =   0.7143 -       NOMINAL 5/7 (identificar en la Etapa B)
+  k = J/(m r^2)=   0.4000 -       derivado de c
+  h_sup        =    49.00 mm      cara superior del plato sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  h            =    69.00 mm      centro de la bola sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  d            =    70.00 mm      DISENO
+  r_brazo      =    24.00 mm      DISENO
+  z_rot        =    26.20 mm      DISENO (derivado)
+  H_serv       =   136.00 mm      DISENO (derivado)
+  L_var        =   162.20 mm      DISENO
+  sigma_brazo  =       -1         DISENO (artefacto del ensamble)
+  phi_max      =    45.00 deg     HOJA_DATOS
+  omega_srv    =    600.0 deg/s   HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+  T_pwm        =   0.0200 s
+  Ts           =   0.0333 s       PENDIENTE medir (nominal 30 fps)
+  retardo      =   0.0750 s       ESTIMADO a priori, no medido
+  H_cam        =    450.0 mm      MEDIDO
+  x_max        =    127.0 mm
+
+=== 1. Geometria del neutro ===
+  L_var - (z_rot + H_serv) = 0.000 mm  (0 => varilla vertical con brazo horizontal y plato horizontal)
+  Cinematica inversa en th = 0: phix = 0.000000 deg, phiy = 0.000000 deg
+
+=== 2. Relacion servo -> plato (eje X, servo Y en neutro) ===
+  Pendiente en el neutro dth/dphi = 0.3429 deg/deg
+  phi = -45 deg -> th =  -13.446 deg
+  phi = +45 deg -> th =   14.069 deg
+  Maxima desviacion respecto de la recta en +-45 deg: 1.982 deg
+  Maxima desviacion respecto de la recta en +-20 deg: 0.263 deg
+  Inclinacion alcanzable simetrica (limitada por el servo): +-13.446 deg
+
+=== 3. Acople del mecanismo: IK por eje vs inclinacion real 3D ===
+  Rejilla de +-12 deg por eje, paso 2 deg (169 puntos)
+  Error maximo de inclinacion en X: 0.6286 deg
+  Error maximo de inclinacion en Y: 0.4591 deg
+
+=== 4. Verificacion de la implementacion: inclinacion constante ===
+  th = 2.0 deg, aceleracion teorica = -244.546 mm/s^2, tiempo hasta |x| = 127 mm: 1.019 s
+  Maximo |x_modelo - x_teorico| = 2.132e-13 mm  (debe ser ~0: verifica la transcripcion)
+  y se mantiene en 0.000e+00 mm (debe ser 0)
+
+=== 5. Medicion de la camara con el plato inclinado (solo eje X) ===
+  Hipotesis: camara fija sobre la junta, homografia calibrada con el plato horizontal.
+  x = -127.0 mm: Xm - x en [-3.12, 12.85] mm para th en [-14, 14] deg
+  x =   +0.0 mm: Xm - x en [-16.61, 16.61] mm para th en [-14, 14] deg
+  x = +127.0 mm: Xm - x en [-12.85, 3.12] mm para th en [-14, 14] deg
+  Error de la aproximacion lineal Xm = x - h*th: maximo 13.849 mm
+
+Resultados guardados en /home/user/LAB-CONTROL/etapaA/resultados
+FIN A1
