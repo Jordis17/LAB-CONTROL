@@ -68,3 +68,18 @@ Lectura:
   límite del eje Y. Se recomienda θ_lim ≈ 10° y una cinemática inversa por tabla medida.
 - El desnivel de −3,5° en Y es grande: un PD solo dejaría unos 100 mm de error. Se corrige por
   software, con el pulso de neutro de cada eje.
+
+## Sentido de giro (confirmado por el equipo, 2026-11-04)
+
+- `X 20` → el lado del **servo X (+X) baja**. `Y 20` → el lado del **servo Y (+Y) baja**.
+  Los dos servos responden igual: **un comando positivo baja su lado del plato**.
+- En la convención del modelo (θx > 0 levanta el lado +X, θy > 0 levanta el lado +Y):
+  **θx = lectura X de la app** y **θy = −(lectura Y de la app)**.
+- `servo_plato_v2_convencion_plato.csv` es la tabla v2 en esa convención: comando del servo
+  (grados del sketch) → θx y θy del plato. En los dos ejes, los comandos negativos levantan el
+  lado con pendiente ~0,55 °/° y los positivos lo bajan con ~0,35 °/°.
+- Desnivel en el neutro, en convención del plato: θx = +1,3° y θy = +3,5° (los lados +X y +Y
+  quedan altos). Para nivelar hay que bajarlos, o sea, comandos positivos: unos +3° en X y +7°
+  en Y según el ajuste (≈ +33 µs y +76 µs).
+- **Para el firmware:** comando_servo = −g⁻¹(θ_cmd), donde g es la relación medida. El signo
+  negativo viene de que un pulso mayor baja el lado.
