@@ -54,6 +54,7 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | Fricción de rodadura, holguras, desnivel del plato en reposo | — | PENDIENTE medir | CLAUDE.md 0.1 |
 | Requisitos | R1 ts ≤ 3 s, R2 Mp ≤ 20 %, R3 ess ≤ 3 mm (ensayo 100 mm → 0); R4 \|x\| ≤ 127 mm; diseño PM ≥ 40°, GM ≥ 6 dB | **DECISIÓN DE INGENIERÍA** (propuestos por la IA, aceptados por el equipo; no hay enunciado) | `etapaC/C0_requisitos_BoP.m` |
 | Placa ESP32 | Placa de desarrollo ESP32 de 38 pines con módulo ESP-32 tipo WROOM-32 (FCC ID 2BB77-ESP32-32X), USB–serie **CP2102**, micro-USB, AMS1117 de 3,3 V. En el Arduino IDE: "ESP32 Dev Module" | Identificada por foto (2026-11-04) | Foto del equipo |
+| Prueba de servos | Ambos servos responden con `prueba_servos.ino` (GPIO18 y GPIO19, fuente externa). Brazos ajustados a mano para que con el neutro (1500 µs, comando `C`) el plato quede lo más horizontal posible | **Hecho por el equipo (2026-11-04)**. Pendiente: sentido de giro por eje, desnivel residual medido con inclinómetro, tensión de la fuente | Equipo |
 | Conexiones ESP32–servos | Servo X en GPIO18 y servo Y en GPIO19 (con 330 Ω), servos con fuente externa de 5–6 V y ≥ 3 A, GND común, ESP32 por USB | DISEÑO | `docs/conexiones_esp32_servos.html` |
 
 ## 4. Decisiones pendientes
