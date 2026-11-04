@@ -354,6 +354,8 @@ Todos en `datos_prototipo/camara/` (ver la sección 5):
 
 ### 3.0 Seguridad antes de energizar
 
+El esquema de cableado completo, con la fuente externa, el GND común, el capacitor y las resistencias, está en `docs/conexiones_esp32_servos.html`.
+
 - [ ] Los servos se alimentan de una **fuente aparte** (4,8–6 V, al menos 2 A), **no** del
       pin de 5 V de la ESP32.
 - [ ] **GND común** entre la fuente de los servos y la ESP32.

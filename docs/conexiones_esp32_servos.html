@@ -1,0 +1,247 @@
+<title>Conexiones ESP32 y servos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: hoja de taller de una sola columna; el esquema arriba, luego tablas y la verificacion. */
+:root{
+  --bg:#f3f5f4; --panel:#ffffff; --fg:#1b2420; --muted:#5a6661; --line:#cfd6d2;
+  --board:#1f3b57; --board-ink:#e8eef4; --accent:#b4521d;
+  --w-red:#d0342c; --w-brown:#7a4a26; --w-orange:#e8891c; --w-black:#2a2a2a; --w-usb:#4a6fa5;
+  --warn-bg:#fdeee3; --warn-fg:#8a3a10; --ok:#2f7d4f;
+  --f-disp:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121816; --panel:#1a2220; --fg:#e3e9e6; --muted:#9aa6a1; --line:#2f3a36;
+  --board:#2b5378; --board-ink:#eef4fa; --accent:#f08a4b;
+  --w-black:#c9c9c9; --warn-bg:#3a2216; --warn-fg:#f6b48a; --ok:#5cbf86; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121816; --panel:#1a2220; --fg:#e3e9e6; --muted:#9aa6a1; --line:#2f3a36;
+  --board:#2b5378; --board-ink:#eef4fa; --accent:#f08a4b;
+  --w-black:#c9c9c9; --warn-bg:#3a2216; --warn-fg:#f6b48a; --ok:#5cbf86; color-scheme:dark}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.pagina{max-width:1000px;margin:0 auto;padding-block:28px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font:600 13px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:600 clamp(30px,5vw,44px)/1.05 var(--f-disp);margin:0;text-wrap:balance}
+h2{font:600 24px/1.15 var(--f-disp);margin:0 0 10px;text-wrap:balance}
+p{margin:0;max-width:68ch}
+.sub{color:var(--muted)}
+.aviso{background:var(--warn-bg);color:var(--warn-fg);border-radius:6px;padding:12px 14px;font-weight:600;max-width:none}
+.esquema{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto}
+.esquema svg{display:block;min-width:760px;width:100%;height:auto}
+.leyenda{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;font-size:14px;color:var(--muted)}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.leyenda i{display:inline-block;width:22px;height:4px;border-radius:2px}
+.tabla{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 13px/1.2 var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:none}
+code,.pin{font-family:var(--f-mono);font-size:.92em}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;border:1px solid var(--line)}
+.dos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.dos>section{min-width:0}
+ul.check{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ul.check li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+ul.check li::before{content:"";width:16px;height:16px;border:2px solid var(--ok);border-radius:3px;margin-top:3px}
+ul.lista{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.nota{font-size:14px;color:var(--muted)}
+svg text{font-family:var(--f-body)}
+</style>
+
+<div class="pagina">
+  <header>
+    <span class="eyebrow">Ball on Plate · alimentación y señales</span>
+    <h1>Conexiones ESP32 y servos</h1>
+    <p class="sub">Cómo conectar la ESP32 y los dos servos MG90D con una fuente o batería externa. Los servos se alimentan de la fuente externa; la ESP32 se alimenta por el USB de la PC, que además lleva las tramas serie. Las dos partes solo comparten la tierra (GND).</p>
+  </header>
+
+  <p class="aviso">Nunca alimentes los servos desde el pin 5V/VIN ni desde el 3V3 de la ESP32. Al arrancar o cuando se traban, cada servo puede pedir del orden de 1 A: eso reinicia la placa o la daña.</p>
+
+  <section>
+    <h2>Esquema</h2>
+    <div class="esquema" role="img" aria-label="Esquema de conexiones: fuente externa con fusible e interruptor a dos rieles, +5 a 6 V y GND; capacitor entre rieles; cada servo con cable rojo al riel positivo, marrón a GND y naranja a un pin de la ESP32 a través de una resistencia de 330 ohm; GND de la ESP32 al riel de GND; ESP32 por USB a la PC.">
+      <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg">
+        <!-- Fuente externa -->
+        <rect x="30" y="35" width="150" height="110" rx="6" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="105" y="65" text-anchor="middle" font-size="16" font-weight="600" fill="var(--fg)">Fuente / batería</text>
+        <text x="105" y="86" text-anchor="middle" font-size="14" fill="var(--muted)">5 a 6 V, ≥ 3 A</text>
+        <text x="166" y="76" text-anchor="end" font-size="16" font-weight="700" fill="var(--w-red)">+</text>
+        <text x="166" y="126" text-anchor="end" font-size="18" font-weight="700" fill="var(--fg)">−</text>
+        <circle cx="180" cy="70" r="5" fill="var(--w-red)"/>
+        <circle cx="180" cy="120" r="5" fill="var(--fg)"/>
+
+        <!-- + : fusible e interruptor -->
+        <line x1="180" y1="70" x2="215" y2="70" stroke="var(--w-red)" stroke-width="4"/>
+        <rect x="215" y="61" width="44" height="18" rx="3" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="237" y="56" text-anchor="middle" font-size="13" fill="var(--muted)">fusible 3 A</text>
+        <line x1="259" y1="70" x2="275" y2="70" stroke="var(--w-red)" stroke-width="4"/>
+        <circle cx="277" cy="70" r="3" fill="var(--fg)"/>
+        <line x1="277" y1="70" x2="305" y2="56" stroke="var(--fg)" stroke-width="3"/>
+        <circle cx="307" cy="70" r="3" fill="var(--fg)"/>
+        <text x="292" y="45" text-anchor="middle" font-size="13" fill="var(--muted)">interruptor</text>
+
+        <!-- Rieles -->
+        <line x1="307" y1="70" x2="780" y2="70" stroke="var(--w-red)" stroke-width="5"/>
+        <text x="785" y="75" font-size="14" font-weight="600" fill="var(--w-red)">+5…6 V</text>
+        <line x1="180" y1="120" x2="780" y2="120" stroke="var(--w-brown)" stroke-width="5"/>
+        <text x="785" y="125" font-size="14" font-weight="600" fill="var(--w-brown)">GND</text>
+
+        <!-- Capacitor entre rieles -->
+        <line x1="360" y1="70" x2="360" y2="88" stroke="var(--w-red)" stroke-width="3"/>
+        <line x1="346" y1="88" x2="374" y2="88" stroke="var(--fg)" stroke-width="3"/>
+        <path d="M346 100 Q360 94 374 100" fill="none" stroke="var(--fg)" stroke-width="3"/>
+        <line x1="360" y1="98" x2="360" y2="120" stroke="var(--w-brown)" stroke-width="3"/>
+        <circle cx="360" cy="70" r="4.5" fill="var(--w-red)"/><circle cx="360" cy="120" r="4.5" fill="var(--w-brown)"/>
+        <text x="380" y="93" font-size="13" fill="var(--muted)">C 1000 µF, ≥ 16 V</text>
+        <text x="380" y="108" font-size="13" fill="var(--muted)">(+ al riel rojo)</text>
+
+        <!-- Servo X -->
+        <rect x="640" y="185" width="150" height="80" rx="6" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="715" y="217" text-anchor="middle" font-size="17" font-weight="600" fill="var(--fg)">Servo X</text>
+        <text x="715" y="238" text-anchor="middle" font-size="13" fill="var(--muted)">MG90D · lado +X</text>
+        <!-- Servo Y -->
+        <rect x="640" y="325" width="150" height="80" rx="6" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="715" y="357" text-anchor="middle" font-size="17" font-weight="600" fill="var(--fg)">Servo Y</text>
+        <text x="715" y="378" text-anchor="middle" font-size="13" fill="var(--muted)">MG90D · lado +Y</text>
+
+        <!-- Alimentacion servo X: marron (GND) y rojo (+) -->
+        <polyline points="560,120 560,200 640,200" fill="none" stroke="var(--w-brown)" stroke-width="4"/>
+        <polyline points="600,70 600,220 640,220" fill="none" stroke="var(--w-red)" stroke-width="4"/>
+        <circle cx="560" cy="120" r="4.5" fill="var(--w-brown)"/><circle cx="600" cy="70" r="4.5" fill="var(--w-red)"/>
+        <!-- Alimentacion servo Y -->
+        <polyline points="520,120 520,340 640,340" fill="none" stroke="var(--w-brown)" stroke-width="4"/>
+        <polyline points="540,70 540,360 640,360" fill="none" stroke="var(--w-red)" stroke-width="4"/>
+        <circle cx="520" cy="120" r="4.5" fill="var(--w-brown)"/><circle cx="540" cy="70" r="4.5" fill="var(--w-red)"/>
+
+        <!-- ESP32 -->
+        <rect x="40" y="250" width="230" height="210" rx="8" fill="var(--board)"/>
+        <text x="155" y="282" text-anchor="middle" font-size="18" font-weight="600" fill="var(--board-ink)">ESP32 (DevKit)</text>
+        <text x="155" y="302" text-anchor="middle" font-size="13" fill="var(--board-ink)" opacity=".8">lógica de 3,3 V</text>
+        <!-- pines lado derecho -->
+        <g font-family="var(--f-mono)" font-size="13" fill="var(--board-ink)">
+          <text x="258" y="329" text-anchor="end">5V / VIN</text>
+          <text x="258" y="364" text-anchor="end">GND</text>
+          <text x="258" y="399" text-anchor="end">GPIO18</text>
+          <text x="258" y="434" text-anchor="end">GPIO19</text>
+        </g>
+        <circle cx="270" cy="325" r="5" fill="var(--panel)" stroke="var(--board-ink)" stroke-width="2"/>
+        <circle cx="270" cy="360" r="5" fill="var(--board-ink)"/>
+        <circle cx="270" cy="395" r="5" fill="var(--board-ink)"/>
+        <circle cx="270" cy="430" r="5" fill="var(--board-ink)"/>
+        <text x="282" y="329" font-size="13" font-weight="600" fill="var(--warn-fg)">sin conectar</text>
+
+        <!-- GND ESP32 al riel de GND -->
+        <polyline points="270,360 440,360 440,120" fill="none" stroke="var(--w-black)" stroke-width="4"/>
+        <circle cx="440" cy="120" r="4.5" fill="var(--w-brown)"/>
+        <text x="448" y="250" font-size="13" fill="var(--muted)" transform="rotate(-90 448 250)">GND común</text>
+
+        <!-- Senal X: GPIO18 - R - servo X -->
+        <line x1="270" y1="395" x2="320" y2="395" stroke="var(--w-orange)" stroke-width="4"/>
+        <rect x="320" y="387" width="46" height="16" rx="2" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="343" y="381" text-anchor="middle" font-size="12" fill="var(--muted)">330 Ω</text>
+        <polyline points="366,395 470,395 470,240 640,240" fill="none" stroke="var(--w-orange)" stroke-width="4"/>
+        <!-- Senal Y: GPIO19 - R - servo Y -->
+        <line x1="270" y1="430" x2="320" y2="430" stroke="var(--w-orange)" stroke-width="4"/>
+        <rect x="320" y="422" width="46" height="16" rx="2" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="343" y="456" text-anchor="middle" font-size="12" fill="var(--muted)">330 Ω</text>
+        <polyline points="366,430 600,430 600,380 640,380" fill="none" stroke="var(--w-orange)" stroke-width="4"/>
+
+        <!-- Etiquetas de cable en los servos -->
+        <g font-size="12" fill="var(--muted)">
+          <text x="636" y="196" text-anchor="end">marrón</text>
+          <text x="636" y="216" text-anchor="end">rojo</text>
+          <text x="636" y="256" text-anchor="end">naranja</text>
+          <text x="636" y="336" text-anchor="end">marrón</text>
+          <text x="636" y="356" text-anchor="end">rojo</text>
+          <text x="636" y="396" text-anchor="end">naranja</text>
+        </g>
+
+        <!-- USB a la PC -->
+        <rect x="120" y="455" width="70" height="14" rx="3" fill="var(--panel)" stroke="var(--board-ink)" stroke-width="2"/>
+        <line x1="155" y1="469" x2="155" y2="500" stroke="var(--w-usb)" stroke-width="5"/>
+        <rect x="40" y="500" width="230" height="44" rx="6" fill="var(--panel)" stroke="var(--fg)" stroke-width="2"/>
+        <text x="155" y="519" text-anchor="middle" font-size="15" font-weight="600" fill="var(--fg)">PC Linux (USB)</text>
+        <text x="155" y="536" text-anchor="middle" font-size="12" fill="var(--muted)">alimenta la ESP32 + serial 921600</text>
+      </svg>
+    </div>
+    <div class="leyenda">
+      <span><i style="background:var(--w-red)"></i>+5…6 V (solo servos)</span>
+      <span><i style="background:var(--w-brown)"></i>GND de la fuente y de los servos</span>
+      <span><i style="background:var(--w-black)"></i>GND de la ESP32</span>
+      <span><i style="background:var(--w-orange)"></i>Señal PWM</span>
+      <span><i style="background:var(--w-usb)"></i>USB</span>
+      <span>Punto relleno = unión</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Lista de conexiones</h2>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Desde</th><th>Hacia</th><th>Cable</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td>Fuente <b>+</b></td><td>Fusible → interruptor → riel <b>+</b></td><td><span class="sw" style="background:var(--w-red)"></span>rojo, ≥ 0,5 mm² (AWG 20)</td><td>El fusible va lo más cerca posible de la fuente.</td></tr>
+          <tr><td>Fuente <b>−</b></td><td>Riel <b>GND</b></td><td><span class="sw" style="background:var(--w-brown)"></span>negro o marrón, ≥ 0,5 mm²</td><td></td></tr>
+          <tr><td>Capacitor 1000 µF</td><td>Entre riel + (pata larga) y GND (franja)</td><td>—</td><td>Cerca de los conectores de los servos. Respetar la polaridad.</td></tr>
+          <tr><td>Servo X <b>rojo</b></td><td>Riel <b>+</b></td><td><span class="sw" style="background:var(--w-red)"></span></td><td>En el Tower Pro: marrón = GND, rojo = +, naranja = señal.</td></tr>
+          <tr><td>Servo X <b>marrón</b></td><td>Riel <b>GND</b></td><td><span class="sw" style="background:var(--w-brown)"></span></td><td></td></tr>
+          <tr><td>Servo X <b>naranja</b></td><td>330 Ω → <span class="pin">GPIO18</span></td><td><span class="sw" style="background:var(--w-orange)"></span></td><td>Mismo pin que el sketch de prueba (<code>PIN_X = 18</code>).</td></tr>
+          <tr><td>Servo Y <b>rojo</b></td><td>Riel <b>+</b></td><td><span class="sw" style="background:var(--w-red)"></span></td><td></td></tr>
+          <tr><td>Servo Y <b>marrón</b></td><td>Riel <b>GND</b></td><td><span class="sw" style="background:var(--w-brown)"></span></td><td></td></tr>
+          <tr><td>Servo Y <b>naranja</b></td><td>330 Ω → <span class="pin">GPIO19</span></td><td><span class="sw" style="background:var(--w-orange)"></span></td><td><code>PIN_Y = 19</code>.</td></tr>
+          <tr><td>ESP32 <span class="pin">GND</span></td><td>Riel <b>GND</b></td><td><span class="sw" style="background:var(--w-black)"></span>cualquiera</td><td><b>Imprescindible.</b> Sin GND común la señal PWM no tiene referencia y los servos tiemblan o no responden.</td></tr>
+          <tr><td>ESP32 USB</td><td>PC Linux</td><td><span class="sw" style="background:var(--w-usb)"></span>USB de datos</td><td>Alimenta la placa y lleva las tramas. Algunos cables USB son solo de carga: usar uno de datos.</td></tr>
+          <tr><td>ESP32 <span class="pin">5V / VIN</span></td><td><b>Nada</b></td><td>—</td><td>Si se une al riel + con el USB conectado, la fuente y el USB de la PC quedan en paralelo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="dos">
+    <section>
+      <h2>Materiales</h2>
+      <ul class="lista">
+        <li><b>Fuente regulada de 5 V y 3 A o más</b> (o de 6 V, que da servos más rápidos: 0,08 s/60° contra 0,10 s/60°). Anoten cuál usan: el modelo usa 4,8 V.</li>
+        <li><b>Con batería:</b> 4 pilas AA de NiMH (4,8 V) directo, o un pack 2S LiPo (7,4 V) <b>con un regulador buck de 5–6 V y 3 A o más</b>. Nunca 7,4 V directo a los servos: la hoja de datos admite de 4,8 a 6 V.</li>
+        <li>Fusible de 3 A con portafusible, e interruptor.</li>
+        <li>Capacitor electrolítico de 1000 µF, 16 V o más.</li>
+        <li>2 resistencias de 330 Ω (¼ W) en serie con las señales.</li>
+        <li>Bornera o una placa perforada soldada para los rieles. Las pistas de una protoboard aguantan poca corriente y los contactos se aflojan con la vibración.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Por qué así</h2>
+      <ul class="lista">
+        <li><b>Fuente aparte:</b> los picos de corriente de los servos hacen caer la tensión. Si comparten alimentación con la ESP32, la placa se reinicia en medio del control.</li>
+        <li><b>GND común:</b> el pulso PWM de 3,3 V se mide respecto de una tierra. Las dos tierras tienen que ser la misma.</li>
+        <li><b>Capacitor:</b> entrega los picos de corriente de arranque y evita que la tensión caiga.</li>
+        <li><b>330 Ω:</b> protegen el pin si el servo falla o si se equivoca un cable. No afectan al PWM.</li>
+        <li><b>GPIO18 y 19:</b> son pines de uso general sin función de arranque. No usar 6 a 11 (memoria flash), 34 a 39 (solo entrada) ni 0, 2, 12 y 15 (pines de arranque).</li>
+        <li><b>Señal de 3,3 V:</b> los MG90D suelen aceptarla. Si un servo no responde bien, se puede agregar un convertidor de nivel a 5 V.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section>
+    <h2>Antes de energizar</h2>
+    <ul class="check">
+      <li>Con todo desconectado, medir la fuente con el multímetro: entre 4,8 y 6 V.</li>
+      <li>Revisar la polaridad del capacitor y de cada conector de servo (marrón a GND).</li>
+      <li>Continuidad entre el GND de la ESP32 y el − de la fuente.</li>
+      <li>Que <b>no</b> haya continuidad entre el riel + y el 5V/VIN de la ESP32.</li>
+      <li>Cargar en la ESP32 el sketch de prueba del instructivo, con los servos todavía desconectados del riel +.</li>
+      <li>Brazos de los servos sueltos o la varilla desconectada en la primera prueba: mandar <code>C</code> (neutro) y después montar el brazo horizontal.</li>
+      <li>Encender primero la ESP32 (USB) y después la fuente de los servos. Apagar en orden inverso.</li>
+      <li>Mano en el interruptor las primeras veces. Si un servo zumba fuerte o se calienta, apagar.</li>
+    </ul>
+  </section>
+
+  <p class="nota">Placa indicada por el equipo: <b>“ESP32-32X”</b>. Este esquema vale para cualquier placa de desarrollo ESP32 (WROOM-32), pero los pines cambian de lugar entre modelos. Ubiquen <span class="pin">GPIO18</span>, <span class="pin">GPIO19</span> y <span class="pin">GND</span> por la serigrafía de su placa, y confirmen el modelo exacto: se necesita para la Etapa G (PIL).</p>
+</div>
