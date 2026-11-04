@@ -243,5 +243,5 @@ svg text{font-family:var(--f-body)}
     </ul>
   </section>
 
-  <p class="nota">Placa indicada por el equipo: <b>“ESP32-32X”</b>. Este esquema vale para cualquier placa de desarrollo ESP32 (WROOM-32), pero los pines cambian de lugar entre modelos. Ubiquen <span class="pin">GPIO18</span>, <span class="pin">GPIO19</span> y <span class="pin">GND</span> por la serigrafía de su placa, y confirmen el modelo exacto: se necesita para la Etapa G (PIL).</p>
+  <p class="nota">Placa del equipo (identificada por foto, 2026-11-04): placa de desarrollo <b>ESP32 de 38 pines</b>, módulo ESP-32 (FCC ID 2BB77-ESP32-32X, tipo WROOM-32), puente USB–serie <b>Silicon Labs CP2102</b>, conector micro-USB, regulador AMS1117 de 3,3 V y botones RST y BOOT. En la fila derecha de pines, contando desde la antena, están juntos <span class="pin">GND</span>, <span class="pin">G19</span> y <span class="pin">G18</span> (posiciones 7, 8 y 9): ahí van el GND común, el servo Y y el servo X. El pin <span class="pin">V5</span> (abajo a la izquierda) queda sin conectar. En el Arduino IDE se usa la placa “ESP32 Dev Module”, y en Windows el driver CP210x de Silicon Labs.</p>
 </div>
