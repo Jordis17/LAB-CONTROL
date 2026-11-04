@@ -13,9 +13,10 @@ Tabla que mandó el equipo el 2026-11-04 (captura de una hoja de cálculo).
 
 **Datos que faltan para interpretarla** (pedidos al equipo):
 
-1. Todos los valores son positivos. ¿El instrumento mostraba el **valor absoluto**? ¿Hacia qué
-   lado se inclinaba el plato con comandos negativos y con positivos?
-2. Instrumento de medida (app del celular u otro) y dónde se apoyó sobre el plato.
+1. ~~¿Valor absoluto?~~ **Respondido (2026-11-04):** la app del celular mostraba valores
+   **sin signo**. Falta saber hacia qué lado se inclinaba el plato con comandos negativos y con
+   positivos.
+2. ~~Instrumento~~ **Respondido:** app del celular, apoyado sobre la cara superior del plato.
 3. Si se midió también la inclinación en el otro eje (acople), y desde qué lado se llegó a cada
    comando (holgura).
 4. Ángulo del **brazo** del servo respecto de la horizontal con el comando `C`.
