@@ -212,7 +212,7 @@ svg text{font-family:var(--f-body)}
         <li><b>Con batería:</b> 4 pilas AA de NiMH (4,8 V) directo, o un pack 2S LiPo (7,4 V) <b>con un regulador buck de 5–6 V y 3 A o más</b>. Nunca 7,4 V directo a los servos: la hoja de datos admite de 4,8 a 6 V.</li>
         <li>Fusible de 3 A con portafusible, e interruptor.</li>
         <li>Capacitor electrolítico de 1000 µF, 16 V o más.</li>
-        <li>2 resistencias de 330 Ω (¼ W) en serie con las señales.</li>
+        <li>2 resistencias de 330 Ω (¼ W) en serie con las señales: <b>recomendadas, no imprescindibles</b>. Sirve cualquier valor de 220 Ω a 1 kΩ. Sin ellas, la señal se puede conectar directo siguiendo los cuidados de “Por qué así”.</li>
         <li>Bornera o una placa perforada soldada para los rieles. Las pistas de una protoboard aguantan poca corriente y los contactos se aflojan con la vibración.</li>
       </ul>
     </section>
@@ -222,7 +222,7 @@ svg text{font-family:var(--f-body)}
         <li><b>Fuente aparte:</b> los picos de corriente de los servos hacen caer la tensión. Si comparten alimentación con la ESP32, la placa se reinicia en medio del control.</li>
         <li><b>GND común:</b> el pulso PWM de 3,3 V se mide respecto de una tierra. Las dos tierras tienen que ser la misma.</li>
         <li><b>Capacitor:</b> entrega los picos de corriente de arranque y evita que la tensión caiga.</li>
-        <li><b>330 Ω:</b> protegen el pin si el servo falla o si se equivoca un cable. No afectan al PWM.</li>
+        <li><b>330 Ω (opcionales):</b> la entrada de señal del servo casi no consume corriente, así que el PWM funciona igual con o sin ellas. Solo protegen el pin de la ESP32 si un cable de 5–6 V toca la señal por error, o si los servos están alimentados con la ESP32 apagada. Sin resistencias: revisar dos veces que el naranja vaya al GPIO, encender primero la ESP32 y después la fuente de los servos, y apagar en orden inverso.</li>
         <li><b>GPIO18 y 19:</b> son pines de uso general sin función de arranque. No usar 6 a 11 (memoria flash), 34 a 39 (solo entrada) ni 0, 2, 12 y 15 (pines de arranque).</li>
         <li><b>Señal de 3,3 V:</b> los MG90D suelen aceptarla. Si un servo no responde bien, se puede agregar un convertidor de nivel a 5 V.</li>
       </ul>
