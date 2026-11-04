@@ -1,4 +1,4 @@
-ETAPA D - D1_MIL_BoP   (2026-11-03 07:26:50)
+ETAPA D - D1_MIL_BoP   (2026-11-04 21:36:31)
 MATLAB 8.4.0
 
 === Parametros de la planta (A0_parametros_BoP) ===
@@ -22,63 +22,70 @@ MATLAB 8.4.0
   H_cam        =    450.0 mm      MEDIDO
   x_max        =    127.0 mm
 
-Controlador (C1, 2026-11-03 07:20:07): Kp = 0.03412 deg/mm, Kd = 0.02588 deg/(mm/s), Ki = 0.02275 deg/(mm s),
-  th_lim = 12.0 deg, e_clip = 30 mm, v_int = 25 mm/s, Nq = 4, Kalman sigma_a = 500, sigma_m = 1
+Controlador (C1, 2026-11-04 21:05:24): Kp = 0.03412 deg/mm, Kd = 0.02588 deg/(mm/s), Ki = 0.02275 deg/(mm s),
+  th_lim = 10.0 deg, e_clip = 30 mm, v_int = 25 mm/s, Nq = 4, Kalman sigma_a = 500, sigma_m = 1
+Actuador: medido (relacion servo-plato; ver etapaD/funciones/bop_actuador.m)
 Simulacion: dt = Ts/33, retardo total 0.075 s (medicion 0.065 s + PWM), servo omega_n = 50 rad/s,
   ruido de camara 1.00 mm (semilla 1), velocidad del servo 600 deg/s.
 
 === D1. Ensayo de requisitos: x0 = 100 mm, r = 0 ===
-    x0 = 100.1 mm, r = 0.0 mm: tr = 0.83 s, ts = 1.37 s, Mp = 4.4 %, ess = 0.11 mm
-    max|x_hat| = 100.2 mm, max|x| plato = 102.7 mm, th_cmd en [-2.32, 3.62] deg, saturado 0.0 % (0.00 s), std th en reposo 0.308 deg
+    x0 = 100.0 mm, r = 0.0 mm: tr = 0.80 s, ts = 1.30 s, Mp = 4.5 %, ess = 0.16 mm
+    max|x_hat| = 100.0 mm, max|x| plato = 102.4 mm, th_cmd en [-2.33, 3.60] deg, saturado 0.0 % (0.00 s), std th en reposo 0.308 deg
   Verificacion de requisitos:
-    R1 ts  =  1.37 s   <= 3.0 s   -> CUMPLE
-    R2 Mp  =   4.4 %   <= 20 %    -> CUMPLE
-    R3 ess =  0.11 mm  <= 3.0 mm  -> CUMPLE
-    R4 max|x| (plato) = 102.7 mm <= 127 mm -> CUMPLE
+    R1 ts  =  1.30 s   <= 3.0 s   -> CUMPLE
+    R2 Mp  =   4.5 %   <= 20 %    -> CUMPLE
+    R3 ess =  0.16 mm  <= 3.0 mm  -> CUMPLE
+    R4 max|x| (plato) = 102.4 mm <= 127 mm -> CUMPLE
 
 === D2. Saturacion y anti-windup: empujon de 420 mm/s desde el centro, desnivel 1 deg ===
   (1) actuador ideal, sin saturacion
     max|x_hat| = 113.9 mm, max|x| plato = 124.0 mm, th_cmd en [-4.24, 12.92] deg, u en [-4.24, 12.92] deg
     saturado 0.0 % del tiempo (0.00 s); integrador en [-0.995, 0.000] deg; |x_hat| < 3 mm desde 5.37 s; ess = 2.07 mm
   (2) saturado, sin anti-windup
-    max|x_hat| = 116.6 mm, max|x| plato = 126.3 mm, th_cmd en [-4.25, 12.00] deg, u en [-4.25, 12.92] deg
-    saturado 3.9 % del tiempo (0.23 s); integrador en [-0.995, 0.000] deg; |x_hat| < 3 mm desde 5.37 s; ess = 2.10 mm
+    max|x_hat| = 125.8 mm, max|x| plato = 132.7 mm, th_cmd en [-4.23, 10.00] deg, u en [-4.23, 12.95] deg
+    saturado 5.6 % del tiempo (0.33 s); integrador en [-1.018, 0.000] deg; |x_hat| < 3 mm desde 5.77 s; ess = 3.11 mm
+    AVISO: la bola pasa |x| = 127 mm.
   (3) saturado, con anti-windup
-    max|x_hat| = 116.6 mm, max|x| plato = 126.3 mm, th_cmd en [-4.25, 12.00] deg, u en [-4.25, 12.92] deg
-    saturado 3.9 % del tiempo (0.23 s); integrador en [-0.995, 0.000] deg; |x_hat| < 3 mm desde 5.37 s; ess = 2.10 mm
+    max|x_hat| = 125.8 mm, max|x| plato = 132.7 mm, th_cmd en [-4.23, 10.00] deg, u en [-4.23, 12.95] deg
+    saturado 5.6 % del tiempo (0.33 s); integrador en [-1.018, 0.000] deg; |x_hat| < 3 mm desde 5.77 s; ess = 3.11 mm
+    AVISO: la bola pasa |x| = 127 mm.
   (2b) PID clasico, saturado, sin anti-windup
-    max|x_hat| = 116.5 mm, max|x| plato = 126.5 mm, th_cmd en [-4.22, 12.00] deg, u en [-4.22, 12.95] deg
-    saturado 3.9 % del tiempo (0.23 s); integrador en [-1.152, 1.566] deg; |x_hat| < 3 mm desde 5.90 s; ess = 3.48 mm
+    max|x_hat| = 125.8 mm, max|x| plato = 132.7 mm, th_cmd en [-4.14, 10.00] deg, u en [-4.14, 13.00] deg
+    saturado 5.6 % del tiempo (0.33 s); integrador en [-1.189, 1.812] deg; |x_hat| < 3 mm desde 5.90 s; ess = 3.71 mm
+    AVISO: la bola pasa |x| = 127 mm.
   (3b) PID clasico, saturado, con anti-windup
-    max|x_hat| = 116.6 mm, max|x| plato = 126.3 mm, th_cmd en [-4.07, 12.00] deg, u en [-4.07, 12.92] deg
-    saturado 3.9 % del tiempo (0.23 s); integrador en [-1.138, 1.314] deg; |x_hat| < 3 mm desde 5.90 s; ess = 3.17 mm
+    max|x_hat| = 125.8 mm, max|x| plato = 132.7 mm, th_cmd en [-3.85, 10.00] deg, u en [-3.85, 12.94] deg
+    saturado 5.6 % del tiempo (0.33 s); integrador en [-1.164, 1.333] deg; |x_hat| < 3 mm desde 5.90 s; ess = 3.11 mm
+    AVISO: la bola pasa |x| = 127 mm.
 
 === D3. Perturbacion: desnivel de 1 deg en X, bola en el centro ===
-  max|x_hat| = 30.5 mm, ess (ultimo s) = 0.88 mm, recupera |x_hat| < 3 mm a los 5.17 s
+  max|x_hat| = 31.3 mm, ess (ultimo s) = 0.89 mm, recupera |x_hat| < 3 mm a los 5.17 s
   Error que dejaria un PD: desnivel/Kp = 29.3 mm
 
 === D4. Dos ejes: (80, -60) -> (0, 0) y a los 4,5 s -> (50, 50) ===
-  Eje X, tramo 1 (x0 = 80 -> 0):  tr = 0.80 s, ts = 2.97 s, Mp = 5.2 %, ess = 2.03 mm, th en [-2.0, 2.9] deg
-  Eje X, tramo 2 (0 -> 50):         tr = 0.77 s, ts = 3.70 s, Mp = 8.8 %, ess = 0.80 mm, th en [-2.3, 1.3] deg
-  Eje Y, tramo 1 (x0 = -60 -> 0):  tr = 0.67 s, ts = 3.83 s, Mp = 10.5 %, ess = 3.70 mm, th en [-2.3, 1.7] deg
-  Eje Y, tramo 2 (0 -> 50):         tr = 0.67 s, ts = 4.00 s, Mp = 14.7 %, ess = 1.24 mm, th en [-2.3, 1.5] deg
-  max distancia al centro (marco del plato): 102.7 mm
+  Eje X, tramo 1 (x0 = 80 -> 0):  tr = 0.77 s, ts = 2.97 s, Mp = 5.3 %, ess = 2.08 mm, th en [-2.0, 2.9] deg
+  Eje X, tramo 2 (0 -> 50):         tr = 0.77 s, ts = 3.70 s, Mp = 8.9 %, ess = 0.79 mm, th en [-2.3, 1.2] deg
+  Eje Y, tramo 1 (x0 = -60 -> 0):  tr = 0.67 s, ts = 3.83 s, Mp = 10.5 %, ess = 3.72 mm, th en [-2.3, 1.7] deg
+  Eje Y, tramo 2 (0 -> 50):         tr = 0.67 s, ts = 4.00 s, Mp = 14.7 %, ess = 1.26 mm, th en [-2.3, 1.5] deg
+  max distancia al centro (marco del plato): 102.4 mm
 
 === D5. Robustez: ensayo D1 con un parametro cambiado a la vez ===
   caso                     ts[s]   Mp[%]  ess[mm]  max|x|[mm]  std th ss[deg]  cumple
-  nominal                   1.37     4.4    0.11      102.7         0.308      CUMPLE
-  retardo 120 ms            3.90     5.5    1.93      102.7         0.301      NO CUMPLE
-  c = 0,685                 1.30     4.0    0.24      102.6         0.308      CUMPLE
-  h_sup = 40 mm             1.37     4.4    0.12      102.3         0.307      CUMPLE
-  h_sup = 60 mm             1.37     4.3    0.11      103.1         0.309      CUMPLE
-  servos a 6 V              1.37     4.4    0.11      102.7         0.308      CUMPLE
-  servo lento (wn = 30)     1.20     4.7    0.02      102.2         0.304      CUMPLE
-  ruido 0,3 mm              1.30     3.5    0.08      102.7         0.092      CUMPLE
-  ruido 2 mm                3.90     7.0    0.97      102.7         0.616      NO CUMPLE
+  nominal                   1.30     4.5    0.16      102.4         0.308      CUMPLE
+  retardo 120 ms            3.90     5.7    1.93      102.4         0.301      NO CUMPLE
+  c = 0,685                 1.30     4.1    0.29      102.3         0.308      CUMPLE
+  h_sup = 40 mm             1.30     4.5    0.16      102.1         0.307      CUMPLE
+  h_sup = 60 mm             1.30     4.4    0.15      102.8         0.308      CUMPLE
+  servos a 6 V              1.30     4.5    0.16      102.4         0.308      CUMPLE
+  servo lento (wn = 30)     1.20     4.8    0.05      101.9         0.304      CUMPLE
+  ruido 0,3 mm              1.27     3.6    0.13      102.4         0.092      CUMPLE
+  ruido 2 mm                3.90     7.6    1.39      102.4         0.616      NO CUMPLE
+  actuador del diseno       1.37     4.4    0.11      102.7         0.308      CUMPLE
+  firmware sin tabla        4.90    24.6    2.13       80.2         0.321      NO CUMPLE
 
 === D6. Planta lineal vs no lineal en lazo cerrado ===
-  Ensayo D1: lineal ts = 1.30 s, Mp = 4.3 %, max|x| = 102.5 mm | no lineal ts = 1.37 s, Mp = 4.4 %, max|x| = 102.7 mm | max|x_nl - x_lin| = 1.64 mm
-  Ensayo D2: lineal ts = NaN s, Mp = NaN %, max|x| = 119.1 mm | no lineal ts = NaN s, Mp = NaN %, max|x| = 126.3 mm | max|x_nl - x_lin| = 10.66 mm
+  Ensayo D1: lineal ts = 1.27 s, Mp = 4.4 %, max|x| = 102.2 mm | no lineal ts = 1.30 s, Mp = 4.5 %, max|x| = 102.4 mm | max|x_nl - x_lin| = 1.63 mm
+  Ensayo D2: lineal ts = NaN s, Mp = NaN %, max|x| = 127.5 mm | no lineal ts = NaN s, Mp = NaN %, max|x| = 132.7 mm | max|x_nl - x_lin| = 9.73 mm
 
 Resultados en /home/user/LAB-CONTROL/etapaD/resultados
 FIN D1

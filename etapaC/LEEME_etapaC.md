@@ -66,8 +66,10 @@ te·(s + a·ω)(s² + 2ζω·s + ω²), con ζ = 0,7 y a = 1. El coeficiente de 
 
 **Integral:** Ti = 1,5 s. El error que entra al integrador se recorta a ±30 mm.
 
-**Saturación:** θ_lim = 12°. El mecanismo alcanza ±13,4° (A1); se deja margen por la
-asimetría y las holguras.
+**Saturación:** θ_lim = **10°** (actualizado el 2026-11-04). Con la relación servo → plato
+medida, el peor eje (Y) alcanza ±11,3° con ±40° de comando; se deja ~1,3° de margen. Antes
+de la medición era 12°, con el ±13,4° del diseño. Kp, Ki, Kd, el Kalman y los márgenes no
+cambian, porque el firmware compensa la ganancia del mecanismo con la tabla medida.
 
 **Kalman:** la velocidad del filtro entra al lazo, así que su sintonía es parte del diseño. Con
 `PROCESS_ACCEL_STD = 1500` (el valor actual de `config.py`), la velocidad sale tan ruidosa que

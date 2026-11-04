@@ -1,4 +1,4 @@
-ETAPA C - C1_disenar_controlador_BoP   (2026-11-03 07:18:57)
+ETAPA C - C1_disenar_controlador_BoP   (2026-11-04 20:48:50)
 MATLAB 8.4.0
 
 === Parametros de la planta (A0_parametros_BoP) ===
@@ -55,7 +55,7 @@ MATLAB 8.4.0
   Ley discreta (cada cuadro, Ts = 0.0333 s), por eje:
     eps[k]    = x_hat[k] - r[k]                          [mm]
     u[k]      = Kp*eps[k] + I[k] + Kd*v_hat[k]              [rad]
-    th_cmd[k] = min(max(u[k], -th_lim), th_lim),  th_lim = 12.0 deg
+    th_cmd[k] = min(max(u[k], -th_lim), th_lim),  th_lim = 10.0 deg
     nq[k]     = nq[k-1] + 1 si |v_hat[k]| < 25 mm/s; si no, 0
     I[k+1]    = I[k] + Ki*Ts*sat(eps[k], +-30 mm)  si nq[k] >= 4
                 y no (th_cmd saturado y sign(eps) == sign(u))   (clamping)
@@ -63,7 +63,9 @@ MATLAB 8.4.0
     Incremento por muestra de la integral: Ki*Ts = 1.323e-05 rad/(mm muestra) = 7.582e-04 deg/(mm muestra)
     (la ganancia continua es Ki = 3.970e-04 rad/(mm s); no confundir con el incremento por muestra)
   Kalman estacionario (sigma_a = 500, sigma_m = 1.0): K = [0.6473; 9.897 1/s]
-  th_lim = 12.0 deg: el mecanismo alcanza +-13.45 deg (A1); se deja margen por la asimetria y holguras.
+  th_lim = 10.0 deg: con la relacion servo-plato medida el plato alcanza +-11.30 deg
+    en el peor eje (diseno: +-13.45 deg). Se deja margen por holguras y por la tabla.
+  Neutro de los servos que deja el plato horizontal (de la tabla): X +2.42 deg, Y +6.85 deg de comando
 
 === 6. Lazo discreto nominal (planta ZOH + retardo 0.075 s + Kalman + controlador lineal) ===
   Frecuencia de cruce wc = 3.296 rad/s (0.524 Hz)
@@ -87,9 +89,9 @@ MATLAB 8.4.0
 
 === 8. Por que esta estructura: PD vs PID clasico vs PID con integracion condicional ===
   Mismo simulador (Etapa D), misma planta no lineal, Kp y Kd iguales; solo cambia la integral.
-  PD (sin integral)          regulacion 100 mm: ts =  1.53 s, Mp =   2.6 %, ess =  0.27 mm | desnivel 1 deg: max|x| =  32.1 mm, ess = 30.12 mm
-  PID clasico                regulacion 100 mm: ts =  3.93 s, Mp =  38.1 %, ess =  2.04 mm | desnivel 1 deg: max|x| =  29.2 mm, ess =  0.97 mm
-  PID integ. condicional     regulacion 100 mm: ts =  1.37 s, Mp =   4.4 %, ess =  0.11 mm | desnivel 1 deg: max|x| =  30.5 mm, ess =  0.88 mm
+  PD (sin integral)          regulacion 100 mm: ts =  1.40 s, Mp =   3.0 %, ess =  0.11 mm | desnivel 1 deg: max|x| =  32.9 mm, ess = 30.98 mm
+  PID clasico                regulacion 100 mm: ts =  3.93 s, Mp =  38.6 %, ess =  2.10 mm | desnivel 1 deg: max|x| =  30.0 mm, ess =  0.98 mm
+  PID integ. condicional     regulacion 100 mm: ts =  1.30 s, Mp =   4.5 %, ess =  0.16 mm | desnivel 1 deg: max|x| =  31.3 mm, ess =  0.89 mm
   Lectura: el PD no corrige el desnivel (error = desnivel/Kp); el PID clasico lo corrige
   pero su integral se carga durante todo el recorrido y da sobreimpulso grande; la
   integracion condicional (solo con la bola quieta 4 cuadros) conserva la respuesta

@@ -31,7 +31,32 @@ exposición es instantánea y la ESP32 calcula en tiempo cero.
 Todos los casos comparten la planta, Ts, el retardo, el ruido (con la misma semilla), el
 integrador numérico y la duración, salvo lo que cada caso cambia a propósito.
 
-## 3. Resultados preliminares (Octave 8.4; ver `verificacion_octave/D1_consola.txt`)
+## 3. Resultados con el actuador medido (vigentes; Octave 8.4, `verificacion_octave/D1_consola.txt`)
+
+Desde el 2026-11-04 el MIL usa la **relación servo → plato medida** en el prototipo
+(`bop_actuador.m`, tipo `'medido'`): la tabla de `datos_prototipo/mecanica/` interpolada, con
+la asimetría y el neutro que nivela el plato. El firmware simulado invierte esa misma tabla.
+La saturación del controlador bajó a **θ_lim = 10°**, porque el peor eje alcanza ±11,3°.
+
+| Caso | Resultado |
+|---|---|
+| D1 requisitos (100 mm → 0) | ts 1,30 s, Mp 4,5 %, ess 0,16 mm, max\|x\| 102,4 mm: **cumple R1–R4** |
+| D2 empujón de 420 mm/s + 1° de desnivel | Satura 0,33 s y la bola **llega a 132,7 mm (pasa el borde de 127 mm)**. Con θ_lim = 12° llegaba a 126,3 mm. Con integración condicional, con y sin AW dan igual; con un PID clásico, el AW baja el ess de 3,71 a 3,11 mm |
+| D3 desnivel de 1° | max 31,3 mm; vuelve a < 3 mm a los 5,2 s; ess 0,89 mm |
+| D4 dos ejes | Igual que antes: ts de 3,0 a 4,0 s en los tramos de 50–60 mm (efecto de la banda relativa del 5 %) |
+| D5 robustez | Cumple en todos los casos menos con retardo de 120 ms (ts 3,9 s), ruido de 2 mm (ts 3,9 s) y **firmware sin tabla** (ts 4,9 s, Mp 24,6 %) |
+| D5 actuador del diseño | ts 1,37 s, Mp 4,4 %: el controlador no depende del actuador **si el firmware usa la tabla** |
+| D6 lineal vs no lineal | D1: 1,6 mm de diferencia máxima; D2: 9,7 mm |
+
+Lecturas:
+- **El firmware tiene que usar la tabla medida.** Con una conversión lineal con la pendiente del
+  diseño, el lazo ve ~1,5 veces más ganancia de un lado y un desnivel de 1,3–3,5° en el
+  neutro, y el sobreimpulso pasa del 4,5 % al 24,6 %.
+- **Bajar θ_lim de 12° a 10° reduce el empujón que el controlador puede frenar sin que la bola
+  toque el borde.** Con 420 mm/s ya no alcanza. Es una limitación del actuador real, no del
+  diseño del controlador.
+
+## 3a. Resultados con el actuador del diseño (histórico, antes de la medición)
 
 ### D1 — Requisitos (100 mm → 0)
 
