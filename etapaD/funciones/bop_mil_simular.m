@@ -10,11 +10,13 @@ function R = bop_mil_simular(cfg)
 %     -> el dato llega a la ESP32 en t_k + tau_m, tau_m = retardo - T_pwm/2
 %     -> Kalman por eje (igual que kalman.py, dt = Ts, arranca en la 1a medida)
 %     -> controlador por eje (bop_controlador_paso)
-%     -> cinematica inversa por eje (modo 'plano', lo que haria el firmware)
+%     -> conversion th_cmd -> comando del servo (A.ik, lo que haria el firmware)
 %     -> el servo recibe el objetivo en el siguiente flanco del PWM (T_pwm)
-%     -> servo: 2o orden critico (omega_n), velocidad maxima omega_srv,
-%        carrera +-phi_max
-%     -> cinematica directa por eje (bop_fk_plano) + desnivel th_dist -> plato
+%     -> servo: 2o orden critico (omega_n), velocidad maxima A.wmax,
+%        carrera [A.amin, A.amax]
+%     -> relacion comando -> plato (A.fk) + desnivel th_dist -> plato
+% El actuador A sale de bop_actuador(P, cfg.actuador_tipo): 'medido' (tabla
+% del prototipo, 2026-11-04), 'medido_ik_lineal' o 'diseno'.
 %
 % Durante cfg.t_espera el controlador no actua (th_cmd = 0, integrador en 0):
 % es el arranque del ensayo con la bola quieta, igual que en el experimento.
@@ -34,6 +36,11 @@ if tau_m < 0
 end
 L = bop_modelo_lineal(P);
 ideal = cfg.actuador_ideal;
+if ideal
+    A = [];
+else
+    A = bop_actuador(P, cfg.actuador_tipo);
+end
 saturar = cfg.saturar && ~ideal;
 
 N = round(cfg.T_fin/dt);
@@ -41,8 +48,9 @@ n_fr = floor(cfg.T_fin/Ts) + 1;
 
 % Estado continuo: [x y xd yd  a1 a2 a1d a2d]
 %   a = angulo del servo (phi) o, con actuador ideal, angulo del plato.
-s = [cfg.x0(:); cfg.v0(:); 0; 0; 0; 0];
-obj = [0; 0];                 % objetivo actual del servo (o del plato, si es ideal)
+if ideal, a0 = [0; 0]; else, a0 = A.a0; end
+s = [cfg.x0(:); cfg.v0(:); a0; 0; 0];
+obj = a0;                     % objetivo actual del servo (o del plato, si es ideal)
 obj_pend = [];  t_pend = Inf; % objetivo que espera el siguiente flanco del PWM
 
 % Kalman (por eje)
@@ -75,7 +83,7 @@ for i = 0:N
     t = i*dt;
 
     % --- registro del estado continuo
-    [th, ~, ~] = angulo_plato(s, cfg, P, L, obj);
+    [th, ~, ~] = angulo_plato(s, cfg, A, obj);
     R.x(i+1,:) = s(1:2)';  R.th(i+1,:) = th';  R.a(i+1,:) = s(5:6)';
 
     % --- captura de la camara
@@ -117,9 +125,8 @@ for i = 0:N
         if ideal
             obj_pend = th_cmd;
         else
-            phi = bop_cinematica_inversa(th_cmd, P, 'plano');
-            phi(isnan(phi)) = sign(th_cmd(isnan(phi)))*P.phi_max;
-            obj_pend = min(max(phi, -P.phi_max), P.phi_max);
+            obj_pend = [A.ik(1, th_cmd(1)); A.ik(2, th_cmd(2))];
+            obj_pend = min(max(obj_pend, A.amin), A.amax);
         end
         t_pend = ceil((t + 1e-9)/P.T_pwm)*P.T_pwm;     % siguiente flanco del PWM
     end
@@ -130,17 +137,18 @@ for i = 0:N
     if i == N, break; end
 
     % --- integracion RK4 de la planta y el servo
-    f = @(ss) derivada(ss, cfg, P, L, obj);
+    f = @(ss) derivada(ss, cfg, P, L, A, obj);
     k1 = f(s);  k2 = f(s + dt/2*k1);  k3 = f(s + dt/2*k2);  k4 = f(s + dt*k3);
     s = s + dt/6*(k1 + 2*k2 + 2*k3 + k4);
     if ~ideal
         % limites duros del servo
         for e = 1:2
-            if abs(s(4+e)) > P.phi_max
-                s(4+e) = sign(s(4+e))*P.phi_max;
-                if sign(s(6+e)) == sign(s(4+e)), s(6+e) = 0; end
+            if s(4+e) > A.amax(e)
+                s(4+e) = A.amax(e);  s(6+e) = min(s(6+e), 0);
+            elseif s(4+e) < A.amin(e)
+                s(4+e) = A.amin(e);  s(6+e) = max(s(6+e), 0);
             end
-            s(6+e) = min(max(s(6+e), -P.omega_srv), P.omega_srv);
+            s(6+e) = min(max(s(6+e), -A.wmax(e)), A.wmax(e));
         end
     end
 end
@@ -155,8 +163,8 @@ R.toca_pared = any(abs(R.x(:)) > P.x_max);
 end
 
 % ----------------------------------------------------------------------
-function ds = derivada(s, cfg, P, L, obj)
-[th, thd, thdd, add] = angulo_plato(s, cfg, P, L, obj);
+function ds = derivada(s, cfg, P, L, A, obj)
+[th, thd, thdd, add] = angulo_plato(s, cfg, A, obj);
 q = s(1:2);  qd = s(3:4);
 if strcmp(cfg.planta, 'lineal')
     qdd = P.c_rod*(-P.g*th + L.h_ef*thdd);
@@ -166,7 +174,7 @@ end
 ds = [qd; qdd; s(7:8); add];
 end
 
-function [th, thd, thdd, add] = angulo_plato(s, cfg, P, L, obj) %#ok<INUSD>
+function [th, thd, thdd, add] = angulo_plato(s, cfg, A, obj)
 % Angulo del plato y aceleracion del actuador a partir del estado del servo.
 a = s(5:6);  ad = s(7:8);
 wn = cfg.omega_n_servo;
@@ -174,14 +182,14 @@ add = wn^2*(obj - a) - 2*wn*ad;
 if ~cfg.actuador_ideal
     for e = 1:2
         % limite de velocidad y de carrera: no se acelera hacia afuera
-        if (abs(ad(e)) >= P.omega_srv && sign(add(e)) == sign(ad(e))) || ...
-           (abs(a(e)) >= P.phi_max && sign(add(e)) == sign(a(e)))
+        if (abs(ad(e)) >= A.wmax(e) && sign(add(e)) == sign(ad(e))) || ...
+           (a(e) >= A.amax(e) && add(e) > 0) || (a(e) <= A.amin(e) && add(e) < 0)
             add(e) = 0;
         end
     end
     th = zeros(2,1);  thd = th;  thdd = th;
     for e = 1:2
-        [g0, g1, g2] = bop_fk_plano(a(e), P);
+        [g0, g1, g2] = A.fk(e, a(e));
         th(e) = g0;  thd(e) = g1*ad(e);  thdd(e) = g2*ad(e)^2 + g1*add(e);
     end
 else

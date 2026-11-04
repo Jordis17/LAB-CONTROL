@@ -57,6 +57,7 @@ base = bop_mil_config(P, C);
 base.kalman_sigma_a = C.kalman_sigma_a;
 base.kalman_sigma_m = C.kalman_sigma_m;
 base.omega_n_servo  = C.omega_n_servo;
+fprintf('Actuador: %s (relacion servo-plato; ver etapaD/funciones/bop_actuador.m)\n', base.actuador_tipo);
 fprintf('Simulacion: dt = Ts/%d, retardo total %.3f s (medicion %.3f s + PWM), servo omega_n = %g rad/s,\n', ...
     base.N_sub, base.retardo, base.retardo - P.T_pwm/2, base.omega_n_servo);
 fprintf('  ruido de camara %.2f mm (semilla %d), velocidad del servo %.0f deg/s.\n\n', ...
@@ -138,7 +139,9 @@ var = { 'nominal',               base;
         'servos a 6 V',          setP(base,'omega_srv',deg2rad(60)/0.08);
         'servo lento (wn = 30)', setc(base,'omega_n_servo',30);
         'ruido 0,3 mm',          setc(base,'sigma_ruido',0.3);
-        'ruido 2 mm',            setc(base,'sigma_ruido',2.0) };
+        'ruido 2 mm',            setc(base,'sigma_ruido',2.0);
+        'actuador del diseno',   setc(base,'actuador_tipo','diseno');
+        'firmware sin tabla',    setc(base,'actuador_tipo','medido_ik_lineal') };
 fprintf('  caso                     ts[s]   Mp[%%]  ess[mm]  max|x|[mm]  std th ss[deg]  cumple\n');
 for i = 1:size(var,1)
     cfg = var{i,2};  cfg.x0 = [Rq.x0_mm; 0];  cfg.T_fin = 6.5;

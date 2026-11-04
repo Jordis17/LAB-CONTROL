@@ -10,6 +10,7 @@ function cfg = bop_mil_config(P, C)
 cfg.P = P;                      % parametros de la planta (A0_parametros_BoP)
 cfg.C = C;                      % controlador (C1_controlador.mat)
 cfg.planta = 'no_lineal';       % 'no_lineal' (Etapa A) o 'lineal'
+cfg.actuador_tipo = 'medido';   % 'medido' (tabla del prototipo), 'medido_ik_lineal' o 'diseno'
 cfg.actuador_ideal = false;     % true: sin saturaciones ni limite de velocidad
                                 %       (el plato sigue la dinamica del servo sin limites)
 cfg.saturar = true;             % saturacion de th_cmd en el controlador (+-C.th_lim)

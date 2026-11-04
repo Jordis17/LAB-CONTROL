@@ -51,7 +51,9 @@ v_int   = 25;                  % [mm/s] umbral de "bola quieta" (~2,2 veces la s
 Nq      = 4;                   % [cuadros] el integrador actua tras Nq cuadros seguidos quieta
                                %   (cubre el arranque: retardo + tiempo en ganar velocidad)
 e_clip  = 30;                  % [mm] recorte del error que entra al integrador
-th_lim  = deg2rad(12);         % [rad] saturacion de la inclinacion pedida
+th_lim  = deg2rad(10);         % [rad] saturacion de la inclinacion pedida. Con la relacion
+                               % servo-plato MEDIDA (2026-11-04) el plato alcanza +-11,3 deg en el
+                               % peor eje (Y) con +-40 deg de comando; se deja ~1,3 deg de margen.
 sigma_m = 1.0;                 % [mm] ruido de la camara (marcador de config.py, PENDIENTE medir)
 sigma_a_cand = [1500 1000 500 300];   % candidatos de PROCESS_ACCEL_STD [mm/s^2]
 
@@ -126,8 +128,13 @@ fprintf('    Incremento por muestra de la integral: Ki*Ts = %.3e rad/(mm muestra
     Ki*P.Ts, rad2deg(Ki*P.Ts));
 fprintf('    (la ganancia continua es Ki = %.3e rad/(mm s); no confundir con el incremento por muestra)\n', Ki);
 fprintf('  Kalman estacionario (sigma_a = %d, sigma_m = %.1f): K = [%.4f; %.3f 1/s]\n', sigma_a, sigma_m, Kf);
-fprintf('  th_lim = %.1f deg: el mecanismo alcanza +-%.2f deg (A1); se deja margen por la asimetria y holguras.\n', ...
-    rad2deg(th_lim), rad2deg(min(abs([bop_fk_plano(-P.phi_max,P) bop_fk_plano(P.phi_max,P)]))));
+Aact = bop_actuador(P, 'medido');
+fprintf('  th_lim = %.1f deg: con la relacion servo-plato medida el plato alcanza +-%.2f deg\n', ...
+    rad2deg(th_lim), rad2deg(Aact.th_alcance));
+fprintf('    en el peor eje (diseno: +-%.2f deg). Se deja margen por holguras y por la tabla.\n', ...
+    rad2deg(min(abs([bop_fk_plano(-P.phi_max,P) bop_fk_plano(P.phi_max,P)]))));
+fprintf('  Neutro de los servos que deja el plato horizontal (de la tabla): X %+.2f deg, Y %+.2f deg de comando\n', ...
+    rad2deg(Aact.a0));
 
 %% 6. Margenes y polos de lazo cerrado (nominal)
 fprintf('\n=== 6. Lazo discreto nominal (planta ZOH + retardo %.3f s + Kalman + controlador lineal) ===\n', P.retardo);
