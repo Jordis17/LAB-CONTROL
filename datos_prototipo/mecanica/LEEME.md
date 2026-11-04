@@ -35,3 +35,36 @@ Tabla que mandó el equipo el 2026-11-04 (captura de una hoja de cálculo).
 - **Si se confirma:** con ±45° de servo el plato alcanza unos −15° y solo **+7,5°**. La
   inclinación simétrica útil baja de ±13,4° (diseño) a **±7,5°**. El controlador satura en
   ±12°, así que habría que bajar esa saturación o corregir el montaje.
+
+## `servo_plato_2026-11-04_v2.csv` (vigente)
+
+Segunda medición, del mismo día, **después de que el equipo hizo correcciones en los ejes**
+(falta detallar cuáles). Ya tiene **signo**: app del celular apoyada en el centro de la cara
+superior del plato, con los ejes X e Y que muestra la app. Columnas: comando del servo X con el
+servo Y en neutro → inclinación X; comando del servo Y con el X en neutro → inclinación Y.
+
+**Análisis** (Claude, 2026-11-04; script en la sesión, modelo de cuatro barras del diseño más
+3 parámetros por eje):
+
+| | X | Y |
+|---|---|---|
+| Pendiente cerca del neutro (comando −10 a +10) | −0,50 °/° | +0,54 °/° (diseño: 0,34) |
+| Pendiente media del lado − / lado + | 0,53 / 0,34 °/° | 0,56 / 0,37 °/° |
+| Rango con ±40° de comando | −12,1° a +22,4° | −25,9° a +11,3° |
+| Rango simétrico respecto de la horizontal | ±12,1° | ±11,3° |
+| Desnivel en el neutro (`C`) | +1,3° | −3,5° |
+| Ajuste: k (grados de servo por grado de comando), φ0 (brazo en el neutro), RMS | 1,66; 17°; 0,89° | 1,75; 12°; 0,87° |
+| Comando que nivela el plato según el ajuste | +2,9° (≈ +33 µs) | +6,9° (≈ +76 µs) |
+
+Lectura:
+- El plato se mueve **~1,5 veces más por grado de comando** que en el diseño. Encaja con un
+  servo que gira más de 1° por cada 11,1 µs. Por ejemplo, una versión de 180°:
+  `componentes.xlsx` dice "MG90S (180º)". También encaja con un brazo efectivo más largo. Para
+  separar las dos causas hay que medir **cuánto gira el brazo** con ±40.
+- **Sigue siendo asimétrico** (un lado ~0,55 °/°, el otro ~0,35 °/°). El ajuste lo atribuye a
+  que el brazo queda unos 12–17° fuera de la horizontal en el neutro. El error de 0,9° sugiere
+  que hay algo más: holgura, o la resolución de la app.
+- El rango simétrico útil (±11–12°) se parece al del diseño, pero θ_lim = 12° queda en el
+  límite del eje Y. Se recomienda θ_lim ≈ 10° y una cinemática inversa por tabla medida.
+- El desnivel de −3,5° en Y es grande: un PD solo dejaría unos 100 mm de error. Se corrige por
+  software, con el pulso de neutro de cada eje.
