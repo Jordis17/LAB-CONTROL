@@ -96,3 +96,45 @@ Con los CSV se calculan las mismas métricas del MIL (ts, Mp, ess) y se comparan
 | La bola oscila cada vez más | Retardo real mayor al supuesto; anoten y manden el CSV. Prueben bajar `KP` y `KD` un 30 % en el firmware y anótenlo |
 | El plato tiembla mucho en reposo | Ruido de la cámara: `PROCESS_ACCEL_STD` en 500, luz, calibración de color |
 | La bola queda quieta lejos del centro | Esperen unos segundos: el integrador lo corrige. Si no se mueve, manden el CSV |
+
+---
+
+## Versión 2 (`bop_prueba_lazo_v2/`, 2026-11-05)
+
+**Qué se vio en la primera prueba** (video del equipo):
+- La bola se estabiliza en el centro: el lazo básico funciona.
+- Mientras se sostiene la bola con la mano lejos del centro, el plato se inclina cada vez
+  más. Con la bola quieta, el integrador la toma por un desnivel y se carga hasta el límite.
+- Cerca del borde, la bola queda un rato quieta y después el plato da un **brinco** y la bola
+  sale despedida. La explicación más probable es que la bola **sale del campo de la cámara**
+  (con la GW600 a 450 mm hay ~0,5 mm de margen). La visión la pierde y manda `estado = 0`,
+  la ESP32 pone el plato horizontal **de golpe** y borra el integrador, y al reaparecer la
+  bola el controlador arranca con un error grande.
+
+**Cambios del firmware v2** (protecciones de prueba, **todavía no evaluadas en el MIL**):
+
+| Cambio | Valor | Para qué |
+|---|---|---|
+| Límite de velocidad del ángulo pedido | 3° por cuadro (90°/s) | Sin saltos bruscos cuando la bola se pierde o reaparece |
+| El integrador solo actúa cerca de la referencia | \|error\| < 40 mm | No se carga con la bola sostenida o contra el borde |
+| Tope del integrador | ±3° | Ídem |
+| Filtro de saltos de posición | > 60 mm en un cuadro se ignora; tras 3 seguidos se acepta | Falsas detecciones (mano, reflejos) |
+| Sin bola o sin tramas | Vuelve a horizontal con rampa | Sin golpes |
+
+**Además del firmware, revisen el montaje:**
+1. **Que el plato completo salga en la imagen aunque esté inclinado.** Con `prueba_servos.ino`,
+   inclinen el plato a mano con `X 20`, `X -20`, `Y 20` e `Y -20`. Con
+   `python scripts/calibrate_camera.py` (fase 1, solo vista) comprueben que el borde y la
+   zona donde puede estar la bola siguen dentro de la imagen. Si no, **suban la cámara a
+   ~500 mm**, actualicen `CAMERA_HEIGHT_MM` en `config.py` y recalibren.
+2. **Que la base no se mueva.** Si la estructura salta cuando los servos se mueven rápido,
+   la posición del plato respecto de la cámara cambia y la calibración deja de valer. Fijen la
+   base y el pórtico a la misma tabla (con tornillos o prensas).
+3. **Que los ejes no estén cruzados.** Como hubo que girar el plato, comprueben con
+   `main_vision.py --no-serial` que al empujar la bola **solo hacia el servo X** cambie **solo**
+   la lectura X, y que con el servo Y cambie solo la Y. Si al empujar hacia el servo X cambia la
+   Y, los ejes están intercambiados.
+
+**Qué mandar:** los CSV de `logs/` de las corridas donde pasó el brinco. La columna
+`detectada` muestra si la bola se perdió justo antes, que es lo que confirma o descarta la
+explicación del campo de la cámara.
