@@ -20,7 +20,7 @@
 | Etapa | Estado |
 |---|---|
 | A — Modelo de la planta | **En curso.** Scripts escritos y probados en Octave 8.4 (preliminar). **Falta correrlos en MATLAB** y medir en el prototipo los datos de `etapaA/LEEME_etapaA.md` sección 5. |
-| B — Identificación y validación | **Aplazada** hasta tener el prototipo (decisión del equipo, 2026-11-03). |
+| B — Identificación y validación | **En curso (2026-11-06).** Actuador ya medido (tabla servo → plato). Scripts B1 (rodadura: c y f, con validación) y B2 (medición con el plato inclinado: h_sup) escritos y probados en Octave con datos sintéticos (no se suben). Faltan los ensayos en el prototipo. Ver `etapaB/LEEME_etapaB.md`. |
 | C — Diseño del controlador | **En curso.** Diseño hecho sobre el modelo **del diseño** (sin Etapa B). Probado en Octave (preliminar). Falta correr en MATLAB. Ver `etapaC/LEEME_etapaC.md`. |
 | D — MIL | **En curso.** Simulador y casos escritos; en Octave el ensayo de requisitos cumple R1–R4. Falta correr en MATLAB. Ver `etapaD/LEEME_etapaD.md`. |
 | E — Preparación y generación de código | **En curso.** Scripts E0 (construcción de `Controller_BoP.slx`), E1 (equivalencia con el MIL) y E2 (código e inspección) escritos. E1 Parte A en PASS en Octave (diferencia 0). **Falta correr todo en MATLAB**, más el Code Generation Advisor. Ver `etapaE/LEEME_etapaE.md`. |

@@ -470,6 +470,8 @@ El modelo supone que el servo responde como un sistema de segundo orden con ωn 
 
 ## Parte 4 — Ensayos para la Etapa B (identificación del modelo)
 
+> **Actualizado (2026-11-06):** el procedimiento vigente, con los comandos según la tabla medida, el formato de `ensayos.csv` y los scripts de análisis, está en `etapaB/LEEME_etapaB.md`. Lo que sigue es la versión original.
+
 **Requisitos:** Parte 2 completa (cámara calibrada, color calibrado, signo de Y) y sketch de la
 3.1 funcionando.
 
