@@ -130,7 +130,13 @@ for k = 1:size(casos,1)
                               'SimulationMode', 'processor-in-the-loop (pil)');
     fprintf('\n%s: %d cuadros, %d saturados en el MIL. Ejecutando en la ESP32 (compila y carga la primera vez)...\n', ...
         casos{k,1}, n, sum(R.k_sat(:,1)));
-    out = sim(in);
+    try
+        out = sim(in);
+    catch errSim
+        fprintf('\nERROR en la simulacion PIL:\n%s\n', errSim.getReport('extended','hyperlinks','off'));
+        g_diagnostico_pil(mdl);
+        rethrow(errSim);
+    end
     y = out.yout;
     th  = squeeze(double(y.getElement(1).Values.Data));
     I   = squeeze(double(y.getElement(2).Values.Data));
