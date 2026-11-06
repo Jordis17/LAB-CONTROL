@@ -59,11 +59,11 @@ OUT_OF_PLATE_MARGIN_MM = 25.0
 # ---------------------------------------------------------------- Filtro --
 # MEDIR: dejar la bola quieta en el centro, grabar >=500 muestras y calcular
 # la desviacion estandar en mm. Este valor es la raiz de R.
-MEAS_NOISE_STD_MM = 1.0
+MEAS_NOISE_STD_MM = 0.11
 
 # Aceleracion no modelada, en mm/s^2. El limite fisico es
 # (5/7)*9810*sen(14 deg) = 1700 mm/s^2, que es lo que el plato puede imponer.
-PROCESS_ACCEL_STD = 1500.0
+PROCESS_ACCEL_STD = 500.0
 
 # Cuantos frames seguidos sin bola se toleran prediciendo antes de declarar
 # "sin bola" y reiniciar el filtro.
