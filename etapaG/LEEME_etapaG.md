@@ -51,6 +51,7 @@ G2_comparar_Normal_PIL_BoP    % 3) simula en lazo cerrado y compara
 | Error | Qué hacer |
 |---|---|
 | G0 no reconoce la placa | Abrir `Controller_BoP_ESP32.slx` → *Modeling* → *Model Settings* → *Hardware Implementation* → *Hardware board* y mandarme los nombres que aparecen |
+| `Connectivity configuration "Arduino Board" threw an error … Index exceeds array bounds` y `Target is underspecified` (2026-11-06) | El paquete no detectó solo la ESP32 y la configuración PIL quedó sin puerto. G0 ahora fija `puerto = '/dev/ttyUSB0'` en el modelo (`funciones/g_puerto_arduino.m`) e imprime la configuración del paquete |
 | No puede abrir el puerto serie | Cerrar los otros programas que lo usan; el usuario tiene que estar en el grupo `dialout` |
 | Falla al grabar la ESP32 | Mantener **BOOT** apretado cuando diga "Connecting…" |
 | PIL no soportado para la placa | Mandar el mensaje completo: hay que definir otra ruta antes de seguir (CLAUDE.md, sección 0) |

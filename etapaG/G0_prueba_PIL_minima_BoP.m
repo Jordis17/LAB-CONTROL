@@ -20,9 +20,12 @@
 
 clearvars; close all; clc;
 
+% Puerto serie de la ESP32 en esta PC (ls /dev/ttyUSB* /dev/ttyACM*)
+puerto = '/dev/ttyUSB0';
+
 carpeta = fileparts(mfilename('fullpath'));
 raiz = fileparts(carpeta);
-addpath(carpeta, fullfile(raiz,'etapaE'), fullfile(raiz,'etapaA'), fullfile(raiz,'etapaA','funciones'), ...
+addpath(carpeta, fullfile(carpeta,'funciones'), fullfile(raiz,'etapaE'), fullfile(raiz,'etapaA'), fullfile(raiz,'etapaA','funciones'), ...
         fullfile(raiz,'etapaC'), fullfile(raiz,'etapaC','funciones'), fullfile(raiz,'etapaD','funciones'));
 dirRes = fullfile(carpeta,'resultados');
 if ~isfolder(dirRes), mkdir(dirRes); end
@@ -84,6 +87,10 @@ for i = 1:numel(cfgs)
     catch
     end
 end
+if system(['test -e ' puerto]) ~= 0
+    fprintf('AVISO: %s no existe. Revisen ls /dev/ttyUSB* y cambien la variable puerto.\n', puerto);
+end
+g_puerto_arduino(mdl, puerto);
 set_param(mdl, 'Description', ['Copia de Controller_BoP (etapaE) solo para PIL en la ESP32. ' ...
     'Mismo algoritmo y parametros; cambia la placa en la configuracion.']);
 save_system(mdl);
