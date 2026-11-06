@@ -67,18 +67,21 @@ fprintf('Codigo generado en %s\n', dirCod);
 
 %% 2. Copia a codigo_generado/
 dirCopia = fullfile(carpeta,'codigo_generado');
-if ~isfolder(dirCopia), mkdir(dirCopia); end
+% Se reemplaza la copia anterior completa (si quedara un archivo viejo, la
+% tabla modelo <-> codigo podria apuntar a codigo que ya no corresponde).
+if isfolder(dirCopia), rmdir(dirCopia, 's'); end
+mkdir(dirCopia);
 arch = [dir(fullfile(dirCod,'*.c')); dir(fullfile(dirCod,'*.h'))];
 for i = 1:numel(arch)
-    copyfile(fullfile(dirCod, arch(i).name), dirCopia);
+    copyfile(fullfile(dirCod, arch(i).name), dirCopia, 'f');
 end
 compartido = fullfile(dirBuild,'slprj','ert','_sharedutils');
 if isfolder(compartido)
     a2 = [dir(fullfile(compartido,'*.c')); dir(fullfile(compartido,'*.h'))];
-    for i = 1:numel(a2), copyfile(fullfile(compartido, a2(i).name), dirCopia); end
+    for i = 1:numel(a2), copyfile(fullfile(compartido, a2(i).name), dirCopia, 'f'); end
 end
 if isfolder(fullfile(dirCod,'html'))
-    copyfile(fullfile(dirCod,'html'), fullfile(dirCopia,'html'));
+    copyfile(fullfile(dirCod,'html'), fullfile(dirCopia,'html'), 'f');
 end
 lista = dir(fullfile(dirCopia,'*.*'));
 fprintf('Copiados a codigo_generado/: %s\n', strjoin({lista(~[lista.isdir]).name}, ', '));
