@@ -50,6 +50,17 @@ for i = 1:numel(cfgs)
     catch
     end
 end
+viejo = fullfile(carpeta, [mdl '_ert_rtw']);
+if isfolder(viejo)
+    fprintf('AVISO: existe %s de una generacion anterior (fuera de build/).\n', viejo);
+    fprintf('       No se usa; se puede borrar junto con etapaE/slprj si existe.\n');
+end
+% Se genera desde dentro de build/ para que la carpeta actual y la de
+% generacion coincidan (MATLAB rechaza generar si la carpeta actual tiene
+% codigo generado y CodeGenFolder apunta a otra).
+dirAntes = pwd;
+cd(dirBuild);
+volver = onCleanup(@() cd(dirAntes));
 slbuild(mdl);
 dirCod = fullfile(dirBuild, [mdl '_ert_rtw']);
 fprintf('Codigo generado en %s\n', dirCod);
