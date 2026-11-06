@@ -16,6 +16,25 @@ diary(archivoConsola);  limpiezaDiary = onCleanup(@() diary('off'));
 fprintf('ETAPA G - G0c_diagnostico_PIL_ESP32   (%s)\n', datestr(now,'yyyy-mm-dd HH:MM:SS'));
 raiz = matlabshared.supportpkg.getSupportPackageRoot;
 
+%% 0. Variante de la ESP32 y GetBoard despues de elegirla
+addpath(fullfile(carpeta,'funciones'), fullfile(fileparts(carpeta),'etapaE'));
+init_Controller_BoP();
+mdl = 'Controller_BoP_ESP32';
+load_system(fullfile(carpeta,[mdl '.slx']));
+set_param(0, 'CurrentSystem', mdl);
+mostrar('codertarget.arduinobase.registry.getESP32SupportedBoards');
+g_variante_esp32(mdl, 'ESP32-WROOM', 'Dev Module');
+try
+    b = codertarget.arduinobase.board.GetBoard('boardName', 'ESP32-WROOM (Arduino Compatible)');
+    fprintf('GetBoard despues de elegir la variante: OK (%s)\n', class(b));
+    if isprop(b,'boardInfo'), disp(b.boardInfo); end
+    if isprop(b,'boardInfo') && isprop(b.boardInfo,'IsPilSupported')
+        fprintf('IsPilSupported = %s\n', mat2str(b.boardInfo.IsPilSupported));
+    end
+catch e
+    fprintf('GetBoard despues de elegir la variante: ERROR\n%s\n', e.getReport('extended','hyperlinks','off'));
+end
+
 %% 1. GetBoard y las clases de placas
 mostrar('codertarget.arduinobase.board.GetBoard');
 for p = {'codertarget.arduinobase.board', 'codertarget.arduinotarget.board', 'codertarget.esp32.board'}

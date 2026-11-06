@@ -91,6 +91,13 @@ if system(['test -e ' puerto]) ~= 0
     fprintf('AVISO: %s no existe. Revisen ls /dev/ttyUSB* y cambien la variable puerto.\n', puerto);
 end
 g_puerto_arduino(mdl, puerto);
+g_variante_esp32(mdl, 'ESP32-WROOM', 'Dev Module');
+try
+    codertarget.arduinobase.board.GetBoard('boardName', placa);
+    fprintf('GetBoard(%s): OK\n', placa);
+catch e
+    fprintf('GetBoard(%s) sigue fallando: %s\n', placa, e.message);
+end
 set_param(mdl, 'Description', ['Copia de Controller_BoP (etapaE) solo para PIL en la ESP32. ' ...
     'Mismo algoritmo y parametros; cambia la placa en la configuracion.']);
 save_system(mdl);
