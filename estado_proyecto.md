@@ -23,7 +23,7 @@
 | B — Identificación y validación | **En curso (2026-11-06).** Actuador ya medido (tabla servo → plato). Scripts B1 (rodadura: c y f, con validación) y B2 (medición con el plato inclinado: h_sup) escritos y probados en Octave con datos sintéticos (no se suben). Faltan los ensayos en el prototipo. Ver `etapaB/LEEME_etapaB.md`. |
 | C — Diseño del controlador | **Corrida en MATLAB (2026-11-06)**: Kp 0,03412 °/mm, Kd 0,02588 °/(mm/s), Ki 0,02275 °/(mm·s), θ_lim 10°, PM 40,9°, GM +11,8/−12,6 dB, estable. Provisional hasta tener la Etapa B. |
 | D — MIL | **Corrida en MATLAB (2026-11-06)** con el actuador medido: D1 cumple R1–R4 (ts 1,30 s, Mp 4,4 %, ess 0,18 mm, max 102,7 mm). Robustez: no cumple ts con retardo de 120 ms (3,03 s), ruido de 2 mm (4,9 s) ni firmware sin tabla (4,7 s, Mp 23,8 %). Provisional hasta tener la Etapa B. |
-| E — Preparación y generación de código | **En curso.** E0 construyó `Controller_BoP.slx` en MATLAB R2026a. **E1 en MATLAB: Parte A PASS y Parte B PASS** (2026-11-06): el modelo coincide **exactamente** con el MIL (diferencia 0, igualdad bit a bit en th_cmd, I y saturado) en 5 ensayos, incluidos 9 cuadros saturados. **Code Generation Advisor: 0 Fail, 5 Warning, 26 Passed** (31 verificaciones), con las advertencias justificadas en `etapaE/resultados/advisor/LEEME_advisor.md`. Falta: E2 (la primera corrida falló por una carpeta de generación vieja; script corregido). |
+| E — Preparación y generación de código | **Completada (2026-11-06, MATLAB R2026a).** `Controller_BoP.slx` separado de la planta (12 entradas al bloque, 3 salidas). E1: igual al MIL bit a bit. Code Generation Advisor: 0 Fail, 5 Warning justificados. E2: código generado e inspección PASS; tabla modelo ↔ código en `etapaE/tabla_modelo_codigo.md`; el código C compilado con gcc reproduce el MIL (diferencia ≤ 4e-11 rad, por el redondeo de los CSV). |
 | F — SIL | No iniciada |
 | G — PIL | No iniciada |
 | H — Implementación física | No iniciada |
@@ -186,4 +186,21 @@ Datos pendientes: correr E0, E1 (Parte B), Code Generation Advisor y E2 en MATLA
 Problemas detectados: ninguno todavía (no hay corrida en MATLAB).
 Qué debe conservarse: Controller_BoP.slx (intocable), codigo_generado/, resultados/ y el reporte del Advisor.
 Siguiente paso: con el código generado, completar la tabla modelo <-> código; después, Etapa F (banco SIL).
+```
+
+```
+Etapa: E — Preparación y generación de código (cierre, 2026-11-06)
+Completada: Sí
+Resultados obtenidos: E1 Parte A y B PASS (diferencia 0 en th_cmd, I y saturado, 5 ensayos);
+  Advisor 0 Fail / 5 Warning / 26 Passed; E2 inspección PASS; código C compilado en PC igual
+  al MIL hasta 4e-11 rad.
+Archivos generados: etapaE/Controller_BoP.slx, etapaE/codigo_generado/, etapaE/resultados/
+  (E0, E1, E2 y advisor/), etapaE/tabla_modelo_codigo.md
+Datos pendientes: ninguno para E. Para G: placa en la configuración de hardware (endianness y
+  redondeo de la división entera) y el support package de Arduino.
+Problemas detectados: ninguno que bloquee. Observaciones para H en la tabla modelo ↔ código
+  (nq double sin tope; double emulado en la ESP32).
+Decisiones tomadas: modelo de un eje con Reusable function; double; parámetros ExportedGlobal.
+Qué debe conservarse: Controller_BoP.slx (referencia intocable), codigo_generado/, resultados/.
+Siguiente etapa: F — SIL (banco Normal vs SIL con planta en Simulink).
 ```
