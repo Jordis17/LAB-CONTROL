@@ -51,7 +51,7 @@ for k = 1:size(casos,1)
     dth = th - R.k_th(:,1);  dI = I - R.k_I(:,1);
     res(k,:) = [max(abs(dth)) rmse_v(dth) isequal(th, R.k_th(:,1)) max(abs(dI)) rmse_v(dI) sum(sat ~= R.k_sat(:,1))];
     fprintf('\n%s: %d cuadros, %d saturados en el MIL, %d en la ESP32\n', casos{k,1}, n, sum(R.k_sat(:,1)), sum(sat));
-    fprintf('  th max|dif| = %.3g, RMSE = %.3g, igual = %d | I max|dif| = %.3g | saturado distinto en %d\n', res(k,:));
+    fprintf('  th max|dif| = %.3g, RMSE = %.3g, igual = %d | I max|dif| = %.3g, RMSE = %.3g | saturado distinto en %d\n', res(k,:));
     fprintf('  _step en la ESP32: %d a %d ciclos (%.1f a %.1f us), mediana %.1f us\n', ...
         min(cic), max(cic), min(cic)/f_cpu*1e6, max(cic)/f_cpu*1e6, median(cic)/f_cpu*1e6);
     todosCiclos = [todosCiclos; cic]; %#ok<AGROW>

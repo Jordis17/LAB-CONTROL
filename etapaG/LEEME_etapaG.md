@@ -110,9 +110,57 @@ PIL de Simulink). Si al grabar se queda en "Connecting…", mantengan apretado *
 Criterio de G4 y G5: max\|PIL − Normal\| ≤ 1e-12 en th_cmd e I, y 0 diferencias en saturado.
 También se reporta el tiempo de `_step` en la ESP32.
 
-## Resultados
+## Resultados (MATLAB R2026a, ESP32-D0WD-V3 rev. 3.1, 2026-11-06)
 
-| Prueba | Criterio | Resultado |
-|---|---|---|
-| G4 D1 y D2 (controlador solo) | ≤ 1e-12; 0 en saturado | pendiente |
-| G5 lazo cerrado | ≤ 1e-12; 0 en saturado | pendiente |
+Consolas en `resultados/G3_consola.txt`, `G4_consola.txt` y `G5_consola.txt`. Las métricas se
+recalcularon desde los CSV crudos (`G4_caso_*.csv`, `G5_comparacion.csv`) y coinciden.
+
+**G3: preparación.**
+- Las 10 copias del código de la Etapa E son idénticas byte a byte.
+- El sketch ocupa 263 705 bytes de flash (20 %) y 21 600 bytes de RAM (6 %).
+- Se grabó con esptool en el chip ESP32-D0WD-V3.
+- Paso de prueba: th = 0,0059548883249507583 rad = Kp·10, el valor exacto esperado.
+
+| Prueba | Muestras | th_cmd max\|dif\| | I max\|dif\| | saturado distinto | Resultado |
+|---|---|---|---|---|---|
+| G4 D1 (controlador solo vs MIL) | 194 | 0 (igualdad exacta) | 0 | 0 de 0 saturados | **PASS** |
+| G4 D2 con saturación (controlador solo vs MIL) | 179 | 0 (igualdad exacta) | 0 | 0; 9 cuadros saturados en las dos | **PASS** |
+| G5 lazo cerrado, dos ejes (PIL vs Normal) | 271 | 0 (271/271 iguales) | 0 (271/271) | 0 | **PASS** |
+
+**No es un cero trivial:**
+- En D2, θ va de −4,5° a +10,0°. La ESP32 satura en 10° en los mismos 9 cuadros que el MIL, y
+  su integrador llega a −1,04° (pasa por el anti-windup).
+- En G5, la bola de la rama PIL va de (80, −60) mm a (−2,4; 1,5) mm a los 4,4 s y a
+  (50,2; 51,2) mm a los 9 s.
+- La rama Normal de G5 reproduce la del banco SIL de Simulink (F1) con ≤ 2,3e-10 relativo, el
+  límite del CSV.
+
+**Tiempo de cómputo en la ESP32 (240 MHz, ciclos medidos con `ESP.getCycleCount`):**
+- `Controller_BoP_step` tarda 7,5 µs de mediana y 31,3 µs como máximo. El máximo es la primera
+  llamada, con la caché fría.
+- Eso es el **0,094 % de Ts** (33,3 ms), con double emulado por software (la FPU de la ESP32 es
+  de precisión simple).
+- Con 2 ejes por cuadro sobra tiempo. No hace falta pasar a single en la Etapa H por tiempo de
+  cálculo.
+
+**Qué verifica PIL (CLAUDE.md, sección 5):**
+- que **el mismo código verificado en SIL**, compilado con el compilador del procesador objetivo
+  (xtensa-esp32-elf-gcc 8.4, -Os) y ejecutado en la ESP32, calcula exactamente lo mismo que el
+  modelo;
+- que lo hace con double emulado y con dos instancias de la *Reusable function*;
+- que pasa por la saturación, el anti-windup y la integración condicional;
+- su costo de cómputo real.
+
+**Qué no verifica:**
+- la temporización real: los pasos los marca la PC por el puerto serie, no un temporizador de
+  30 fps;
+- la recepción de las tramas del pipeline de visión, la cinemática inversa, el PWM y el watchdog
+  del firmware de la Etapa H;
+- el comportamiento con la planta real.
+
+Un PASS en PIL no es una validación sobre la planta.
+
+**Diferencia con lo planeado:** el banco no es un modelo de Simulink con bloques en modo PIL.
+Lo maneja un script de MATLAB con un comunicador serie propio, porque el paquete de Arduino no
+habilita PIL para la ESP32 (`IsPilSupported = 0`). La rama Normal de este banco coincide con la
+del banco de Simulink de la Etapa F.

@@ -25,7 +25,7 @@
 | D — MIL | **Corrida en MATLAB (2026-11-06)** con el actuador medido: D1 cumple R1–R4 (ts 1,30 s, Mp 4,4 %, ess 0,18 mm, max 102,7 mm). Robustez: no cumple ts con retardo de 120 ms (3,03 s), ruido de 2 mm (4,9 s) ni firmware sin tabla (4,7 s, Mp 23,8 %). Provisional hasta tener la Etapa B. |
 | E — Preparación y generación de código | **Completada (2026-11-06, MATLAB R2026a).** `Controller_BoP.slx` separado de la planta (12 entradas al bloque, 3 salidas). E1: igual al MIL bit a bit. Code Generation Advisor: 0 Fail, 5 Warning justificados. E2: código generado e inspección PASS; tabla modelo ↔ código en `etapaE/tabla_modelo_codigo.md`; el código C compilado con gcc reproduce el MIL (diferencia ≤ 4e-11 rad, por el redondeo de los CSV). |
 | F — SIL | **Completada (2026-11-06, MATLAB R2026a).** Banco `BoP_Test_SIL.slx` (ramas Normal y SIL, dos ejes, una planta por rama). **PASS: diferencia 0 e igualdad exacta en 271/271 muestras** de th_cmd, I, saturado y de la planta. Para compilar SIL hizo falta E3 (configuración de hardware; modelo v1.2, E1 y E2 repetidos, código idéntico). Limitación: el ensayo no satura (la saturación se verificó en E1). Ver `etapaF/LEEME_etapaF.md`. |
-| G — PIL | **En curso (2026-11-06).** Paquete de Arduino instalado por el equipo. G0 (prueba PIL mínima con la copia `Controller_BoP_ESP32.slx`, que solo cambia la placa), G1 (banco Normal vs PIL) y G2 (comparación) escritos. **Hallazgo:** el paquete de Arduino no habilita PIL en la ESP32 (`IsPilSupported = 0` en `ESP32WROOMdevkitC_38Board`; G0b/G0c). La conexión PIL propia que reutiliza la clase del paquete compila con Xtensa, pero esa clase falla por dentro. **Ruta elegida:** PIL propio (alternativa de ingeniería). El código de `etapaE/codigo_generado` (el verificado en SIL, sin cambios) corre en la ESP32 con un sketch puente serie (G3); hay prueba del controlador solo vs MIL (G4) y un banco en lazo cerrado Normal vs PIL en MATLAB (G5), cuya rama Normal reproduce la de F1 (2,3e-10 relativo, Octave). Pendiente: correr G3, G4 y G5. Ver `etapaG/LEEME_etapaG.md`. |
+| G — PIL | **Completada (2026-11-06, MATLAB R2026a + ESP32-D0WD-V3).** El paquete de Arduino no habilita PIL para la ESP32 (`IsPilSupported = 0`; G0, G0b, G0c). **Alternativa de ingeniería:** PIL propio. El código de `etapaE/codigo_generado` (idéntico byte a byte) se compila con Xtensa y corre en la ESP32 con un sketch puente serie (G3). **G4** (controlador solo vs MIL, D1 y D2 con 9 cuadros saturados) y **G5** (lazo cerrado de dos ejes, Normal vs PIL, 271 muestras): **PASS con igualdad exacta**. `_step`: 7,5 µs de mediana y 31,3 µs como máximo (0,094 % de Ts). Ver `etapaG/LEEME_etapaG.md`. |
 | H — Implementación física | No iniciada |
 
 ## 3. Parámetros conocidos (de CLAUDE.md sección 0 y `docs/`)
@@ -63,7 +63,7 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 |---|---|---|
 | Cambiar `PROCESS_ACCEL_STD` de 1500 a 500 en `proyecto_ControlDIP-develop/src/config.py` | Pipeline, C, D, H | Lo pide el diseño de la Etapa C (con 1500 el plato tiembla 0,67° en reposo). **No se tocó `config.py`**: decide el equipo, idealmente después de medir el ruido. |
 | Dinámica real del servo (ωn = 50 rad/s es un supuesto) | C, D | Medir con el prototipo (escalón de comando, registro de la cámara). |
-| Ruta PIL si el paquete de soporte no habilita PIL para ESP32 | G | Comprobar con una prueba PIL mínima antes de la Etapa G. |
+| ~~Ruta PIL si el paquete de soporte no habilita PIL para ESP32~~ | G | **Resuelto (2026-11-06):** no lo habilita; se usó un PIL propio (ver Etapa G). |
 
 **Decisiones tomadas**
 
@@ -125,7 +125,12 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | `etapaE/E0_build_Controller_BoP.m`, `init_Controller_BoP.m`, `ley_control_BoP_bloque.m` | Construcción del modelo del controlador, parámetros calibrables y función del bloque |
 | `etapaE/E1_verificar_equivalencia_BoP.m` | Modelo vs MIL, muestra a muestra (Parte A sin Simulink, Parte B con `sim`) |
 | `etapaE/E2_generar_codigo_BoP.m` | Generación de código e inspección automática |
-| `etapaE/Controller_BoP.slx`, `etapaE/codigo_generado/` | **Todavía no existen.** Los generan E0 y E2 en MATLAB. |
+| `etapaE/Controller_BoP.slx`, `etapaE/codigo_generado/` | Modelo del controlador (v1.2) y su código generado |
+| `etapaF/` | Banco SIL `BoP_Test_SIL.slx`, F0 y F1, planta del banco (`funciones/planta_bop_paso.m`), resultados |
+| `etapaG/G0_prueba_PIL_minima_BoP.m`, `G0b_…`, `G0c_…` | Intento con el PIL de Simulink y diagnósticos (evidencia de que la ESP32 no tiene PIL en el paquete) |
+| `etapaG/pil_esp32/bop_pil_esp32/` | Sketch puente serie y copia del código de la Etapa E que corre en la ESP32 |
+| `etapaG/G3_…`, `G4_…`, `G5_…`, `etapaG/funciones/g_pil_*.m` | Preparación y carga, PIL del controlador solo, banco en lazo cerrado y comunicador serie |
+| `etapaG/resultados/` | Consolas G0 a G5, CSV de G4 y G5, `G5_resultados.mat`, `G5_diferencias.png` |
 
 El contenido del zip `Proyecto_FINAL_LAB_Control_para_ClaudeCode.zip` se copió a la raíz del repo sin cambios (sesión 1).
 
@@ -220,4 +225,26 @@ Decisiones tomadas: planta del banco simplificada (actuador directo en ángulo d
   entero), suficiente para comparar el controlador.
 Qué debe conservarse: BoP_Test_SIL.slx, resultados/, Controller_BoP.slx v1.2.
 Siguiente etapa: G — PIL (banco separado con la ESP32); en paralelo, B con el prototipo.
+```
+
+```
+Etapa: G — PIL (cierre, 2026-11-06)
+Completada: Sí
+Resultados obtenidos: G4, controlador solo vs MIL: igualdad exacta en D1 (194 cuadros) y en D2
+  (179 cuadros, 9 saturados en las dos). G5, lazo cerrado de dos ejes, Normal vs PIL: igualdad
+  exacta en 271/271 muestras de las 10 señales. La rama Normal coincide con F1 (≤ 2,3e-10 relativo).
+  _step en la ESP32: 7,5 µs de mediana y 31,3 µs como máximo (0,094 % de Ts), con double emulado.
+Archivos generados: etapaG/ (scripts G0 a G5, pil_esp32/, funciones/, resultados/).
+Datos pendientes: ninguno para G.
+Problemas detectados: el Simulink Support Package for Arduino (R2026a) no habilita PIL para la
+  ESP32 (IsPilSupported = 0; su clase PIL falla por dentro aun registrada a mano). El código
+  generado con la placa ESP32 no es idéntico al de SIL (una variable temporal extra) y depende
+  de rtw_continuous.h, así que no se usó.
+Decisiones tomadas: PIL propio (alternativa de ingeniería). Corre en la ESP32 exactamente el
+  código verificado en SIL, con un comunicador serie propio y el banco en MATLAB, coherente con
+  el banco de Simulink de F.
+Qué debe conservarse: etapaG/resultados/, pil_esp32/, Controller_BoP_ESP32.slx (evidencia del
+  intento), las consolas G0b y G0c.
+Siguiente etapa: B — identificación con el prototipo (pendiente desde el inicio). Después,
+  actualizar los parámetros, repetir C y D (y E a G si cambian las ganancias) y pasar a H.
 ```
