@@ -6,6 +6,7 @@ Por eso aqui se VERIFICA leyendo de vuelta, en lugar de confiar en que el
 comando no fallo.
 """
 
+import re
 import subprocess
 
 from src import config
@@ -50,9 +51,19 @@ class V4L2Configurator:
                 ['v4l2-ctl', '-d', self.device, '-C', control],
                 check=True, capture_output=True, text=True,
             ).stdout
-            return int(out.strip().split(':')[-1])
+            return self._parse_valor(out)
         except Exception:
             return None
+
+    @staticmethod
+    def _parse_valor(salida: str):
+        """Entero despues de los dos puntos de 'v4l2-ctl -C'.
+
+        Los controles tipo menu responden con el nombre de la opcion, por
+        ejemplo 'auto_exposure: 1 (Manual Mode)'; por eso no basta int().
+        """
+        m = re.search(r':\s*(-?\d+)', salida)
+        return int(m.group(1)) if m else None
 
     def _set_any(self, clave: str, value: int):
         """Prueba los alias de un control hasta que uno funcione."""

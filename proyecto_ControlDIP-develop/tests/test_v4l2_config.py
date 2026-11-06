@@ -34,6 +34,14 @@ class TestV4L2Configurator(unittest.TestCase):
         self.assertFalse(self.c.verify())
         self.assertTrue(self.c.problemas)
 
+    def test_parse_valor_menu(self):
+        # Los controles tipo menu responden con el nombre de la opcion
+        # (camara Redragon GW600, 2026-11-06): antes daba "no existe".
+        self.assertEqual(V4L2Configurator._parse_valor('auto_exposure: 1 (Manual Mode)\n'), 1)
+        self.assertEqual(V4L2Configurator._parse_valor('exposure_time_absolute: 50\n'), 50)
+        self.assertEqual(V4L2Configurator._parse_valor('brightness: -5'), -5)
+        self.assertIsNone(V4L2Configurator._parse_valor('sin numero'))
+
 
 if __name__ == '__main__':
     unittest.main()
