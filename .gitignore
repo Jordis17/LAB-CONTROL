@@ -1,0 +1,47 @@
+# .gitignore del proyecto final Ball on Plate
+# Lo que SI se sube: scripts, modelos .slx, resultados/ de MATLAB (consolas, CSV, .mat),
+# etapaE/codigo_generado/, datos_prototipo/ y la documentacion.
+# El pipeline de vision tiene su propio .gitignore en proyecto_ControlDIP-develop/
+# (venv, __pycache__, calibration.npz, hsv_config.json, logs/).
+
+# ---- MATLAB / Simulink: archivos temporales y de compilacion
+*.asv
+*.autosave
+*.slxc
+*.mexa64
+*.mexw64
+*.mexmaci64
+*.mexmaca64
+*.mex
+slprj/
+sccprj/
+codegen/
+*_ert_rtw/
+*_grt_rtw/
+*_sfun.*
+*.bak
+.SimulinkProject/
+
+# Carpeta de generacion de E2 (lo que importa se copia a etapaE/codigo_generado/)
+etapaE/build/
+
+# ---- Octave
+octave-workspace
+octave-core
+
+# ---- Python (por si se corre algo fuera del pipeline)
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# ---- Arduino IDE
+firmware/**/build/
+
+# ---- Sistema operativo y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/
