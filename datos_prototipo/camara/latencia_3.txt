@@ -1,0 +1,42 @@
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+AVISO: la camara NO quedo bloqueada como se pidio.
+  - auto_exposure: no se pudo aplicar (= 1)
+  - auto_exposure: el control no existe en /dev/video0
+Con automatismos activos la calibracion HSV y el dt del filtro
+dejan de ser validos durante la sesion.
+Revise 'v4l2-ctl -d /dev/video0 --list-ctrls'
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Camara abierta: 640x480 @ 30 fps, formato YUYV
+
+--- Latencia de extremo a extremo ---
+Apunte la camara a esta ventana, a pantalla completa si puede,
+y no la mueva. Se haran 15 destellos.
+
+  destello  1:   57.1 ms
+  destello  2:   60.5 ms
+  destello  3:   61.9 ms
+  destello  4:   60.6 ms
+  destello  5:   57.0 ms
+  destello  6:   62.8 ms
+  destello  7:   57.2 ms
+  destello  8:   58.2 ms
+  destello  9:   57.3 ms
+  destello 10:   93.5 ms
+  destello 11:   60.9 ms
+  destello 12:   60.6 ms
+  destello 13:   59.7 ms
+  destello 14:   62.3 ms
+  destello 15:   56.5 ms
+
+  mediana    60.5 ms
+  minimo     56.5 ms
+  maximo     93.5 ms
+
+  Este valor incluye la latencia del monitor, asi que es una cota
+  superior. Criterio del plan: media < 60 ms, desviacion < 10 ms.
+  Si sale alto, pruebe: FOURCC YUYV en vez de MJPG, menor
+  resolucion, exposicion mas corta con mas luz.
+
+Configuracion usada: 640x480, YUYV, exposicion 50 (= 5.0 ms)

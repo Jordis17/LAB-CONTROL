@@ -1,0 +1,30 @@
+Configuracion HSV cargada desde hsv_config.json
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+AVISO: la camara NO quedo bloqueada como se pidio.
+  - auto_exposure: no se pudo aplicar (= 1)
+  - auto_exposure: el control no existe en /dev/video0
+Con automatismos activos la calibracion HSV y el dt del filtro
+dejan de ser validos durante la sesion.
+Revise 'v4l2-ctl -d /dev/video0 --list-ctrls'
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Camara abierta: 640x480 @ 30 fps, formato YUYV
+
+Deje la bola QUIETA en el centro del plato. Tomando 500 muestras...
+
+  100/500
+  200/500
+  300/500
+  400/500
+  500/500
+
+--- Ruido de posicion con la bola quieta ---
+  muestras validas 500, fallos 0
+  media       X  -116.22  Y   132.41 mm
+  desv. est.  X    0.090  Y    0.091 mm
+  pico a pico X     0.60  Y     0.60 mm
+
+  Criterio del plan: desviacion < 1 mm. CUMPLE
+
+  Ponga en src/config.py:   MEAS_NOISE_STD_MM = 0.09

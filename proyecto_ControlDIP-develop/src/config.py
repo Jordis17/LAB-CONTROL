@@ -15,7 +15,7 @@ FRAME_FPS = 30
 
 # MJPG o YUYV. Cual conviene se decide con run_benchmark.py --period en cada
 # una de las dos; gana la que de menor periodo y menor jitter.
-FOURCC = "MJPG"
+FOURCC = "YUYV"
 
 # exposure_time_absolute va en unidades de 100 us, asi que 50 = 5.0 ms.
 # El valor anterior (157 = 15.7 ms) era casi medio periodo de frame: una bola
