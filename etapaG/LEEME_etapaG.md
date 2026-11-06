@@ -43,53 +43,65 @@ herramienta. Si la ESP32 devuelve exactamente lo mismo que el modelo en todas la
 código corrió en su procesador y calculó lo mismo. Si la ruta falla, el plan B es escribir
 también el lado de comunicación y carga (rtiostream propio).
 
-## Modelo para PIL
+## Intento con el PIL de Simulink y por qué no se usa (2026-11-06)
 
-`Controller_BoP_ESP32.slx` es una **copia** de `etapaE/Controller_BoP.slx` (que no se toca) en
-la que **solo cambia la placa** (*Hardware board* = ESP32), necesaria para compilar con el
-compilador de la ESP32. El algoritmo y los parámetros son los mismos (`bop_ley_control`,
-`init_Controller_BoP`). La comparación de G0 y G2 contra el original lo confirma.
+Antes de llegar a la ruta propia se probó el PIL de Simulink con una conexión registrada a mano
+(`pil_esp32/rtwTargetInfo.m` y `pil_esp32/+bop_pil/ConnectivityConfigESP32.m`, una subclase sin
+cambios de la del paquete). Con eso Simulink sí tomó la conexión y **compiló el controlador
+con el compilador Xtensa de la ESP32 sin errores**. Lo que falló fue la clase PIL del paquete
+por dentro (código cerrado .p): pide la variable `arduinoheaderPath`, que solo existe para las
+placas soportadas, y no lee el puerto (`COM port:` vacío) (`resultados/G0_consola.txt`). Seguir
+parchándola sería adivinar, así que se dejó.
 
-## Qué correr (MATLAB, con la ESP32 conectada por USB a esta PC)
+Tampoco sirve la ruta del *Target Framework*: ahí la placa ESP32 no tiene procesador,
+interfaces de comunicación ni protocolo PIL definidos.
 
-Antes: cierren todo lo que use el puerto de la ESP32 (`main_vision.py`, `miniterm`, Monitor
-Serie del IDE) y revisen que aparezca:
+## Ruta PIL propia (G3, G4, G5)
 
-```bash
-ls /dev/ttyUSB*
-```
+| Qué corre en la ESP32 | Qué sigue en la PC (MATLAB) |
+|---|---|
+| El código C **generado** de `Controller_BoP_ESP32` (mismo algoritmo y parámetros que `Controller_BoP`; G3 lo compara con el de la Etapa E), compilado con la toolchain Xtensa del paquete de Arduino (`arduino-cli`, FQBN `esp32:esp32:esp32`). Dos instancias, una por eje. | La planta (`planta_bop_paso`, la del banco SIL), la referencia, la rama Normal y la comparación |
+
+`pil_esp32/bop_pil_esp32/bop_pil_esp32.ino` **no contiene el algoritmo**. Solo hace de puente
+serie: recibe `r`, `x_hat`, `v_hat` y `habilitado` como double IEEE de 8 bytes (sin
+redondeo), llama `Controller_BoP_ESP32_step` y devuelve `th_cmd`, `I`, `saturado` y los ciclos
+de CPU que tardó la llamada. El protocolo está descrito al principio del sketch. Es el mismo
+esquema del PIL de Simulink (el código en el procesador y lo demás en la PC), con un
+comunicador propio.
+
+**Banco en lazo cerrado (G5).** Tiene dos ramas, Normal y PIL, cada una con su propia planta.
+Comparten la referencia, la habilitación, la condición inicial, Ts, el ruido y la duración. El
+ensayo es el mismo del banco SIL. La rama Normal ejecuta en MATLAB la misma ley del bloque
+(`bop_ley_control` con la envoltura de `ley_control_BoP_bloque`), que E1 mostró idéntica bit a
+bit al modelo.
+
+**Control de coherencia.** La rama Normal de G5 se compara con la rama Normal del banco SIL de
+Simulink (`etapaF/resultados/F1_comparacion.csv`). Probado en Octave el 2026-11-06: diferencia
+relativa máxima de 2,3e-10 en las 10 señales, que es el límite que impone el CSV de 10 cifras.
+O sea que el banco en MATLAB reproduce el de Simulink.
+
+**Diferencia con el banco de Simulink que pide la Etapa G:** el lazo lo maneja un script de
+MATLAB y no un modelo con bloques en modo PIL. Se justifica porque el PIL de Simulink no está
+disponible para la ESP32 (ver arriba), y lo cubre el control de coherencia.
+
+## Qué correr (MATLAB, ESP32 conectada en /dev/ttyUSB0, puerto libre)
 
 ```matlab
 cd etapaG
-G0_prueba_PIL_minima_BoP      % 1) prueba mínima: el controlador solo, en la ESP32
-G1_build_Test_PIL_BoP         % 2) construye el banco Normal vs PIL (solo si G0 dio PASS)
-G2_comparar_Normal_PIL_BoP    % 3) simula en lazo cerrado y compara
+G3_preparar_PIL_ESP32_BoP      % genera el código, lo compara con el de la Etapa E, compila y graba la ESP32
+G4_PIL_controlador_ESP32_BoP   % controlador solo: ensayos D1 y D2 (con saturación), ESP32 vs MIL
+G5_PIL_lazo_cerrado_ESP32_BoP  % banco en lazo cerrado: ramas Normal y PIL
 ```
 
-- **G0** responde si la ESP32 acepta PIL. Pasa las entradas de dos ensayos del MIL (uno con 9
-  cuadros saturados) por el controlador en la ESP32 y compara con el MIL. La primera vez
-  compila y graba la ESP32 (tarda unos minutos).
-- **G1** construye `BoP_Test_PIL.slx`, igual al banco SIL (misma planta y ensayo) pero con la
-  rama PIL. Es un banco separado del de SIL. Si Simulink no admite dos instancias PIL a la vez,
-  pongan `ejes_pil = {'X'}` al principio de G1 (el eje Y de esa rama queda en modo Normal).
-- **G2** simula y compara muestra a muestra. Criterio: max\|PIL − Normal\| ≤ 1e-12 en th_cmd e I
-  y 0 diferencias en saturado.
+G3 necesita `Controller_BoP_ESP32.slx`, que crea G0 (G0 crea la copia aunque después falle el
+PIL de Simulink). Si al grabar se queda en "Connecting…", mantengan apretado **BOOT**.
 
-## Errores probables la primera vez
-
-| Error | Qué hacer |
-|---|---|
-| G0 no reconoce la placa | Abrir `Controller_BoP_ESP32.slx` → *Modeling* → *Model Settings* → *Hardware Implementation* → *Hardware board* y mandarme los nombres que aparecen |
-| `Connectivity configuration "Arduino Board" threw an error … Index exceeds array bounds` y `Target is underspecified` (2026-11-06) | El paquete no detectó solo la ESP32 y la configuración PIL quedó sin puerto. G0 ahora fija `puerto = '/dev/ttyUSB0'` en el modelo (`funciones/g_puerto_arduino.m`) e imprime la configuración del paquete |
-| No puede abrir el puerto serie | Cerrar los otros programas que lo usan; el usuario tiene que estar en el grupo `dialout` |
-| Falla al grabar la ESP32 | Mantener **BOOT** apretado cuando diga "Connecting…" |
-| PIL no soportado para la placa | Mandar el mensaje completo: hay que definir otra ruta antes de seguir (CLAUDE.md, sección 0) |
-
-Si algo falla, mándenme el mensaje completo. No usen botones de **"Fix"**.
+Criterio de G4 y G5: max\|PIL − Normal\| ≤ 1e-12 en th_cmd e I, y 0 diferencias en saturado.
+También se reporta el tiempo de `_step` en la ESP32.
 
 ## Resultados
 
 | Prueba | Criterio | Resultado |
 |---|---|---|
-| G0 D1 y D2 (controlador solo) | ≤ 1e-12; 0 en saturado | pendiente |
-| G2 lazo cerrado | ≤ 1e-12; 0 en saturado | pendiente |
+| G4 D1 y D2 (controlador solo) | ≤ 1e-12; 0 en saturado | pendiente |
+| G5 lazo cerrado | ≤ 1e-12; 0 en saturado | pendiente |
