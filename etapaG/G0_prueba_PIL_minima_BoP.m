@@ -108,6 +108,9 @@ try
 catch e
     fprintf('GetBoard(%s) sigue fallando: %s\n', placa, e.message);
 end
+if usar_pil_propio
+    g_conexion_target_framework(placa, puerto, 115200);
+end
 set_param(mdl, 'Description', ['Copia de Controller_BoP (etapaE) solo para PIL en la ESP32. ' ...
     'Mismo algoritmo y parametros; cambia la placa en la configuracion.']);
 save_system(mdl);
