@@ -1,4 +1,4 @@
-ETAPA G - G0_prueba_PIL_minima_BoP   (2026-11-06 11:32:25)
+ETAPA G - G0_prueba_PIL_minima_BoP   (2026-11-06 11:35:44)
 MATLAB 26.1.0.3346908 (R2026a) Update 5
 Paquetes de soporte instalados:
   - Simulink Support Package for Arduino Hardware
@@ -121,78 +121,100 @@ Variantes de ESP32-WROOM que ofrece el paquete:
 ESP32.ESP32_board = "ESP32-WROOM-DevKitC(38 pin)"
 GetBoard(ESP32-WROOM (Arduino Compatible)): OK
 
---- Target Framework: placa "ESP32-WROOM (Arduino Compatible)" ---
-  <a href="matlab:helpPopup('target.Board')" style="font-weight:bold">Board</a> with identifier "<strong>ESP32-WROOM (Arduino Compatible)</strong>" and properties:
-
-        CommunicationInterfaces: [0×0 target.CommunicationInterface]
-    CommunicationProtocolStacks: [0×0 target.CommunicationProtocolStack]
-                  MainFunctions: [0×0 target.MainFunction]
-                     Processors: [0×0 target.Processor]
-                          Tools: [1×1 target.Tools]
-                   Manufacturer: ''
-                         AddOns: [0×0 target.AddOn]
-                             Id: 'ESP32-WROOM (Arduino Compatible)'
-                           Name: 'ESP32-WROOM (Arduino Compatible)'
-                        IsValid: 1
-
-Processors (0):
-CommunicationInterfaces (0):
-CommunicationProtocolStacks (0):
-Tools (1):
-  <a href="matlab:helpPopup('target.Tools')" style="font-weight:bold">Tools</a> with properties:
-
-        DebugTools: [0×0 target.ApplicationExecutionTool]
-    ExecutionTools: [0×0 target.ApplicationExecutionTool]
-           IsValid: 1
-
-MainFunctions (0):
-TargetConnection registradas: 0
-No se pudo crear la TargetConnection:
-Unrecognized property 'SerialPort' for class
-'target.RS232Channel'.
-
-Error in g_conexion_target_framework (line 52)
-    c.CommunicationChannel.SerialPort = puerto;
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Error in G0_prueba_PIL_minima_BoP (line 112)
-    g_conexion_target_framework(placa, puerto, 115200);
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 D1_requisitos: 194 cuadros, 0 saturados en el MIL. Ejecutando en la ESP32 (compila y carga la primera vez)...
-[Warning: An error occurred while registering an object in
-RTW.TargetRegistry from file
-"/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/pil_esp32/rtwTargetInfo.m":
-"Connectivity configuration "ESP32 BoP (Arduino PIL)" is
-attempting to register the connectivity configuration class
-"codertarget.arduinotarget.pil.ConnectivityConfig" but this
-has already been registered by connectivity configuration
-"Arduino Board". A connectivity configuration class can only
-be registered by a single connectivity configuration. Change
-the appropriate sl_customization.m file so that the class is
-registered by only a single connectivity configuration.".
-This custom registration is not loaded.] 
-[> In coder.targetreg.internal.TargetRegistry/refresh
-In coder.targetreg.internal/TargetRegistry/refreshConfig
-In coder.internal.getConnectivityConfigs
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.connectivity.connectivityconfig.getPILConnectivityConfig', '/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/connectivityconfig/+coder/+connectivity/+connectivityconfig/getPILConnectivityConfig.m', 16)" style="font-weight:bold">coder.connectivity.connectivityconfig.getPILConnectivityConfig</a> (<a href="matlab: opentoline('/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/connectivityconfig/+coder/+connectivity/+connectivityconfig/getPILConnectivityConfig.m',16,0)">line 16</a>)
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.connectivity.createTargetServices', '/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/dispatch/+coder/+connectivity/createTargetServices.m', 154)" style="font-weight:bold">coder.connectivity.createTargetServices</a> (<a href="matlab: opentoline('/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/dispatch/+coder/+connectivity/createTargetServices.m',154,0)">line 154</a>)
-In build_pil_target
-In sl_feval
-In Simulink.Simulation.internal.DesktopSimHelper
-In Simulink.Simulation.internal.DesktopSimHelper.sim
-In Simulink/SimulationInput/sim
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('G0_prueba_PIL_minima_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m', 154)" style="font-weight:bold">G0_prueba_PIL_minima_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m',154,0)">line 154</a>)] 
+### Unable to find Simulink cache file "Controller_BoP_ESP32.slxc".
+### Searching for referenced models in model 'Controller_BoP_ESP32'.
+### Total of 1 models to build.
+### Starting build procedure for: Controller_BoP_ESP32
+### Generating code and artifacts to 'Model specific' folder structure
+### Generating code into build folder: /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw
+### Invoking Target Language Compiler on Controller_BoP_ESP32.rtw
+### Using System Target File: /usr/local/MATLAB/R2026a/rtw/c/ert/ert.tlc
+### Loading TLC function libraries
+.......
+### Generating TLC interface API for custom data
+.
+### Initial pass through model to cache user defined code
+.
+### Caching model source code
+......................................................
+### Writing header file Controller_BoP_ESP32_types.h
+.
+### Writing source file Controller_BoP_ESP32.c
+### Writing header file Controller_BoP_ESP32_private.h
+### Writing header file Controller_BoP_ESP32.h
+### Writing header file rtwtypes.h
+.
+### Writing header file rtGetNaN.h
+### Writing source file rtGetNaN.c
+### Writing header file rt_nonfinite.h
+### Writing source file rt_nonfinite.c
+### Writing header file rtGetInf.h
+.
+### Writing source file rtGetInf.c
+### Writing header file rtmodel.h
+### Writing header file rt_defines.h
+### Writing source file ert_main.c
+.
+### TLC code generation complete (took 3.033s).
+### Saving binary information cache.
+### Using toolchain: ESP32
+### Creating '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/Controller_BoP_ESP32.mk' ...
+### Building 'Controller_BoP_ESP32': "/usr/local/MATLAB/R2026a/bin/glnxa64/gmake"  -f Controller_BoP_ESP32.mk buildobj
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/bin/xtensa-esp32-elf-gcc" -mlongcalls -Wno-frame-address -ffunction-sections -fdata-sections -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-sign-compare -ggdb -freorder-blocks -Wwrite-strings -fstack-protector -fstrict-volatile-bitfields -Wno-error=unused-but-set-variable -fno-jump-tables -fno-tree-switch-conversion -std=gnu99 -Wno-old-style-declaration -MMD -c -w -DF_CPU=240000000L -DARDUINO=10819 -DARDUINO_ESP32_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32_DEV\"" "-DARDUINO_VARIANT=\"esp32\"" -DARDUINO_PARTITION_default -DESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_CDC_ON_BOOT=0 @"/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/esp32sdkincludes.txt" -Os   -DHAVE_CONFIG_H "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"" -DUNITY_INCLUDE_CONFIG_H -DWITH_POSIX -D_GNU_SOURCE "-DIDF_VER=\"v4.4.5\"" -DESP_PLATFORM -D_POSIX_READER_WRITER_LOCKS -D_RUNONTARGETHARDWARE_BUILD_ -DMW_DONOTSTART_SCHEDULER -D_ROTH_ESP32_ -D__MW_TARGET_USE_HARDWARE_RESOURCES_H__ -DMW_TIMERID=3 -DMW_PRESCALAR=8 -DMW_TIMERCOUNT=43314 -DMW_SCHEDULERCOUNTER=3 -DARDUINO_NUM_SERIAL_PORTS=3 -DARDUINO_SERIAL_RECEIVE_BUFFER_SIZE=256 -D_RTT_BAUDRATE_SERIAL0_=9600 -D_RTT_BAUDRATE_SERIAL1_=9600 -D_RTT_BAUDRATE_SERIAL2_=9600 -D_RTT_CONFIG_SERIAL0_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL1_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL2_=SERIAL_8N1 -D_RTT_TX_PIN_SERIAL0_=1 -D_RTT_RX_PIN_SERIAL0_=3 -D_RTT_TX_PIN_SERIAL1_=33 -D_RTT_RX_PIN_SERIAL1_=32 -D_RTT_TX_PIN_SERIAL2_=17 -D_RTT_RX_PIN_SERIAL2_=16 -DSERIAL_MULTIPURPOSE_0 -DSERIAL_MULTIPURPOSE_1 -DSERIAL_MULTIPURPOSE_2 -D_RTT_ANALOG_REF_=0 -DMW_NUM_PINS=26 -D_ONBOARD_EEPROM_SIZE_=0 -DCLASSIC_INTERFACE=0 -DALLOCATIONFCN=0 -DTERMFCN=1 -DONESTEPFCN=1 -DMAT_FILE=0 -DMULTI_INSTANCE_CODE=1 -DINTEGER_CODE=0 -DMT=0  -DTID01EQ=0 -DXCP_CUSTOM_PLATFORM -DEXIT_FAILURE=1 -DEXTMODE_DISABLEPRINTF -DEXTMODE_DISABLETESTING -DEXTMODE_DISABLE_ARGS_PROCESSING=1 -DINCLUDE_xTaskGetCurrentTaskHandle=1 -DOS_STKSIZE=8192 -DINCLUDE_vTaskDelete -DINCLUDE_vTaskDelay=1 -DUSE_FREERTOS -DSTACK_SIZE=64 -DRT -DMODEL=Controller_BoP_ESP32 -DNUMST=1 -DNCSTATES=0 -DHAVESTDIO -DMODEL_HAS_DYNAMICALLY_LOADED_SFCNS=0 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw -I/usr/local/MATLAB/R2026a/extern/include -I/usr/local/MATLAB/R2026a/simulink/include -I/usr/local/MATLAB/R2026a/rtw/c/src -I/usr/local/MATLAB/R2026a/rtw/c/src/ext_mode/common -I/usr/local/MATLAB/R2026a/rtw/c/ert -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/cores/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/variants/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/mkspiffs -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/scheduler/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/include -I/usr/local/MATLAB/R2026a/toolbox/target/shared/freertos/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/include -o "Controller_BoP_ESP32.o" "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/Controller_BoP_ESP32.c"
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/bin/xtensa-esp32-elf-gcc" -mlongcalls -Wno-frame-address -ffunction-sections -fdata-sections -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-sign-compare -ggdb -freorder-blocks -Wwrite-strings -fstack-protector -fstrict-volatile-bitfields -Wno-error=unused-but-set-variable -fno-jump-tables -fno-tree-switch-conversion -std=gnu99 -Wno-old-style-declaration -MMD -c -w -DF_CPU=240000000L -DARDUINO=10819 -DARDUINO_ESP32_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32_DEV\"" "-DARDUINO_VARIANT=\"esp32\"" -DARDUINO_PARTITION_default -DESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_CDC_ON_BOOT=0 @"/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/esp32sdkincludes.txt" -Os   -DHAVE_CONFIG_H "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"" -DUNITY_INCLUDE_CONFIG_H -DWITH_POSIX -D_GNU_SOURCE "-DIDF_VER=\"v4.4.5\"" -DESP_PLATFORM -D_POSIX_READER_WRITER_LOCKS -D_RUNONTARGETHARDWARE_BUILD_ -DMW_DONOTSTART_SCHEDULER -D_ROTH_ESP32_ -D__MW_TARGET_USE_HARDWARE_RESOURCES_H__ -DMW_TIMERID=3 -DMW_PRESCALAR=8 -DMW_TIMERCOUNT=43314 -DMW_SCHEDULERCOUNTER=3 -DARDUINO_NUM_SERIAL_PORTS=3 -DARDUINO_SERIAL_RECEIVE_BUFFER_SIZE=256 -D_RTT_BAUDRATE_SERIAL0_=9600 -D_RTT_BAUDRATE_SERIAL1_=9600 -D_RTT_BAUDRATE_SERIAL2_=9600 -D_RTT_CONFIG_SERIAL0_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL1_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL2_=SERIAL_8N1 -D_RTT_TX_PIN_SERIAL0_=1 -D_RTT_RX_PIN_SERIAL0_=3 -D_RTT_TX_PIN_SERIAL1_=33 -D_RTT_RX_PIN_SERIAL1_=32 -D_RTT_TX_PIN_SERIAL2_=17 -D_RTT_RX_PIN_SERIAL2_=16 -DSERIAL_MULTIPURPOSE_0 -DSERIAL_MULTIPURPOSE_1 -DSERIAL_MULTIPURPOSE_2 -D_RTT_ANALOG_REF_=0 -DMW_NUM_PINS=26 -D_ONBOARD_EEPROM_SIZE_=0 -DCLASSIC_INTERFACE=0 -DALLOCATIONFCN=0 -DTERMFCN=1 -DONESTEPFCN=1 -DMAT_FILE=0 -DMULTI_INSTANCE_CODE=1 -DINTEGER_CODE=0 -DMT=0  -DTID01EQ=0 -DXCP_CUSTOM_PLATFORM -DEXIT_FAILURE=1 -DEXTMODE_DISABLEPRINTF -DEXTMODE_DISABLETESTING -DEXTMODE_DISABLE_ARGS_PROCESSING=1 -DINCLUDE_xTaskGetCurrentTaskHandle=1 -DOS_STKSIZE=8192 -DINCLUDE_vTaskDelete -DINCLUDE_vTaskDelay=1 -DUSE_FREERTOS -DSTACK_SIZE=64 -DRT -DMODEL=Controller_BoP_ESP32 -DNUMST=1 -DNCSTATES=0 -DHAVESTDIO -DMODEL_HAS_DYNAMICALLY_LOADED_SFCNS=0 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw -I/usr/local/MATLAB/R2026a/extern/include -I/usr/local/MATLAB/R2026a/simulink/include -I/usr/local/MATLAB/R2026a/rtw/c/src -I/usr/local/MATLAB/R2026a/rtw/c/src/ext_mode/common -I/usr/local/MATLAB/R2026a/rtw/c/ert -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/cores/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/variants/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/mkspiffs -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/scheduler/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/include -I/usr/local/MATLAB/R2026a/toolbox/target/shared/freertos/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/include -o "rtGetInf.o" "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/rtGetInf.c"
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/bin/xtensa-esp32-elf-gcc" -mlongcalls -Wno-frame-address -ffunction-sections -fdata-sections -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-sign-compare -ggdb -freorder-blocks -Wwrite-strings -fstack-protector -fstrict-volatile-bitfields -Wno-error=unused-but-set-variable -fno-jump-tables -fno-tree-switch-conversion -std=gnu99 -Wno-old-style-declaration -MMD -c -w -DF_CPU=240000000L -DARDUINO=10819 -DARDUINO_ESP32_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32_DEV\"" "-DARDUINO_VARIANT=\"esp32\"" -DARDUINO_PARTITION_default -DESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_CDC_ON_BOOT=0 @"/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/esp32sdkincludes.txt" -Os   -DHAVE_CONFIG_H "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"" -DUNITY_INCLUDE_CONFIG_H -DWITH_POSIX -D_GNU_SOURCE "-DIDF_VER=\"v4.4.5\"" -DESP_PLATFORM -D_POSIX_READER_WRITER_LOCKS -D_RUNONTARGETHARDWARE_BUILD_ -DMW_DONOTSTART_SCHEDULER -D_ROTH_ESP32_ -D__MW_TARGET_USE_HARDWARE_RESOURCES_H__ -DMW_TIMERID=3 -DMW_PRESCALAR=8 -DMW_TIMERCOUNT=43314 -DMW_SCHEDULERCOUNTER=3 -DARDUINO_NUM_SERIAL_PORTS=3 -DARDUINO_SERIAL_RECEIVE_BUFFER_SIZE=256 -D_RTT_BAUDRATE_SERIAL0_=9600 -D_RTT_BAUDRATE_SERIAL1_=9600 -D_RTT_BAUDRATE_SERIAL2_=9600 -D_RTT_CONFIG_SERIAL0_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL1_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL2_=SERIAL_8N1 -D_RTT_TX_PIN_SERIAL0_=1 -D_RTT_RX_PIN_SERIAL0_=3 -D_RTT_TX_PIN_SERIAL1_=33 -D_RTT_RX_PIN_SERIAL1_=32 -D_RTT_TX_PIN_SERIAL2_=17 -D_RTT_RX_PIN_SERIAL2_=16 -DSERIAL_MULTIPURPOSE_0 -DSERIAL_MULTIPURPOSE_1 -DSERIAL_MULTIPURPOSE_2 -D_RTT_ANALOG_REF_=0 -DMW_NUM_PINS=26 -D_ONBOARD_EEPROM_SIZE_=0 -DCLASSIC_INTERFACE=0 -DALLOCATIONFCN=0 -DTERMFCN=1 -DONESTEPFCN=1 -DMAT_FILE=0 -DMULTI_INSTANCE_CODE=1 -DINTEGER_CODE=0 -DMT=0  -DTID01EQ=0 -DXCP_CUSTOM_PLATFORM -DEXIT_FAILURE=1 -DEXTMODE_DISABLEPRINTF -DEXTMODE_DISABLETESTING -DEXTMODE_DISABLE_ARGS_PROCESSING=1 -DINCLUDE_xTaskGetCurrentTaskHandle=1 -DOS_STKSIZE=8192 -DINCLUDE_vTaskDelete -DINCLUDE_vTaskDelay=1 -DUSE_FREERTOS -DSTACK_SIZE=64 -DRT -DMODEL=Controller_BoP_ESP32 -DNUMST=1 -DNCSTATES=0 -DHAVESTDIO -DMODEL_HAS_DYNAMICALLY_LOADED_SFCNS=0 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw -I/usr/local/MATLAB/R2026a/extern/include -I/usr/local/MATLAB/R2026a/simulink/include -I/usr/local/MATLAB/R2026a/rtw/c/src -I/usr/local/MATLAB/R2026a/rtw/c/src/ext_mode/common -I/usr/local/MATLAB/R2026a/rtw/c/ert -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/cores/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/variants/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/mkspiffs -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/scheduler/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/include -I/usr/local/MATLAB/R2026a/toolbox/target/shared/freertos/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/include -o "rtGetNaN.o" "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/rtGetNaN.c"
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/bin/xtensa-esp32-elf-gcc" -mlongcalls -Wno-frame-address -ffunction-sections -fdata-sections -Wno-error=unused-function -Wno-error=unused-variable -Wno-error=deprecated-declarations -Wno-unused-parameter -Wno-sign-compare -ggdb -freorder-blocks -Wwrite-strings -fstack-protector -fstrict-volatile-bitfields -Wno-error=unused-but-set-variable -fno-jump-tables -fno-tree-switch-conversion -std=gnu99 -Wno-old-style-declaration -MMD -c -w -DF_CPU=240000000L -DARDUINO=10819 -DARDUINO_ESP32_DEV -DARDUINO_ARCH_ESP32 "-DARDUINO_BOARD=\"ESP32_DEV\"" "-DARDUINO_VARIANT=\"esp32\"" -DARDUINO_PARTITION_default -DESP32 -DCORE_DEBUG_LEVEL=0 -DARDUINO_RUNNING_CORE=1 -DARDUINO_EVENT_RUNNING_CORE=1 -DARDUINO_USB_CDC_ON_BOOT=0 @"/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/esp32sdkincludes.txt" -Os   -DHAVE_CONFIG_H "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"" -DUNITY_INCLUDE_CONFIG_H -DWITH_POSIX -D_GNU_SOURCE "-DIDF_VER=\"v4.4.5\"" -DESP_PLATFORM -D_POSIX_READER_WRITER_LOCKS -D_RUNONTARGETHARDWARE_BUILD_ -DMW_DONOTSTART_SCHEDULER -D_ROTH_ESP32_ -D__MW_TARGET_USE_HARDWARE_RESOURCES_H__ -DMW_TIMERID=3 -DMW_PRESCALAR=8 -DMW_TIMERCOUNT=43314 -DMW_SCHEDULERCOUNTER=3 -DARDUINO_NUM_SERIAL_PORTS=3 -DARDUINO_SERIAL_RECEIVE_BUFFER_SIZE=256 -D_RTT_BAUDRATE_SERIAL0_=9600 -D_RTT_BAUDRATE_SERIAL1_=9600 -D_RTT_BAUDRATE_SERIAL2_=9600 -D_RTT_CONFIG_SERIAL0_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL1_=SERIAL_8N1 -D_RTT_CONFIG_SERIAL2_=SERIAL_8N1 -D_RTT_TX_PIN_SERIAL0_=1 -D_RTT_RX_PIN_SERIAL0_=3 -D_RTT_TX_PIN_SERIAL1_=33 -D_RTT_RX_PIN_SERIAL1_=32 -D_RTT_TX_PIN_SERIAL2_=17 -D_RTT_RX_PIN_SERIAL2_=16 -DSERIAL_MULTIPURPOSE_0 -DSERIAL_MULTIPURPOSE_1 -DSERIAL_MULTIPURPOSE_2 -D_RTT_ANALOG_REF_=0 -DMW_NUM_PINS=26 -D_ONBOARD_EEPROM_SIZE_=0 -DCLASSIC_INTERFACE=0 -DALLOCATIONFCN=0 -DTERMFCN=1 -DONESTEPFCN=1 -DMAT_FILE=0 -DMULTI_INSTANCE_CODE=1 -DINTEGER_CODE=0 -DMT=0  -DTID01EQ=0 -DXCP_CUSTOM_PLATFORM -DEXIT_FAILURE=1 -DEXTMODE_DISABLEPRINTF -DEXTMODE_DISABLETESTING -DEXTMODE_DISABLE_ARGS_PROCESSING=1 -DINCLUDE_xTaskGetCurrentTaskHandle=1 -DOS_STKSIZE=8192 -DINCLUDE_vTaskDelete -DINCLUDE_vTaskDelay=1 -DUSE_FREERTOS -DSTACK_SIZE=64 -DRT -DMODEL=Controller_BoP_ESP32 -DNUMST=1 -DNCSTATES=0 -DHAVESTDIO -DMODEL_HAS_DYNAMICALLY_LOADED_SFCNS=0 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw -I/usr/local/MATLAB/R2026a/extern/include -I/usr/local/MATLAB/R2026a/simulink/include -I/usr/local/MATLAB/R2026a/rtw/c/src -I/usr/local/MATLAB/R2026a/rtw/c/src/ext_mode/common -I/usr/local/MATLAB/R2026a/rtw/c/ert -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/cores/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/variants/esp32 -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/mkspiffs -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/scheduler/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/include -I/usr/local/MATLAB/R2026a/toolbox/target/shared/freertos/include -I/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/include -o "rt_nonfinite.o" "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw/rt_nonfinite.c"
+echo ""'### Successfully generated all binary outputs.'
+### Successfully generated all binary outputs.
+gmake: Nothing to be done for `buildobj'.
+### Creating HTML report file <a href="matlab:rtw.report.open('Controller_BoP_ESP32','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32_ert_rtw')">index.html</a>
+### Successful completion of build procedure for: Controller_BoP_ESP32
+### Simulink cache artifacts for 'Controller_BoP_ESP32' were created in '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/Controller_BoP_ESP32.slxc'.
+
+Build Summary
+
+Top model targets:
+
+Model                 Build Reason                                         Status                        Build Duration
+=======================================================================================================================
+Controller_BoP_ESP32  Information cache folder or artifacts were missing.  Code generated and compiled.  0h 0m 19.326s
+
+1 of 1 models built (0 models already up to date)
+Build duration: 0h 0m 22.042s
+### Connectivity configuration for component "Controller_BoP_ESP32": <a href="matlab: targets_hyperlink_manager('run',2);">ESP32 BoP (Arduino PIL)</a> ###
+### COM port: 
+### Baud rate: 115200
 
 ERROR en la simulacion PIL:
-Error using G0_prueba_PIL_minima_BoP (line 154)
-Target is underspecified. Consider the use of Target
-Framework definitions to resolve these issues:
--No connection to target found. Specify a
-target.TargetConnection object with Target property set to
-Board 'ESP32-WROOM (Arduino Compatible)'.
-
-If Target Framework is not being used, see <a href="matlab:helpview('ecoder','create_connect_config_for_target')">Create PIL Target
-Connectivity Configuration</a>.
+Error using G0_prueba_PIL_minima_BoP (line 151)
+Unable to create instance of connectivity configuration
+class "ESP32 BoP (Arduino PIL)". Check that the class is a
+valid connectivity configuration class.
+Caused by:
+    Error using Simulink.Simulation.internal.DesktopSimHelper
+    Unrecognized function or variable 'arduinoheaderPath'.
+    
+    Error in Simulink.Simulation.internal.DesktopSimHelper.sim
+    
+    Error in Simulink.SimulationInput/sim
+    
+    Error in G0_prueba_PIL_minima_BoP (line 151)
+            out = sim(in);
+            ^^^^^^^^^^^^^^
+        Error using Simulink.Simulation.internal.DesktopSimHelper
+        Variable 'arduinoheaderPath' does not exist.
+        
+        Error in Simulink.Simulation.internal.DesktopSimHelper.sim
+        
+        Error in Simulink.SimulationInput/sim
+        
+        Error in G0_prueba_PIL_minima_BoP (line 151)
+                out = sim(in);
+                ^^^^^^^^^^^^^^
+        Suggested Actions:
+            • Load data from a file into the base workspace. - <a href="matlab:slprivate('robustVarRefHotlink_cb', 'loadFile', 'Controller_BoP_ESP32_wrapper', 'arduinoheaderPath')">Fix</a>
+            • Create a new variable. - <a href="matlab:slprivate('robustVarRefHotlink_cb', 'createEntry', 'arduinoheaderPath', 'Controller_BoP_ESP32_wrapper', '', 'normal', '', '', ' ')">Fix</a>
 
 ===== DIAGNOSTICO PIL =====
   HardwareBoard        ESP32-WROOM (Arduino Compatible)
@@ -260,13 +282,19 @@ Archivos de PIL/conectividad que mencionan ESP32:
 /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registertoolchain.m
 
 ===== FIN DIAGNOSTICO =====
-{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('G0_prueba_PIL_minima_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m', 154)" style="font-weight:bold">G0_prueba_PIL_minima_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m',154,0)">line 154</a>)
-Target is underspecified. Consider the use of Target
-Framework definitions to resolve these issues:
--No connection to target found. Specify a
-target.TargetConnection object with Target property set to
-Board 'ESP32-WROOM (Arduino Compatible)'.
-
-If Target Framework is not being used, see <a href="matlab:helpview('ecoder','create_connect_config_for_target')">Create PIL Target
-Connectivity Configuration</a>.
+{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('G0_prueba_PIL_minima_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m', 151)" style="font-weight:bold">G0_prueba_PIL_minima_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m',151,0)">line 151</a>)
+Unable to create instance of connectivity configuration
+class "ESP32 BoP (Arduino PIL)". Check that the class is a
+valid connectivity configuration class.
+Caused by:
+    Error using Simulink.Simulation.internal.DesktopSimHelper
+    Unrecognized function or variable 'arduinoheaderPath'. - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/simulationinput_desktop/+Simulink/+Simulation/+internal/DesktopSimHelper.p','line',0,'name','Simulink.Simulation.internal.DesktopSimHelper'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/simulationinput_desktop/+Simulink/+Simulation/+internal/DesktopSimHelper.p','line',0,'name','Simulink.Simulation.internal.DesktopSimHelper>DesktopSimHelper.sim'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/simulationinput/+Simulink/SimulationInput.p','line',0,'name','Simulink.SimulationInput>SimulationInput.sim'),struct('file','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m','line',151,'name','G0_prueba_PIL_minima_BoP')]);">Show complete stack trace</a>
+        Error using Simulink.Simulation.internal.DesktopSimHelper
+        Variable 'arduinoheaderPath' does not exist.
+        Suggested Actions:
+            • Load data from a file into the base workspace. - <a href="matlab:slprivate('robustVarRefHotlink_cb', 'loadFile', 'Controller_BoP_ESP32_wrapper', 'arduinoheaderPath')">Fix</a>
+            • Create a new variable. - <a href="matlab:slprivate('robustVarRefHotlink_cb', 'createEntry', 'arduinoheaderPath', 'Controller_BoP_ESP32_wrapper', '', 'normal', '', '', ' ')">Fix</a>
+         - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/simulationinput_desktop/+Simulink/+Simulation/+internal/DesktopSimHelper.p','line',0,'name','Simulink.Simulation.internal.DesktopSimHelper'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/simulationinput_desktop/+Simulink/+Simulation/+internal/DesktopSimHelper.p','line',0,'name','Simulink.Simulation.internal.DesktopSimHelper>DesktopSimHelper.sim'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/simulationinput/+Simulink/SimulationInput.p','line',0,'name','Simulink.SimulationInput>SimulationInput.sim'),struct('file','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m','line',151,'name','G0_prueba_PIL_minima_BoP')]);">Show complete stack trace</a>
 } 
+cd ~/Downloads/git/LAB_Control/LAB-CONTROL/etapaG
+G3_preparar_PIL_ESP32_BoP

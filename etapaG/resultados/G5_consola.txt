@@ -1,0 +1,25 @@
+ETAPA G - G5_PIL_lazo_cerrado_ESP32_BoP   (2026-11-06 11:53:52)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+ESP32 responde en /dev/ttyUSB0 (protocolo BoP1), intento 1
+
+Senal   max|PIL-Normal|   RMSE        iguales
+thx     0                 0           271/271
+thy     0                 0           271/271
+Ix      0                 0           271/271
+Iy      0                 0           271/271
+satx    0                 0           271/271
+saty    0                 0           271/271
+xhx     0                 0           271/271
+xhy     0                 0           271/271
+x       0                 0           271/271
+y       0                 0           271/271
+
+Rama Normal de este banco vs rama Normal del banco SIL (F1, CSV con 10 cifras):
+  max|dif| relativo por senal: [9.38e-11 1.07e-10 2.29e-10 1.32e-10 0 0 6.03e-11 8.05e-11 6.08e-11 8.09e-11]
+  Coherencia con F1: PASS (criterio: < 1e-8 relativo, limitado por las 10 cifras del CSV)
+
+Tiempo de _step en la ESP32: max 31.3 us (0.0939 % de Ts), mediana 7.6 us
+Recorrido de la rama PIL: bola de (80.0, -60.0) a (-2.4, 1.5) mm a los 4,4 s y (50.2, 51.2) mm a los 9 s
+
+Criterio (max|dif| <= 1e-12 en th e I, 0 en saturado): PASS
+FIN G5

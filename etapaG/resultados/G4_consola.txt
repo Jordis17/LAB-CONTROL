@@ -1,0 +1,16 @@
+ETAPA G - G4_PIL_controlador_ESP32_BoP   (2026-11-06 11:53:30)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+ESP32 responde en /dev/ttyUSB0 (protocolo BoP1), intento 1
+
+D1_requisitos: 194 cuadros, 0 saturados en el MIL, 0 en la ESP32
+  th max|dif| = 0, RMSE = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  th max|dif| = 0, RMSE =   _step en la ESP32: 70 a 7511 ciclos (0.3 a 31.3 us), mediana 7.5 us
+
+D2_sat_con_AW: 179 cuadros, 9 saturados en el MIL, 9 en la ESP32
+  th max|dif| = 0, RMSE = 0, igual = 1 | I max|dif| = 0 | saturado distinto en 0
+  th max|dif| = 0, RMSE =   _step en la ESP32: 1064 a 3687 ciclos (4.4 a 15.4 us), mediana 7.3 us
+
+Tiempo de _step en la ESP32 (todas las llamadas): max 31.3 us = 0.0939 % de Ts
+Resultado PIL del controlador (ESP32 vs MIL): PASS (criterio max|dif| <= 1e-12)
+FIN G4
+G5_PIL_lazo_cerrado_ESP32_BoP

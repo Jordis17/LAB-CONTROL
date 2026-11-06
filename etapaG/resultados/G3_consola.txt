@@ -1,0 +1,78 @@
+ETAPA G - G3_preparar_PIL_ESP32_BoP   (2026-11-06 11:51:53)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+Codigo copiado de /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/codigo_generado:
+  Controller_BoP.c             6489 bytes  identico: PASS
+  rtGetNaN.c                    956 bytes  identico: PASS
+  rt_nonfinite.c               1485 bytes  identico: PASS
+  Controller_BoP.h             5594 bytes  identico: PASS
+  Controller_BoP_private.h      932 bytes  identico: PASS
+  Controller_BoP_types.h        975 bytes  identico: PASS
+  rtGetNaN.h                    933 bytes  identico: PASS
+  rt_defines.h                 1776 bytes  identico: PASS
+  rt_nonfinite.h               1171 bytes  identico: PASS
+  rtwtypes.h                   6408 bytes  identico: PASS
+Prototipos:
+  extern void Controller_BoP_initialize(RT_MODEL_Controller_BoP_T *const Controller_BoP_M, real_T *Controller_BoP_U_r_mm, real_T *Controller_BoP_U_x_hat_mm, real_T *Controller_BoP_U_v_hat_mm_s, boolean_T *Controller_BoP_U_habilitado, real_T *Controller_BoP_Y_th_cmd_rad, real_T *Controller_BoP_Y_I_rad, boolean_T *Controller_BoP_Y_saturado);
+  extern void Controller_BoP_step(RT_MODEL_Controller_BoP_T *const Controller_BoP_M, real_T Controller_BoP_U_r_mm, real_T Controller_BoP_U_x_hat_mm, real_T Controller_BoP_U_v_hat_mm_s, boolean_T Controller_BoP_U_habilitado, real_T *Controller_BoP_Y_th_cmd_rad, real_T *Controller_BoP_Y_I_rad, boolean_T *Controller_BoP_Y_saturado);
+
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/arduino-cli" compile --config-file "/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/arduino-cli.yaml" --fqbn esp32:esp32:esp32 --build-path "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/bop_pil_esp32_bin" "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/pil_esp32/bop_pil_esp32" 2>&1
+Sketch uses 263705 bytes (20%) of program storage space. Maximum is 1310720 bytes.
+Global variables use 21600 bytes (6%) of dynamic memory, leaving 306080 bytes for local variables. Maximum is 327680 bytes.
+
+[92mUsed platform[0m [92mVersion[0m [90mPath[0m
+[93mesp32:esp32[0m   2.0.17  [90m/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17[0m
+
+
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/arduino-cli" upload --config-file "/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/arduino-cli.yaml" --fqbn esp32:esp32:esp32 -p /dev/ttyUSB0 --input-dir "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/build/bop_pil_esp32_bin" "/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/pil_esp32/bop_pil_esp32" 2>&1
+esptool.py v4.5.1
+Serial port /dev/ttyUSB0
+Connecting.........
+Chip is ESP32-D0WD-V3 (revision v3.1)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: 80:f3:da:54:a0:e8
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 921600
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00005fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x00050fff...
+Compressed 18992 bytes to 13110...
+Writing at 0x00001000... (100 %)
+Wrote 18992 bytes (13110 compressed) at 0x00001000 in 0.3 seconds (effective 558.3 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 146...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.0 seconds (effective 1556.7 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.0 seconds (effective 2291.8 kbit/s)...
+Hash of data verified.
+Compressed 264064 bytes to 147164...
+Writing at 0x00010000... (11 %)
+Writing at 0x0001c682... (22 %)
+Writing at 0x00024ae1... (33 %)
+Writing at 0x00029e3c... (44 %)
+Writing at 0x0002f332... (55 %)
+Writing at 0x00034a4c... (66 %)
+Writing at 0x0003e13a... (77 %)
+Writing at 0x000459a9... (88 %)
+Writing at 0x0004aed2... (100 %)
+Wrote 264064 bytes (147164 compressed) at 0x00010000 in 2.0 seconds (effective 1057.7 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+New upload port: /dev/ttyUSB0 (serial)
+
+ESP32 responde en /dev/ttyUSB0 (protocolo BoP1), intento 1
+Paso de prueba (eje X, r = 0, x = 10 mm, v = 0): th = 0.0059548883249507583 rad, I = 0, sat = 0, 9417 ciclos (39.2 us)
+
+G3 listo: la ESP32 tiene el controlador generado. Siguiente: G4.
+FIN G3
+G4_PIL_controlador_ESP32_BoP
