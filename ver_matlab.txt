@@ -1,0 +1,21 @@
+mex -setup C
+MEX configured to use 'gcc' for C language compilation.
+>> diary('ver_matlab.txt'); ver; diary off
+-----------------------------------------------------------------------------------------------------------------
+MATLAB Version: 26.1.0.3346908 (R2026a) Update 5
+MATLAB License Number: 41254060
+Operating System: Linux 6.8.0-138-generic #138~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:43:15 UTC  x86_64
+Java Version: Java is not loaded
+-----------------------------------------------------------------------------------------------------------------
+MATLAB                                                Version 26.1        (R2026a)
+Simulink                                              Version 26.1        (R2026a)
+Control System Toolbox                                Version 26.1        (R2026a)
+Embedded Coder                                        Version 26.1        (R2026a)
+MATLAB Coder                                          Version 26.1        (R2026a)
+Model Predictive Control Toolbox                      Version 26.1        (R2026a)
+Model-Based Calibration Toolbox                       Version 26.1        (R2026a)
+Optimization Toolbox                                  Version 26.1        (R2026a)
+Simscape                                              Version 26.1        (R2026a)
+Simulink Coder                                        Version 26.1        (R2026a)
+Statistics and Machine Learning Toolbox               Version 26.1        (R2026a)
+Symbolic Math Toolbox                                 Version 26.1        (R2026a)

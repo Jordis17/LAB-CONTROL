@@ -12,7 +12,7 @@
 | Dónde corre Claude Code | Nube (contenedor Linux). Repo `Jordis17/LAB-CONTROL`, rama `claude/great-bell-pprlzs`. |
 | `matlab -batch "ver"` | **No disponible** (`matlab: command not found`, 2026-11-03). |
 | Modo de trabajo | **"MATLAB no disponible"** (CLAUDE.md 0.2). La IA escribe los `.m` y construye los `.slx` con scripts `build_*.m`; el equipo los corre en la computadora con MATLAB y sube la salida de consola y los archivos generados. Nada se reporta como ejecutado si no hay salida real. |
-| Versión de MATLAB y toolboxes | **PENDIENTE.** El equipo debe correr `ver` en su computadora y pegar la salida aquí (o subirla a `matlab_salidas/ver.txt`). Interesa: Simulink, Control System Toolbox, System Identification Toolbox, Embedded Coder, Simulink Coder, paquete de soporte Arduino/ESP32. |
+| Versión de MATLAB y toolboxes | **MATLAB R2026a Update 5 en la PC con Linux** (Ubuntu 22.04), salida en `ver_matlab.txt` (2026-11-06): MATLAB, Simulink, MATLAB Coder, Simulink Coder, Embedded Coder, Control System Toolbox (y otros que no se usan). `mex -setup C` → gcc. **Falta** el Simulink Support Package for Arduino Hardware (para PIL, Etapa G). |
 | Python / visión | Pipeline en `proyecto_ControlDIP-develop/` (corre en la PC Linux del montaje). Sin ejecutar sobre el montaje real todavía. |
 
 ## 2. Etapas
