@@ -1,0 +1,29 @@
+Camara /dev/video0: automatismos bloqueados y verificados.
+Camara abierta: 640x480 @ 30 fps, formato YUYV
+
+Midiendo el periodo entre frames (300 muestras)...
+  50/300
+  100/300
+  150/300
+  200/300
+  250/300
+  300/300
+
+--- Periodo entre frames (ms) ---
+  media       38.24   ->   26.2 fps
+  mediana     35.75
+  desv.est.   11.34
+  minimo      31.71
+  p95         64.01
+  maximo      99.76
+
+  35.7 % de los periodos dentro de +-5 ms de la media
+  Criterio del plan: 95 % dentro de +-5 ms. NO CUMPLE
+
+  Histograma:
+     31.7-  35.1 ms | ############################################################ 149
+     35.1-  38.5 ms | ############################################################ 107
+     62.3-  65.7 ms | ########################################### 43
+     96.4-  99.8 ms | # 1
+
+Configuracion usada: 640x480, YUYV, exposicion 50 (= 5.0 ms)
