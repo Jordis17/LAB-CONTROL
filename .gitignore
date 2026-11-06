@@ -45,3 +45,5 @@ desktop.ini
 *~
 .vscode/
 .idea/
+# ---- LaTeX (logs sueltos)
+texput.log

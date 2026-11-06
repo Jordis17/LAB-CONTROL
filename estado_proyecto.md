@@ -19,11 +19,11 @@
 
 | Etapa | Estado |
 |---|---|
-| A — Modelo de la planta | **En curso.** Scripts escritos y probados en Octave 8.4 (preliminar). **Falta correrlos en MATLAB** y medir en el prototipo los datos de `etapaA/LEEME_etapaA.md` sección 5. |
+| A — Modelo de la planta | **Corrida en MATLAB R2026a (2026-11-06)**, resultados en `etapaA/resultados/`, iguales a Octave: pendiente 0,3429 °/°, ceros de Xm/Θ en ±j22,372 rad/s, jacobiano con error de 1,7e-13, polos de `c2d` iguales a `bop_discretizar`. Falta reemplazar la geometría de diseño con lo que salga de B (h_sup). |
 | B — Identificación y validación | **En curso (2026-11-06).** Actuador ya medido (tabla servo → plato). Scripts B1 (rodadura: c y f, con validación) y B2 (medición con el plato inclinado: h_sup) escritos y probados en Octave con datos sintéticos (no se suben). Faltan los ensayos en el prototipo. Ver `etapaB/LEEME_etapaB.md`. |
-| C — Diseño del controlador | **En curso.** Diseño hecho sobre el modelo **del diseño** (sin Etapa B). Probado en Octave (preliminar). Falta correr en MATLAB. Ver `etapaC/LEEME_etapaC.md`. |
-| D — MIL | **En curso.** Simulador y casos escritos; en Octave el ensayo de requisitos cumple R1–R4. Falta correr en MATLAB. Ver `etapaD/LEEME_etapaD.md`. |
-| E — Preparación y generación de código | **En curso.** E0 construyó `Controller_BoP.slx` en MATLAB R2026a. **E1 en MATLAB: Parte A PASS y Parte B PASS** (2026-11-06): el modelo coincide **exactamente** con el MIL (diferencia 0, igualdad bit a bit en th_cmd, I y saturado) en 5 ensayos, incluidos 9 cuadros saturados. Falta: Code Generation Advisor y E2 (código e inspección). Consola en `etapaE/resultados/E1_consola.txt`. |
+| C — Diseño del controlador | **Corrida en MATLAB (2026-11-06)**: Kp 0,03412 °/mm, Kd 0,02588 °/(mm/s), Ki 0,02275 °/(mm·s), θ_lim 10°, PM 40,9°, GM +11,8/−12,6 dB, estable. Provisional hasta tener la Etapa B. |
+| D — MIL | **Corrida en MATLAB (2026-11-06)** con el actuador medido: D1 cumple R1–R4 (ts 1,30 s, Mp 4,4 %, ess 0,18 mm, max 102,7 mm). Robustez: no cumple ts con retardo de 120 ms (3,03 s), ruido de 2 mm (4,9 s) ni firmware sin tabla (4,7 s, Mp 23,8 %). Provisional hasta tener la Etapa B. |
+| E — Preparación y generación de código | **En curso.** E0 construyó `Controller_BoP.slx` en MATLAB R2026a. **E1 en MATLAB: Parte A PASS y Parte B PASS** (2026-11-06): el modelo coincide **exactamente** con el MIL (diferencia 0, igualdad bit a bit en th_cmd, I y saturado) en 5 ensayos, incluidos 9 cuadros saturados. **Code Generation Advisor: 0 Fail, 5 Warning, 26 Passed** (31 verificaciones), con las advertencias justificadas en `etapaE/resultados/advisor/LEEME_advisor.md`. Falta: E2 (la primera corrida falló por una carpeta de generación vieja; script corregido). |
 | F — SIL | No iniciada |
 | G — PIL | No iniciada |
 | H — Implementación física | No iniciada |
