@@ -1,0 +1,91 @@
+ETAPA G - G0b_diagnostico_PIL_ESP32   (2026-11-06 11:19:40)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+TargetHardware = ESP32-WROOM (Arduino Compatible)
+
+===== 1. /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registerpil.m =====
+function config = registerpil
+%
+
+%   Copyright 2025 The MathWorks, Inc.
+
+config(1) = rtw.connectivity.ConfigRegistry;
+config(1).ConfigName = 'Arduino Board';
+config(1).ConfigClass = 'codertarget.arduinotarget.pil.ConnectivityConfig';
+config(1).isConfigSetCompatibleFcn = @i_isConfigSetCompatible;
+end
+
+function isConfigSetCompatible = i_isConfigSetCompatible(configSet)
+% If any updates are being made to this function, then make sure that
+% all the fields are checked for its existence and then used. g2258298 
+% has a dot indexing error and we suspect it is due to partially loaded 
+% configset data when it comes to this function. When a hardware is
+% selected 'initializing board board parameter values' takes some time
+% and probably this function is called before the parameters are fully
+% loaded. You can see this behavior when you open a model and try 
+% selecting a hardware, a pop up opens with 'Initializing board board 
+% parameter values' and takes few seconds to load the board.
+
+isConfigSetCompatible = false;
+if configSet.isValidParam('CoderTargetData')
+    coderTargetData =  getParam(configSet,'CoderTargetData');
+    if ~isempty(coderTargetData) && isfield(coderTargetData, 'TargetHardware')
+		selectedBoard = codertarget.arduinobase.board.GetBoard('boardName',coderTargetData.TargetHardware);
+		if ~isempty(selectedBoard) && isprop(selectedBoard, 'isArduinoBoard')...
+     		&& isprop(selectedBoard, 'boardInfo')
+			if selectedBoard.isArduinoBoard
+				boardInfo = selectedBoard.boardInfo;
+				if isprop(boardInfo, 'IsPilSupported')
+					isConfigSetCompatible = boardInfo.IsPilSupported;
+				end
+			end
+		end
+    end
+end
+end
+
+
+===== 2. isConfigSetCompatibleFcn sobre Controller_BoP_ESP32 =====
+Config 1: Arduino Board
+  ERROR:
+Undefined function 'getParam' for input arguments of type
+'Simulink.ConfigSet'.
+
+Error in arduinoregistry.registerpil>i_isConfigSetCompatible (line 25)
+    coderTargetData =  getParam(configSet,'CoderTargetData');
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error in G0b_diagnostico_PIL_ESP32 (line 44)
+            r = cfg(i).isConfigSetCompatibleFcn(cs);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+===== 3. GetBoard('ESP32-WROOM (Arduino Compatible)') =====
+ERROR:
+Index exceeds array bounds.
+
+Error in codertarget.arduinobase.board.GetBoard
+
+Error in G0b_diagnostico_PIL_ESP32 (line 57)
+    b = codertarget.arduinobase.board.GetBoard('boardName', ctd.TargetHardware);
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+===== 4. IsPilSupported por placa =====
+  Arduino Due                                true
+  Arduino Mega 2560                          true
+  Arduino Uno                                true
+  Arduino Nano 33 IoT                        true
+  ESP32-WROOM (Arduino Compatible)           ERROR: Index exceeds array bounds.
+  ESP32-WROVER (Arduino Compatible)          ERROR: Index exceeds array bounds.
+  Raspberry Pi Pico (Arduino Compatible)     ERROR: Unable to resolve the name 'codertarget.arduinobase.board.Raspberry Pi Pico (Arduino Compatible)Board'.
+  Teensy 4.1 (Arduino Compatible)            true
+
+===== 5. Donde se define ESP32_board =====
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/registry/parameters/ESP32WROVERArduinoCompatible.xml:6:    <parameter Alignment="1" Callback="widgetChangedCallback" ColSpan="[1,3]" Data="" DialogRefresh="1" DoNotStore="false" Enabled="1" Entries="codertarget.arduinobase.registry.getESP32SupportedBoards(hObj, 'ESP32-WROVER')" EntriesType="callback" Name="Board:" RowSpan="[1,1]" SaveValueAsString="true" Storage="ESP32.ESP32_board" Tag="ESP32_board" ToolTip="" Type="combobox" TypePUAttachedTo="cpu" Value="" ValueRange="" ValueType="" Visible="1"/>
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/registry/parameters/ESP32WROOMArduinoCompatible.xml:6:    <parameter Alignment="1" Callback="widgetChangedCallback" ColSpan="[1,3]" Data="" DialogRefresh="1" DoNotStore="false" Enabled="1" Entries="codertarget.arduinobase.registry.getESP32SupportedBoards(hObj, 'ESP32-WROOM')" EntriesType="callback" Name="Board:" RowSpan="[1,1]" SaveValueAsString="true" Storage="ESP32.ESP32_board" Tag="ESP32_board" ToolTip="" Type="combobox" TypePUAttachedTo="cpu" Value="" ValueRange="" ValueType="" Visible="1"/>
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/library_index.json:346744:      "url": "https://downloads.arduino.cc/libraries/github.com/iliaslamprou/Virtuino_library_for_all_ESP8266_and_ESP32_boards-1.7.2.zip",
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/library_index.json:346745:      "archiveFileName": "Virtuino_library_for_all_ESP8266_and_ESP32_boards-1.7.2.zip",
+
+Donde aparece IsPilSupported:
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registerpil.m:32:				if isprop(boardInfo, 'IsPilSupported')
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registerpil.m:33:					isConfigSetCompatible = boardInfo.IsPilSupported;
+
+FIN G0b
+G0_prueba_PIL_minima_BoP
