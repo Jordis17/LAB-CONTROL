@@ -108,7 +108,7 @@ else
         ds = ds.addElement(timeseries(logical(p.hab), t), 'habilitado');
         in = Simulink.SimulationInput(mdl);
         in = in.setExternalInput(ds);
-        in = in.setModelParameter('LoadExternalInput','on', 'StopTime', sprintf('%.17g', t(end)));
+        in = in.setModelParameter('StopTime', sprintf('%.17g', t(end)));   % setExternalInput ya habilita la entrada externa
         out = sim(in);
         y = out.yout;
         th  = squeeze(double(y.getElement(1).Values.Data));
