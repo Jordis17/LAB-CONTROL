@@ -1,0 +1,1 @@
+var modelInfo = {model:"Controller_BoP"};var modelHierarchy=[{model:"Controller_BoP",relativePath:"_internal.html",parent:"null"},];var AddCode = true;var ProtectedModel = false;

@@ -1,4 +1,4 @@
-ETAPA E - E2_generar_codigo_BoP   (2026-11-06 09:54:44)
+ETAPA E - E2_generar_codigo_BoP   (2026-11-06 10:15:40)
 MATLAB 26.1.0.3346908 (R2026a) Update 5
 Configuracion de generacion:
   SystemTargetFile         ert.tlc
@@ -10,32 +10,151 @@ Configuracion de generacion:
   ObjectivePriorities      Execution efficiency, Traceability
   Solver                   FixedStepDiscrete
   FixedStep                Ts_ctrl
-{Error using coder.internal.slBuildAll
-MATLAB session parameter 'CodeGenFolder' is set to
-/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build
-and the current directory is
-/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE,
-which contains a code generation folder. For clarity about the
-location of the latest generated code, before you start a build, you
-may:
+AVISO: existe /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP_ert_rtw de una generacion anterior (fuera de build/).
+       No se usa; se puede borrar junto con etapaE/slprj si existe.
+### Unable to find Simulink cache file "Controller_BoP.slxc".
+### Searching for referenced models in model 'Controller_BoP'.
+### Total of 1 models to build.
+### Starting build procedure for: Controller_BoP
+### Generating code and artifacts to 'Model specific' folder structure
+### Generating code into build folder: /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw
+### Invoking Target Language Compiler on Controller_BoP.rtw
+### Using System Target File: /usr/local/MATLAB/R2026a/rtw/c/ert/ert.tlc
+### Loading TLC function libraries
+.......
+### Generating TLC interface API for custom data
+.
+### Initial pass through model to cache user defined code
+.
+### Caching model source code
+....................................................
+### Writing header file Controller_BoP_types.h
+### Writing source file Controller_BoP.c
+.
+### Writing header file Controller_BoP_private.h
+### Writing header file Controller_BoP.h
+### Writing header file rtwtypes.h
+### Writing header file rtGetNaN.h
+### Writing source file rtGetNaN.c
+.
+### Writing header file rt_nonfinite.h
+### Writing source file rt_nonfinite.c
+### Writing header file rt_defines.h
+### Writing source file ert_main.c
+.
+### TLC code generation complete (took 0.823s).
+### Creating HTML report file <a href="matlab:rtw.report.open('Controller_BoP','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw')">index.html</a>
+### Saving binary information cache.
+### Using toolchain: GNU gcc/g++ | gmake (64-bit Linux)
+### Creating '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw/Controller_BoP.mk' ...
+### Successful completion of code generation for: Controller_BoP
+### Simulink cache artifacts for 'Controller_BoP' were created in '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP.slxc'.
 
-Error in coder.internal.slBuildAll
+Build Summary
 
-Error in coder.internal.slBuildAll
+Top model targets:
 
-Error in coder.internal.codegenAndCompile
+Model           Build Reason                                         Status           Build Duration
+====================================================================================================
+Controller_BoP  Information cache folder or artifacts were missing.  Code generated.  0h 0m 5.7409s
 
-Error in coder.internal.buildSimulinkModel
+1 of 1 models built (0 models already up to date)
+Build duration: 0h 0m 6.3875s
+Codigo generado en /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw
+Copiados a codigo_generado/: Controller_BoP.c, Controller_BoP.h, Controller_BoP_private.h, Controller_BoP_types.h, ert_main.c, rtGetNaN.c, rtGetNaN.h, rt_defines.h, rt_nonfinite.c, rt_nonfinite.h, rtwtypes.h
 
-Error in slbuild
+Inspeccion del codigo (Controller_BoP.c y Controller_BoP.h):
+  [PASS] Funcion de paso (reusable, con estado como argumento)      (2)
+  [PASS] Funcion de inicializacion                                  (2)
+  [PASS] Parametro BoP_Kp como global calibrable                    (8)
+  [PASS] Parametro BoP_Ki                                           (8)
+  [PASS] Parametro BoP_Kd                                           (8)
+  [PASS] Parametro BoP_Ts                                           (8)
+  [PASS] Saturacion con BoP_th_lim                                  (9)
+  [PASS] Recorte del error con BoP_e_clip                           (9)
+  [PASS] Umbral de bola quieta BoP_v_int                            (8)
+  [PASS] Cuadros BoP_Nq                                             (8)
+  [PASS] Estado interno (DWork) del integrador / contador           (18)
+  [PASS] Entrada booleana habilitado                                (7)
+  [PASS] Salida th_cmd_rad                                          (9)
+  [PASS] Tipo double (real_T)                                       (41)
+  [PASS] Tipo booleano (boolean_T)                                  (8)
+  [PASS] Sin funciones trigonometricas (no hay planta ni cinematica) (0)
+  [PASS] Sin restos del modelo de la planta                         (0)
 
-Error in slbuild
+Lineas de Controller_BoP.c que mencionan los parametros o el estado (para la tabla modelo <-> codigo):
+    15: * Embedded hardware selection: Generic->32-bit Embedded Processor
+    29: real_T BoP_Kd = 0.00045161873056426543;/* Variable: BoP_Kd
+    30: * Referenced by: '<Root>/BoP_Kd'
+    33: real_T BoP_Ki = 0.00039699255499671724;/* Variable: BoP_Ki
+    34: * Referenced by: '<Root>/BoP_Ki'
+    37: real_T BoP_Kp = 0.00059548883249507583;/* Variable: BoP_Kp
+    38: * Referenced by: '<Root>/BoP_Kp'
+    41: real_T BoP_Nq = 4.0;                   /* Variable: BoP_Nq
+    42: * Referenced by: '<Root>/BoP_Nq'
+    45: real_T BoP_Ts = 0.033333333333333333;  /* Variable: BoP_Ts
+    46: * Referenced by: '<Root>/BoP_Ts'
+    49: real_T BoP_e_clip = 30.0;              /* Variable: BoP_e_clip
+    50: * Referenced by: '<Root>/BoP_e_clip'
+    53: real_T BoP_th_lim = 0.17453292519943295;/* Variable: BoP_th_lim
+    54: * Referenced by: '<Root>/BoP_th_lim'
+    57: real_T BoP_v_int = 25.0;               /* Variable: BoP_v_int
+    58: * Referenced by: '<Root>/BoP_v_int'
+    63: void Controller_BoP_step(RT_MODEL_Controller_BoP_T *const Controller_BoP_M,
+    64: real_T Controller_BoP_U_r_mm, real_T Controller_BoP_U_x_hat_mm, real_T
+    65: Controller_BoP_U_v_hat_mm_s, boolean_T Controller_BoP_U_habilitado, real_T
+    66: *Controller_BoP_Y_th_cmd_rad, real_T *Controller_BoP_Y_I_rad, boolean_T
+    67: *Controller_BoP_Y_saturado)
+    69: DW_Controller_BoP_T *Controller_BoP_DW = Controller_BoP_M->dwork;
+    75: *  Constant: '<Root>/BoP_Kd'
+    76: *  Constant: '<Root>/BoP_Ki'
+    77: *  Constant: '<Root>/BoP_Kp'
+    78: *  Constant: '<Root>/BoP_Nq'
+    79: *  Constant: '<Root>/BoP_Ts'
+    80: *  Constant: '<Root>/BoP_e_clip'
+    81: *  Constant: '<Root>/BoP_th_lim'
+    82: *  Constant: '<Root>/BoP_v_int'
+    83: *  Inport: '<Root>/habilitado'
+    88: if (Controller_BoP_U_habilitado) {
+    89: eps_ = Controller_BoP_U_x_hat_mm - Controller_BoP_U_r_mm;
+    90: a__1 = (BoP_Kp * eps_ + Controller_BoP_DW->I) + BoP_Kd *
+    91: Controller_BoP_U_v_hat_mm_s;
+    92: *Controller_BoP_Y_th_cmd_rad = fmin(fmax(a__1, -BoP_th_lim), BoP_th_lim);
+    93: *Controller_BoP_Y_saturado = (*Controller_BoP_Y_th_cmd_rad != a__1);
+    94: if (fabs(Controller_BoP_U_v_hat_mm_s) < BoP_v_int) {
+    95: Controller_BoP_DW->nq++;
+    97: Controller_BoP_DW->nq = 0.0;
+   116: if ((!*Controller_BoP_Y_saturado || !(tmp == a__1)) &&
+   117: (Controller_BoP_DW->nq >= fmax(BoP_Nq, 1.0))) {
+   118: Controller_BoP_DW->I += BoP_Ki * BoP_Ts * fmin(fmax(eps_, -BoP_e_clip),
+   119: BoP_e_clip);
+   122: /* Outport: '<Root>/th_cmd_rad' */
+   123: *Controller_BoP_Y_th_cmd_rad = 0.0;
+   124: Controller_BoP_DW->I = 0.0;
+   125: Controller_BoP_DW->nq = 0.0;
+   128: *Controller_BoP_Y_saturado = false;
+   134: *Controller_BoP_Y_I_rad = Controller_BoP_DW->I;
+   138: void Controller_BoP_initialize(RT_MODEL_Controller_BoP_T *const Controller_BoP_M,
+   139: real_T *Controller_BoP_U_r_mm, real_T *Controller_BoP_U_x_hat_mm, real_T
+   140: *Controller_BoP_U_v_hat_mm_s, boolean_T *Controller_BoP_U_habilitado, real_T
+   141: *Controller_BoP_Y_th_cmd_rad, real_T *Controller_BoP_Y_I_rad, boolean_T
+   142: *Controller_BoP_Y_saturado)
+   144: DW_Controller_BoP_T *Controller_BoP_DW = Controller_BoP_M->dwork;
+   149: (void) memset((void *)Controller_BoP_DW, 0,
+   150: sizeof(DW_Controller_BoP_T));
+   153: *Controller_BoP_U_r_mm = 0.0;
+   154: *Controller_BoP_U_x_hat_mm = 0.0;
+   155: *Controller_BoP_U_v_hat_mm_s = 0.0;
+   156: *Controller_BoP_U_habilitado = false;
+   159: *Controller_BoP_Y_th_cmd_rad = 0.0;
+   160: *Controller_BoP_Y_I_rad = 0.0;
+   161: *Controller_BoP_Y_saturado = false;
+   164: Controller_BoP_DW->I = 0.0;
+   165: Controller_BoP_DW->nq = 0.0;
+   169: void Controller_BoP_terminate(RT_MODEL_Controller_BoP_T *const Controller_BoP_M)
+   172: UNUSED_PARAMETER(Controller_BoP_M);
 
-Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('E2_generar_codigo_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E2_generar_codigo_BoP.m', 53)" style="font-weight:bold">E2_generar_codigo_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E2_generar_codigo_BoP.m',53,0)">line 53</a>)
-slbuild(mdl);
-^^^^^^^^^^^^^
-Suggested Actions:
-    • Delete build artifacts in current folder '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP_ert_rtw'. - <a href="matlab:coder.internal.removeDirectory('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP_ert_rtw');">Fix</a>
-    • Navigate to a folder that does not contain a code generation folder. Then, rebuild.
- - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/slBuildAll.p','line',0,'name','coder.internal.slBuildAll'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/slBuildAll.p','line',0,'name','coder.internal.slBuildAll'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/slBuildAll.p','line',0,'name','coder.internal.slBuildAll'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/buildSimulinkModel.p','line',0,'name','coder.internal.buildSimulinkModel'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/core/general/slbuild.p','line',0,'name','slbuild'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/core/general/slbuild.p','line',0,'name','slbuild'),struct('file','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E2_generar_codigo_BoP.m','line',53,'name','E2_generar_codigo_BoP')]);">Show complete stack trace</a>
-} 
+Inspeccion automatica: PASS
+Pendiente manual: revisar el reporte html (codigo_generado/html) y completar la
+tabla de correspondencia modelo <-> codigo con estas lineas.
+FIN E2

@@ -1,0 +1,18 @@
+chequeo,esperado,encontrado,ocurrencias,resultado
+"Funcion de paso (reusable, con estado como argumento)",presente,1,2,PASS
+"Funcion de inicializacion",presente,1,2,PASS
+"Parametro BoP_Kp como global calibrable",presente,1,8,PASS
+"Parametro BoP_Ki",presente,1,8,PASS
+"Parametro BoP_Kd",presente,1,8,PASS
+"Parametro BoP_Ts",presente,1,8,PASS
+"Saturacion con BoP_th_lim",presente,1,9,PASS
+"Recorte del error con BoP_e_clip",presente,1,9,PASS
+"Umbral de bola quieta BoP_v_int",presente,1,8,PASS
+"Cuadros BoP_Nq",presente,1,8,PASS
+"Estado interno (DWork) del integrador / contador",presente,1,18,PASS
+"Entrada booleana habilitado",presente,1,7,PASS
+"Salida th_cmd_rad",presente,1,9,PASS
+"Tipo double (real_T)",presente,1,41,PASS
+"Tipo booleano (boolean_T)",presente,1,8,PASS
+"Sin funciones trigonometricas (no hay planta ni cinematica)",ausente,0,0,PASS
+"Sin restos del modelo de la planta",ausente,0,0,PASS
