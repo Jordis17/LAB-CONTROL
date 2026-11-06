@@ -1,0 +1,502 @@
+ETAPA G - G0c_diagnostico_PIL_ESP32   (2026-11-06 11:27:40)
+
+----- which codertarget.arduinobase.registry.getESP32SupportedBoards: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+registry/getESP32SupportedBoards.p -----
+Variantes de ESP32-WROOM que ofrece el paquete:
+  - ESP32-WROOM-DevKitC(38 pin)
+  - ESP32-WROOM-DevKitV1(30 pin)
+  - ESP32-WROOM-DevKitV1(36 pin)
+ESP32.ESP32_board = "ESP32-WROOM-DevKitC(38 pin)"
+GetBoard despues de elegir la variante: OK (codertarget.arduinobase.board.GetBoard)
+  <a href="matlab:helpPopup('codertarget.arduinobase.board.ESP32WROOMdevkitC_38Board')" style="font-weight:bold">ESP32WROOMdevkitC_38Board</a> with properties:
+
+                              BoardName: "ESP32-WROOM-DevKitC(38 pin)"
+                                   FQBN: 'esp32:esp32:esp32'
+                        Microcontroller: "esp32"
+                                   Vids: ''
+                                   Pids: ''
+                   ConnectedIOBoardName: "ESP32-WROOM-DevKitC"
+                           Architecture: "Xtensa"
+                                   SRAM: 320
+        VIDPIDBasedAutoCOMPortDetection: 0
+                      OnBoardEEPROMSize: 0
+                        VariantFilePath: 'esp32\2.0.17\variants\esp32'
+                       DigitalInputPins: [1×26 double]
+                      DigitalOutputPins: [1×22 double]
+                             AnalogPins: [1×16 double]
+                           AnalogPinRef: [1×16 double]
+                            DACPinNames: {1×2 cell}
+                              DACPinRef: [1×2 double]
+                          InterruptPins: {1×26 cell}
+                         InterruptModes: {1×4 cell}
+                                PWMPins: [1×22 double]
+                              PWMTimers: [1×22 double]
+                         PWMInvalidPins: []
+                       InputCapturePins: []
+                     InputCaptureTimers: 0
+                              ServoPins: [1×22 double]
+                          ServoMaxCount: 16
+                             I2CModules: 0
+           I2CModuleMaximumBusSpeedInHz: 400000
+                  I2CModuleBusSpeedInHz: 100000
+               I2CMaxAllowedAddressBits: 7
+                                I2CPins: {1×2 cell}
+             I2CSupportsPinMultiPurpose: 1
+                 I2CMultipurposeSDAPins: {1×26 cell}
+                 I2CMultipurposeSCLPins: {1×26 cell}
+                         UltrasonicPins: [1×22 double]
+                            SerialPorts: [1×3 double]
+                        SerialPortMacro: {1×3 cell}
+                         SerialPortPins: {1×3 cell}
+                SerialReceiveBufferSize: 256
+          SerialSupportsPinMultiPurpose: {1×3 cell}
+               SerialMultipurposeTXPins: {1×3 cell}
+               SerialMultipurposeRXPins: {1×3 cell}
+                             SPIModules: [1×2 double]
+                             SPIMOSIPin: [1×2 double]
+                             SPIMISOPin: [1×2 double]
+                              SPICLKPin: [1×2 double]
+                              SPICSPins: [1×22 double]
+             SPISupportsPinMultiPurpose: {1×2 cell}
+                 SPIMultipurposeSDOPins: {1×2 cell}
+                 SPIMultipurposeSDIPins: {1×2 cell}
+                 SPIMultipurposeSCKPins: {1×2 cell}
+                SupportedSerialBaudRate: {13×1 cell}
+                   IsSPIShieldSupported: 0
+                     SPIbasedShieldPins: {1×4 cell}
+                        SchedulerTimers: {1×3 cell}
+                            maxUDPPorts: 4
+                            maxTCPPorts: 4
+                        maxWiFiUDPPorts: 1
+                        maxWiFiTCPPorts: 2
+                        flowControlType: [1×1 struct]
+                          openPortDelay: [1×1 struct]
+                                WiFiLib: ""
+                  IsThingSpeakSupported: 1
+    IsThingSpeakMultiFieldReadSupported: 1
+                    IsEthernetSupported: 0
+                        IsWiFiSupported: 1
+                   IsCANShieldSupported: 0
+                IsMotorCarrierSupported: 0
+                      IsSDCardSupported: 1
+                   IsWebSocketSupported: 0
+                          IsWiFiOnboard: 1
+              IsMATFileLoggingSupported: 1
+                 IsSerial0PinAccessible: 1
+                        IsDHCPSupported: 1
+                       IsVirtualComPort: 0
+                         IsPilSupported: 0
+                      IsModBusSupported: 0
+                         IsBLESupported: 1
+                        IsMQTTSupported: 1
+                      IsSSLTLSSupported: 1
+               IsOnBoardEEPROMSupported: 0
+                         IsOTASupported: 0
+                      ESP32CPUFrequency: '240000000L'
+                         ESP32BoardName: 'ESP32_DEV'
+                         ESP32FlashMode: 'dio'
+                    ESP32FlashFrequency: '80m'
+                         ESP32FlashSize: '4MB'
+                  ESP32PartitionsScheme: 'default'
+                           ESP32Defines: ''
+                        ESP32ExtraFlags: ''
+                   ESP32LinkerExtraLibs: ''
+                     ESP32ProgramMemory: 1310720
+                        ESP32DataMemory: 327680
+                            ESP32Module: 'ESP32-WROOM'
+                              TouchPins: [1×10 double]
+                           TouchPinsRef: [1×10 double]
+
+IsPilSupported = false
+
+----- which codertarget.arduinobase.board.GetBoard: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/GetBoard.p -----
+
+Clases en codertarget.arduinobase.board:
+  codertarget.arduinobase.board.GetBoard
+  codertarget.arduinobase.board.ESP32WROOMdevkitC_38Board
+  codertarget.arduinobase.board.ESP32WROOMBase
+  codertarget.arduinobase.board.AbstractBoard
+  codertarget.arduinobase.board.ESP32WROOMdevkitV1_30Board
+  codertarget.arduinobase.board.ESP32WROOMdevkitV1_36Board
+  codertarget.arduinobase.board.ESP32WROVERModuleBoard
+  codertarget.arduinobase.board.ArduinoDueBoard
+  codertarget.arduinobase.board.ArduinoMega2560Board
+  codertarget.arduinobase.board.ArduinoUnoBoard
+  codertarget.arduinobase.board.ArduinoNano33IoTBoard
+  codertarget.arduinobase.board.Teensy41Board
+  codertarget.arduinobase.board.ArduinoLeonardoBoard
+  codertarget.arduinobase.board.ArduinoMKR1000Board
+  codertarget.arduinobase.board.ArduinoMKRWiFi1010Board
+  codertarget.arduinobase.board.ArduinoMKRZeroBoard
+  codertarget.arduinobase.board.ArduinoMegaADKBoard
+  codertarget.arduinobase.board.ArduinoMicroBoard
+  codertarget.arduinobase.board.ArduinoNano30Board
+  codertarget.arduinobase.board.ArduinoNano33BLESenseBoard
+  codertarget.arduinobase.board.ArduinoNanoRP2040ConnectBoard
+  codertarget.arduinobase.board.ArduinoRobotControlBoard
+  codertarget.arduinobase.board.ArduinoRobotMotorBoard
+  codertarget.arduinobase.board.ArduinoUnoR4MinimaBoard
+  codertarget.arduinobase.board.ArduinoUnoR4WiFiBoard
+  codertarget.arduinobase.board.ESP32WROVERBase
+  codertarget.arduinobase.board.RaspberryPiPicoArduinoCompatibleBoard
+  codertarget.arduinobase.board.RaspberryPiPicoWArduinoCompatibleBoard
+  codertarget.arduinobase.board.Teensy40Board
+Funciones: getArduinoVariantMapping, getMatchingBoardNames
+
+Paquete codertarget.arduinotarget.board: no existe
+
+Paquete codertarget.esp32.board: no existe
+
+Archivos de placa con ESP32 en el nombre:
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/ESP32WROOMdevkitV1_36Board.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/ESP32WROOMdevkitC_38Board.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/ESP32WROVERModuleBoard.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/ESP32WROOMdevkitV1_30Board.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/ESP32WROOMBase.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/templates/ESP32WROOMTemplateBoard.m
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/templates/ESP32WROVERTemplateBoard.m
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+board/ESP32WROVERBase.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinobase/+codertarget/+arduinobase/+registry/getESP32SupportedBoards.p
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardSerial/.skip.esp32c3
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardSerial/.skip.esp32
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardLogout/.skip.esp32c3
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardLogout/.skip.esp32
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardMessage/.skip.esp32c3
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardMessage/.skip.esp32
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardReprogram/.skip.esp32c3
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/Keyboard/KeyboardReprogram/.skip.esp32
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/KeyboardAndMouseControl/.skip.esp32c3
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/libraries/USB/examples/KeyboardAndMouseControl/.skip.esp32
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/hardware/esp32/2.0.17/variants/sparkfun_esp32_iot_redboard
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32-solo-1.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32-bridge.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32h2-builtin.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32s3-ftdi.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32-wrover-kit-1.8v.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c2-ftdi.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32h2-bridge.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c3-ftdi.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c6-builtin.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32-wrover-kit-3.3v.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32s3-bridge.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32-ethernet-kit-3.3v.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32s3-builtin.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32-wrover.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c3-builtin.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c3-bridge.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c2-bridge.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32c6-bridge.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32h2-ftdi.cfg
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/openocd-esp32/v0.12.0-esp32-20230921/share/openocd/scripts/board/esp32s2-kaluga-1.cfg
+
+
+GetBoard con otros nombres:
+  ESP32-WROOM            -> ERROR: Unable to resolve the name 'codertarget.arduinobase.board.ESP32WROOMBoard'.
+  ESP32                  -> ERROR: Unable to resolve the name 'codertarget.arduinobase.board.ESP32Board'.
+  ESP32 Dev Module       -> ERROR: Unable to resolve the name 'codertarget.arduinobase.board.ESP32DevModuleBoard'.
+  esp32                  -> codertarget.arduinobase.board.GetBoard (numel 1)
+  ESP32WROOM             -> ERROR: Unable to resolve the name 'codertarget.arduinobase.board.ESP32WROOMBoard'.
+  ESP32-WROOM-DevKitC    -> ERROR: Unable to resolve the name 'codertarget.arduinobase.board.ESP32WROOMDevKitCBoard'.
+
+----- which codertarget.arduinotarget.pil.ConnectivityConfig: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+codertarget/+arduinotarget/+pil/ConnectivityConfig.p -----
+
+Clases en codertarget.arduinotarget.pil: codertarget.arduinotarget.pil.ConnectivityConfig, codertarget.arduinotarget.pil.Launcher, codertarget.arduinotarget.pil.TargetApplicationFramework
+
+----- which codertarget.arduinotarget.pil.ConnectivityConfig: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+codertarget/+arduinotarget/+pil/ConnectivityConfig.p -----
+
+----- which codertarget.arduinotarget.pil.Launcher: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+codertarget/+arduinotarget/+pil/Launcher.p -----
+
+----- which codertarget.arduinotarget.pil.TargetApplicationFramework: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+codertarget/+arduinotarget/+pil/TargetApplicationFramework.p -----
+
+Archivos con rtIOStreamOpen:
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/matlab/hardware/supportpackages/sharedarduino/target/transport/rtiostream_serial_daemon.cpp
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/matlab/hardware/supportpackages/sharedarduino/target/transport/rtiostream_wifi.cpp
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/matlab/hardware/supportpackages/sharedarduino/target/transport/rtiostream_ble.cpp
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/src/rtiostream_serial.cpp
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/src/rtiostream_tcpip.cpp
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/src/rtiostream_serial_daemon.cpp
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/src/rtiostream_wifi.cpp
+
+
+----- which arduinoregistry.registertoolchain: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registertoolchain.m -----
+% -------------------------------------------------------------------------
+% Create the ToolchainInfoRegistry entries
+% -------------------------------------------------------------------------
+
+%   Copyright 2025 The MathWorks, Inc.
+function config = registertoolchain
+rootDir = fileparts(mfilename('fullpath'));
+toolchainLoc = fullfile(erase(rootDir,'+arduinoregistry'),'arduinotoolchains');
+config = coder.make.ToolchainInfoRegistry; % initialize
+
+% Platform specific registration information
+if strcmpi(computer('arch'), 'win64')
+    config(end).Name           = 'Arduino AVR';
+    config(end).Alias          = {'Arduino AVR v1.6.1','Arduino AVR v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_avr_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end).Name           = 'Arduino AVR';
+    config(end).Alias          = {'Arduino AVR v1.6.1','Arduino AVR v1.6.7'}'; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_avr_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')
+    config(end).Name           = 'Arduino AVR';
+    config(end).Alias          = {'Arduino AVR v1.6.1','Arduino AVR v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_avr_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')
+    config(end).Name           = 'Arduino AVR';
+    config(end).Alias          = {'Arduino AVR v1.6.1','Arduino AVR v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_avr_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end).Name           = 'Arduino AVR';
+    config(end).Alias          = {'Arduino AVR v1.6.1','Arduino AVR v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_avr_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name           = 'Arduino ARM';
+    config(end).Alias          = {'Arduino ARM v1.6.1','Arduino ARM v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'Arduino ARM';
+    config(end).Alias          = {'Arduino ARM v1.6.1','Arduino ARM v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')
+    config(end+1).Name           = 'Arduino ARM';
+    config(end).Alias          = {'Arduino ARM v1.6.1','Arduino ARM v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')
+    config(end+1).Name           = 'Arduino ARM';
+    config(end).Alias          = {'Arduino ARM v1.6.1','Arduino ARM v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'Arduino ARM';
+    config(end).Alias          = {'Arduino ARM v1.6.1','Arduino ARM v1.6.7'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name         = 'Arduino ARM MBED';
+    config(end).Alias          = {'Arduino ARM MBED v1.8.19','Arduino ARM v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'Arduino ARM MBED';
+    config(end).Alias          = {'Arduino ARM MBED v1.8.19','Arduino ARM v1.8.19'}; % internal use only 
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')   
+    config(end+1).Name           = 'Arduino ARM MBED';
+    config(end).Alias          = {'Arduino ARM MBED v1.8.19','Arduino ARM v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')    
+    config(end+1).Name           = 'Arduino ARM MBED';
+    config(end).Alias          = {'Arduino ARM MBED v1.8.19','Arduino ARM v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'Arduino ARM MBED';
+    config(end).Alias          = {'Arduino ARM MBED v1.8.19','Arduino ARM v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name         = 'Arduino ARM MBED RP2040';
+    config(end).Alias          = {'Arduino ARM MBED RP2040 v1.8.19','Arduino ARM MBED RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_rp2040_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'Arduino ARM MBED RP2040';
+    config(end).Alias          = {'Arduino ARM MBED RP2040 v1.8.19','Arduino ARM MBED RP2040 v1.8.19'}; % internal use only 
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_rp2040_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')   
+    config(end+1).Name           = 'Arduino ARM MBED RP2040';
+    config(end).Alias          = {'Arduino ARM MBED RP2040 v1.8.19','Arduino ARM MBED RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_rp2040_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')    
+    config(end+1).Name           = 'Arduino ARM MBED RP2040';
+    config(end).Alias          = {'Arduino ARM MBED RP2040 v1.8.19','Arduino ARM MBED RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_rp2040_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'Arduino ARM MBED RP2040';
+    config(end).Alias          = {'Arduino ARM MBED RP2040 v1.8.19','Arduino ARM MBED RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_mbed_rp2040_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name         = 'Arduino ARM RP2040';
+    config(end).Alias          = {'Arduino ARM RP2040 v1.8.19','Arduino ARM RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_rp2040_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'Arduino ARM RP2040';
+    config(end).Alias          = {'Arduino ARM RP2040 v1.8.19','Arduino ARM RP2040 v1.8.19'}; % internal use only 
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_rp2040_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')   
+    config(end+1).Name           = 'Arduino ARM RP2040';
+    config(end).Alias          = {'Arduino ARM RP2040 v1.8.19','Arduino ARM RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_rp2040_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')    
+    config(end+1).Name           = 'Arduino ARM RP2040';
+    config(end).Alias          = {'Arduino ARM RP2040 v1.8.19','Arduino ARM RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_rp2040_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'Arduino ARM RP2040';
+    config(end).Alias          = {'Arduino ARM RP2040 v1.8.19','Arduino ARM RP2040 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_rp2040_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name         = 'ESP32';
+    config(end).Alias          = {'Arduino ESP32 v1.8.19','Arduino ESP32 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_esp32_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'ESP32';
+    config(end).Alias          = {'Arduino ESP32 v1.8.19','Arduino ESP32 v1.8.19'}; % internal use only 
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_esp32_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')   
+    config(end+1).Name           = 'ESP32';
+    config(end).Alias          = {'Arduino ESP32 v1.8.19','Arduino ESP32 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_esp32_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')    
+    config(end+1).Name           = 'ESP32';
+    config(end).Alias          = {'Arduino ESP32 v1.8.19','Arduino ESP32 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_esp32_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'ESP32';
+    config(end).Alias          = {'Arduino ESP32 v1.8.19','Arduino ESP32 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_esp32_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name           = 'Arduino ARM M7';
+    config(end).Alias          = {'Arduino ARM M7 v1.8.19','Arduino ARM M7 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m7_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'Arduino ARM M7';
+    config(end).Alias          = {'Arduino ARM M7 v1.8.19','Arduino ARM M7 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m7_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')
+    config(end+1).Name           = 'Arduino ARM M7';
+    config(end).Alias          = {'Arduino ARM M7 v1.8.19','Arduino ARM M7 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m7_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')
+    config(end+1).Name           = 'Arduino ARM M7';
+    config(end).Alias          = {'Arduino ARM M7 v1.8.19','Arduino ARM M7 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m7_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'Arduino ARM M7';
+    config(end).Alias          = {'Arduino ARM M7 v1.8.19','Arduino ARM M7 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m7_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+if strcmpi(computer('arch'), 'win64')
+    config(end+1).Name           = 'Arduino ARM M4';
+    config(end).Alias          = {'Arduino ARM M4 v1.8.19','Arduino ARM M4 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m4_gmake_win64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win64'};
+elseif strcmpi(computer('arch'), 'win32')
+    config(end+1).Name           = 'Arduino ARM M4';
+    config(end).Alias          = {'Arduino ARM M4 v1.8.19','Arduino ARM M4 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m4_gmake_win32_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'win32'};
+elseif strcmpi(computer('arch'), 'glnxa64')
+    config(end+1).Name           = 'Arduino ARM M4';
+    config(end).Alias          = {'Arduino ARM M4 v1.8.19','Arduino ARM M4 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m4_gmake_glnxa64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'glnxa64'};
+elseif strcmpi(computer('arch'), 'maci64')
+    config(end+1).Name           = 'Arduino ARM M4';
+    config(end).Alias          = {'Arduino ARM M4 v1.8.19','Arduino ARM M4 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m4_gmake_maci64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maci64'};
+elseif strcmpi(computer('arch'), 'maca64')
+    config(end+1).Name           = 'Arduino ARM M4';
+    config(end).Alias          = {'Arduino ARM M4 v1.8.19','Arduino ARM M4 v1.8.19'}; % internal use only
+    config(end).FileName        = fullfile(toolchainLoc, 'arduino_arm_m4_gmake_maca64_v1.8.19.mat');
+    config(end).TargetHWDeviceType = {'*'};
+    config(end).Platform           = {'maca64'};
+end
+
+end
+
+
+esptool:
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py/4.5.1/esptool.py
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/data/packages/esp32/tools/esptool_py/4.5.1/esptool
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/downloads/packages/esptool-v4.5.1-src.tar.gz
+
+arduino-cli:
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/arduino-cli.yaml
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/3P.instrset/arduinoide.instrset/aCLI/arduino-cli
+
+FIN G0c
+G0_prueba_PIL_minima_BoP

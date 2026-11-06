@@ -1,0 +1,272 @@
+ETAPA G - G0_prueba_PIL_minima_BoP   (2026-11-06 11:32:25)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+Paquetes de soporte instalados:
+  - Simulink Support Package for Arduino Hardware
+  - MATLAB Support Package for Arduino Hardware
+Conexion PIL propia registrada: pil_esp32/rtwTargetInfo.m
+
+Copia: /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP.slx -> /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/Controller_BoP_ESP32.slx
+Hardware board: ESP32-WROOM (Arduino Compatible)
+  ProdHWDeviceType       ARM Compatible->ARM Cortex
+  ProdBitPerInt          32
+  ProdBitPerLong         32
+  ProdBitPerDouble       64
+  ProdEndianess          LittleEndian
+  ProdIntDivRoundTo      Zero
+  SystemTargetFile       ert.tlc
+  CodeInterfacePackaging Reusable function
+
+CoderTargetData (configuracion del paquete en el modelo):
+  UseCoderTarget                                     true
+  TargetHardware                                     ESP32-WROOM (Arduino Compatible)
+  ExtModeProtocolInfo.XCPonSerial.HostInterface      Simulink
+  ExtModeProtocolInfo.XCPonSerial.LoggingBufferAuto  true
+  ExtModeProtocolInfo.XCPonSerial.LoggingBufferSize  250
+  ExtModeProtocolInfo.XCPonSerial.LoggingBufferNum   3
+  ExtModeProtocolInfo.XCPonSerial.MaxContigSamples   10
+  ExtModeProtocolInfo.XCPonWiFi.HostInterface        Simulink
+  ExtModeProtocolInfo.XCPonWiFi.LoggingBufferAuto    true
+  ExtModeProtocolInfo.XCPonWiFi.LoggingBufferSize    250
+  ExtModeProtocolInfo.XCPonWiFi.LoggingBufferNum     3
+  ExtModeProtocolInfo.XCPonWiFi.MaxContigSamples     10
+  ConnectionInfo.XCPonSerial.Baudrate                codertarget.arduinobase.registry.getBaudRate
+  ConnectionInfo.XCPonSerial.COMPort                 codertarget.arduinobase.internal.getExternalModeMexArgs('Serial')
+  ConnectionInfo.XCPonSerial.Verbose                 false
+  ConnectionInfo.XCPonWiFi.IPAddress                 codertarget.arduinobase.internal.getExternalModeMexArgs('Wifi')
+  ConnectionInfo.XCPonWiFi.Port                      17725
+  ConnectionInfo.XCPonWiFi.Verbose                   false
+  ExtMode.Configuration                              XCP on Serial
+  ExtMode.COMPortBaud                                921600
+  ExtMode.targetPollingTimeMode                      Automatically
+  ExtMode.targetPollingTime                          2
+  ExtMode.UseRealtimeStampLogging                    0
+  RTOS                                               FreeRTOS
+  RTOSBaseRateTaskPriority                           14
+  DetectTaskOverruns                                 0
+  Scheduler_interrupt_source                         0
+  ESP32.ESP32_board                                  
+  ESP32.BootButtonPressCheckbox                      0
+  Runtime.BuildAction                                Build, load and run
+  Runtime.DisableParallelBuild                       0
+  Runtime.ForceBuildStaticLibrary                    0
+  Runtime.VerboseOutput                              0
+  HostBoardConnection.AppDownload_port_source        Manually Select
+  HostBoardConnection.AppDownload_COMPort_select     
+  HostBoardConnection.AppDownload_COMPort_specify    /dev/ttyACM0
+  HostBoardConnection.AppDownload_baud               921600(Default)
+  HostBoardConnection.AppDownload_baud_specify       
+  HostBoardConnection.ConnectedIO_serial_port        Serial 0
+  HostBoardConnection.ConnectedIO_port_source1       Manually Select
+  HostBoardConnection.ConnectedIO_port_source2       Manually Select
+  HostBoardConnection.ConnectedIO_COMPort_select     
+  HostBoardConnection.ConnectedIO_COMPort_specify    /dev/ttyACM0
+  HostBoardConnection.ConnectedIO_baud               921600(Default)
+  HostBoardConnection.ConnectedIO_baud_specify       
+  HostBoardConnection.ExternalMode_serial_port       Serial 0
+  HostBoardConnection.ExternalMode_port_source1      Manually Select
+  HostBoardConnection.ExternalMode_port_source2      Manually Select
+  HostBoardConnection.ExternalMode_COMPort_select    
+  HostBoardConnection.ExternalMode_COMPort_specify   /dev/ttyACM0
+  HostBoardConnection.ExternalMode_baud              921600(Default)
+  HostBoardConnection.ExternalMode_baud_specify      
+  ConnectedIO.ConnectedIOMode                        Auto
+  ConnectedIO.ActionOnOverrun                        warning
+  OverRunDetection.Enable_overrun_detection          0
+  OverRunDetection.Digital_output_to_set_on_overrun  13
+  AnalogInRefVoltage.Analog_input_reference_voltage  0
+  Serial.Serial0_tx_pin                              1
+  Serial.Serial0_rx_pin                              3
+  Serial.Serial0_baud_rate                           9600
+  Serial.Serial0_baud_specify                        921600
+  Serial.Serial0_Config                              SERIAL_8N1
+  Serial.Serial1_tx_pin                              33
+  Serial.Serial1_rx_pin                              32
+  Serial.Serial1_baud_rate                           9600
+  Serial.Serial1_baud_specify                        921600
+  Serial.Serial1_Config                              SERIAL_8N1
+  Serial.Serial2_tx_pin                              17
+  Serial.Serial2_rx_pin                              16
+  Serial.Serial2_baud_rate                           9600
+  Serial.Serial2_baud_specify                        921600
+  Serial.Serial2_Config                              SERIAL_8N1
+  I2C.I2C0_SDA_Pin                                   21
+  I2C.I2C0_SCL_Pin                                   22
+  I2C.I2C0BusSpeedHz                                 100000
+  SPI.SPI0_SDO_Pin                                   23
+  SPI.SPI0_SDI_Pin                                   19
+  SPI.SPI0_SCK_Pin                                   18
+  SPI.SPI0_clock_out_frequency                       4000
+  SPI.SPI0_mode                                      Mode 0 - Clock Polarity 0, Clock Phase 0
+  SPI.SPI0_bitorder                                  MSB first
+  SPI.SDSlaveSelect                                  5
+  SPI.SPI1_SDO_Pin                                   13
+  SPI.SPI1_SDI_Pin                                   12
+  SPI.SPI1_SCK_Pin                                   14
+  SPI.SPI1_clock_out_frequency                       4000
+  SPI.SPI1_mode                                      Mode 0 - Clock Polarity 0, Clock Phase 0
+  SPI.SPI1_bitorder                                  MSB first
+  PWM.PWM_Default_Frequency                          1000
+  Http.Enable_custom_ca_certificate                  0
+  Http.Custom_ca_certificate_file                    
+  IOBlocksMode                                       deployed
+  DataVersion                                        2016.02
+  HostBoardConnection.AppDownload_COMPort_specify -> /dev/ttyUSB0
+  HostBoardConnection.ConnectedIO_COMPort_specify -> /dev/ttyUSB0
+  HostBoardConnection.ExternalMode_COMPort_specify -> /dev/ttyUSB0
+AVISO: ESP32.ESP32_board esta vacio (variante de la placa sin elegir en Target hardware resources).
+Variantes de ESP32-WROOM que ofrece el paquete:
+  - ESP32-WROOM-DevKitC(38 pin)
+  - ESP32-WROOM-DevKitV1(30 pin)
+  - ESP32-WROOM-DevKitV1(36 pin)
+ESP32.ESP32_board = "ESP32-WROOM-DevKitC(38 pin)"
+GetBoard(ESP32-WROOM (Arduino Compatible)): OK
+
+--- Target Framework: placa "ESP32-WROOM (Arduino Compatible)" ---
+  <a href="matlab:helpPopup('target.Board')" style="font-weight:bold">Board</a> with identifier "<strong>ESP32-WROOM (Arduino Compatible)</strong>" and properties:
+
+        CommunicationInterfaces: [0×0 target.CommunicationInterface]
+    CommunicationProtocolStacks: [0×0 target.CommunicationProtocolStack]
+                  MainFunctions: [0×0 target.MainFunction]
+                     Processors: [0×0 target.Processor]
+                          Tools: [1×1 target.Tools]
+                   Manufacturer: ''
+                         AddOns: [0×0 target.AddOn]
+                             Id: 'ESP32-WROOM (Arduino Compatible)'
+                           Name: 'ESP32-WROOM (Arduino Compatible)'
+                        IsValid: 1
+
+Processors (0):
+CommunicationInterfaces (0):
+CommunicationProtocolStacks (0):
+Tools (1):
+  <a href="matlab:helpPopup('target.Tools')" style="font-weight:bold">Tools</a> with properties:
+
+        DebugTools: [0×0 target.ApplicationExecutionTool]
+    ExecutionTools: [0×0 target.ApplicationExecutionTool]
+           IsValid: 1
+
+MainFunctions (0):
+TargetConnection registradas: 0
+No se pudo crear la TargetConnection:
+Unrecognized property 'SerialPort' for class
+'target.RS232Channel'.
+
+Error in g_conexion_target_framework (line 52)
+    c.CommunicationChannel.SerialPort = puerto;
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Error in G0_prueba_PIL_minima_BoP (line 112)
+    g_conexion_target_framework(placa, puerto, 115200);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+D1_requisitos: 194 cuadros, 0 saturados en el MIL. Ejecutando en la ESP32 (compila y carga la primera vez)...
+[Warning: An error occurred while registering an object in
+RTW.TargetRegistry from file
+"/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/pil_esp32/rtwTargetInfo.m":
+"Connectivity configuration "ESP32 BoP (Arduino PIL)" is
+attempting to register the connectivity configuration class
+"codertarget.arduinotarget.pil.ConnectivityConfig" but this
+has already been registered by connectivity configuration
+"Arduino Board". A connectivity configuration class can only
+be registered by a single connectivity configuration. Change
+the appropriate sl_customization.m file so that the class is
+registered by only a single connectivity configuration.".
+This custom registration is not loaded.] 
+[> In coder.targetreg.internal.TargetRegistry/refresh
+In coder.targetreg.internal/TargetRegistry/refreshConfig
+In coder.internal.getConnectivityConfigs
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.connectivity.connectivityconfig.getPILConnectivityConfig', '/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/connectivityconfig/+coder/+connectivity/+connectivityconfig/getPILConnectivityConfig.m', 16)" style="font-weight:bold">coder.connectivity.connectivityconfig.getPILConnectivityConfig</a> (<a href="matlab: opentoline('/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/connectivityconfig/+coder/+connectivity/+connectivityconfig/getPILConnectivityConfig.m',16,0)">line 16</a>)
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('coder.connectivity.createTargetServices', '/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/dispatch/+coder/+connectivity/createTargetServices.m', 154)" style="font-weight:bold">coder.connectivity.createTargetServices</a> (<a href="matlab: opentoline('/usr/local/MATLAB/R2026a/toolbox/coder/connectivity_targetservices/dispatch/+coder/+connectivity/createTargetServices.m',154,0)">line 154</a>)
+In build_pil_target
+In sl_feval
+In Simulink.Simulation.internal.DesktopSimHelper
+In Simulink.Simulation.internal.DesktopSimHelper.sim
+In Simulink/SimulationInput/sim
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('G0_prueba_PIL_minima_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m', 154)" style="font-weight:bold">G0_prueba_PIL_minima_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m',154,0)">line 154</a>)] 
+
+ERROR en la simulacion PIL:
+Error using G0_prueba_PIL_minima_BoP (line 154)
+Target is underspecified. Consider the use of Target
+Framework definitions to resolve these issues:
+-No connection to target found. Specify a
+target.TargetConnection object with Target property set to
+Board 'ESP32-WROOM (Arduino Compatible)'.
+
+If Target Framework is not being used, see <a href="matlab:helpview('ecoder','create_connect_config_for_target')">Create PIL Target
+Connectivity Configuration</a>.
+
+===== DIAGNOSTICO PIL =====
+  HardwareBoard        ESP32-WROOM (Arduino Compatible)
+  ProdHWDeviceType     ARM Compatible->ARM Cortex
+  TargetHWDeviceType   ARM Compatible->ARM Cortex
+  ProdEqTarget         on
+  PortableWordSizes    on
+  SystemTargetFile     ert.tlc
+  TargetLang           C
+  Toolchain            ESP32
+  CreateSILPILBlock    None
+Raiz de paquetes: /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a
+Archivos .m que mencionan "Arduino Board":
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/matlab/hardware/supportpackages/sharedarduino/+simulinkio/arduinoioserver.m
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registerpil.m
+
+----- /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/matlab/hardware/supportpackages/sharedarduino/+simulinkio/arduinoioserver.m -----
+5:%   board - Arduino Board type (character vector or string, e.g. 'Uno', 'Mega2560', ...)
+12:        BoardInfo
+13:        BoardIndex
+28:                obj.BoardInfo = arduinoio.internal.BoardInfo.getInstance('SimulinkIO');
+29:                b = obj.BoardInfo;
+30:                boardType = validatestring(varargin{1}, {b.Boards.Name});
+31:                obj.BoardIndex = find(arrayfun(@(x) strcmp(x.Name, boardType), b.Boards), 1);
+33:                if isequal(boardType,'Due')
+67:            buildInfo.Board         = obj.BoardInfo.Boards(obj.BoardIndex).Name;
+68:            buildInfo.BoardName     = obj.BoardInfo.Boards(obj.BoardIndex).BoardName;
+69:            buildInfo.Package       = obj.BoardInfo.Boards(obj.BoardIndex).Package;
+70:            buildInfo.CPU           = obj.BoardInfo.Boards(obj.BoardIndex).CPU;
+71:            buildInfo.MemorySize    = obj.BoardInfo.Boards(obj.BoardIndex).MemorySize;
+74:            % For Arduino Clone boards which uses CH340 or FTDI chip,
+78:            % Note: Baudrate is not picked from BoardsInfo xml 
+79:            % num2str(obj.BoardInfo.Boards(obj.BoardIndex).BaudRate);
+82:            buildInfo.MCU           = obj.BoardInfo.Boards(obj.BoardIndex).MCU;
+83:            buildInfo.VIDPID        = obj.BoardInfo.Boards(obj.BoardIndex).VIDPID;
+86:            % Serial lib is not available for all the arduino boards. Add
+87:            % the lib only if the board supports Serial.
+88:            %g3361999:BoardInfo is always populated with field PinSerial, so checking if
+90:            if ~isempty(obj.BoardInfo.Boards(obj.BoardIndex).PinsSerial)
+92:                buildInfo.PinsSerial=obj.BoardInfo.Boards(obj.BoardIndex).PinsSerial;
+95:            if ismember( buildInfo.Board , arduinoio.internal.ArduinoConstants.AREF3VBoards)
+105:            buildInfo.MAXPacketSize = arduinoio.internal.getMaxBufferSizeForBoard(buildInfo.Board);
+118:            % - Connect board due to the WiFiNINA version issues (1.8.8 required to SAMD boards and 1.8.14 required for RP2040 Connect).
+120:            if matches(buildInfo.Board,{'NanoRP2040Connect','RaspberryPiPico'}) && any(contains(buildInfo.Libraries,"WiFi"))
+125:            if matches(buildInfo.Board,{'NanoRP2040Connect','RaspberryPiPicoW'}) && any(contains(buildInfo.Libraries,"WiFiHTTP"))
+
+----- /home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registerpil.m -----
+6:config(1) = rtw.connectivity.ConfigRegistry;
+7:config(1).ConfigName = 'Arduino Board';
+9:config(1).isConfigSetCompatibleFcn = @i_isConfigSetCompatible;
+12:function isConfigSetCompatible = i_isConfigSetCompatible(configSet)
+17:% selected 'initializing board board parameter values' takes some time
+20:% selecting a hardware, a pop up opens with 'Initializing board board 
+21:% parameter values' and takes few seconds to load the board.
+23:isConfigSetCompatible = false;
+27:		selectedBoard = codertarget.arduinobase.board.GetBoard('boardName',coderTargetData.TargetHardware);
+28:		if ~isempty(selectedBoard) && isprop(selectedBoard, 'isArduinoBoard')...
+29:     		&& isprop(selectedBoard, 'boardInfo')
+30:			if selectedBoard.isArduinoBoard
+31:				boardInfo = selectedBoard.boardInfo;
+32:				if isprop(boardInfo, 'IsPilSupported')
+33:					isConfigSetCompatible = boardInfo.IsPilSupported;
+
+Archivos de PIL/conectividad que mencionan ESP32:
+/home/ablopez@estudiantes.ie.tec.ac.cr/Documents/MATLAB/SupportPackages/R2026a/toolbox/target/supportpackages/arduinotarget/+arduinoregistry/registertoolchain.m
+
+===== FIN DIAGNOSTICO =====
+{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('G0_prueba_PIL_minima_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m', 154)" style="font-weight:bold">G0_prueba_PIL_minima_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaG/G0_prueba_PIL_minima_BoP.m',154,0)">line 154</a>)
+Target is underspecified. Consider the use of Target
+Framework definitions to resolve these issues:
+-No connection to target found. Specify a
+target.TargetConnection object with Target property set to
+Board 'ESP32-WROOM (Arduino Compatible)'.
+
+If Target Framework is not being used, see <a href="matlab:helpview('ecoder','create_connect_config_for_target')">Create PIL Target
+Connectivity Configuration</a>.
+} 
