@@ -1,6 +1,6 @@
 # Tabla de correspondencia modelo ↔ código — Controller_BoP
 
-Código generado el 2026-11-06 con MATLAB R2026a (Simulink Coder 26.1, `ert.tlc`, *Reusable
+Código generado el 2026-11-06 con MATLAB R2026a (vigente: modelo v1.2, después de E3; respecto de v1.1 solo cambian la fecha y la versión del encabezado, así que las líneas citadas siguen valiendo) (Simulink Coder 26.1, `ert.tlc`, *Reusable
 function*, Generic → 32-bit Embedded Processor). Archivos en `codigo_generado/`. Las líneas son
 de `Controller_BoP.c` y `Controller_BoP.h`.
 

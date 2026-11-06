@@ -61,10 +61,32 @@ vez son tres:
 - el modo SIL de los bloques Model, si el nombre del modo cambió en R2026a;
 - la compilación del código SIL (necesita gcc, que ya está configurado).
 
-## Resultados
+## Resultados (MATLAB R2026a, 2026-11-06; `resultados/F1_consola.txt`)
+
+Antes de F1 se corrió E3 (configuración de hardware para SIL, modelo v1.1 → v1.2), y después
+se repitieron E1 (PASS) y E2 (código idéntico salvo la fecha y la versión en el encabezado).
 
 | Señal | Criterio | Resultado |
 |---|---|---|
-| th_cmd X/Y, I X/Y | max\|SIL − Normal\| ≤ 1e-12 | pendiente |
-| saturado X/Y | 0 diferencias | pendiente |
-| x_hat, x (planta) | Se reportan (son consecuencia) | pendiente |
+| th_cmd X e Y | max\|SIL − Normal\| ≤ 1e-12 | **0**; 271/271 muestras exactamente iguales |
+| I X e Y | ≤ 1e-12 | **0**; 271/271 iguales |
+| saturado X e Y | 0 diferencias | **0 diferencias** |
+| x_hat, x, y (planta) | Se reportan | **0**; 271/271 iguales |
+
+**Criterio: PASS.** El lazo hizo el ensayo completo: la bola fue de (80, −60) mm a (−2,4; 1,5) mm
+a los 4,4 s y a (50,2; 51,2) mm a los 9 s, con θ entre −2,7° y 3,0° y el integrador activo
+(±0,12°). Las diferencias son 0 en todas las muestras, no un 0 trivial.
+
+**Qué verifica SIL:** que el código C generado de `Controller_BoP`, compilado con gcc y
+ejecutado como un proceso aparte en la PC, calcula **exactamente** lo mismo que el modelo, en lazo
+cerrado y con dos instancias (una por eje) de la *Reusable function*.
+
+**Qué NO verifica:**
+- que el código ande en la ESP32 (compilador, FPU y tiempos distintos: eso es PIL);
+- que el controlador funcione con la planta real;
+- la rama con saturación: en este ensayo θ no llega a 10°, así que el clamping no se ejercitó
+  aquí. Sí se verificó la equivalencia con saturación en E1 (ensayo D2, 9 cuadros saturados), en
+  lazo abierto.
+
+Un PASS en SIL significa únicamente que el código generado es consistente con el modelo en las
+condiciones evaluadas (CLAUDE.md, sección 5).

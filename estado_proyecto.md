@@ -24,7 +24,7 @@
 | C — Diseño del controlador | **Corrida en MATLAB (2026-11-06)**: Kp 0,03412 °/mm, Kd 0,02588 °/(mm/s), Ki 0,02275 °/(mm·s), θ_lim 10°, PM 40,9°, GM +11,8/−12,6 dB, estable. Provisional hasta tener la Etapa B. |
 | D — MIL | **Corrida en MATLAB (2026-11-06)** con el actuador medido: D1 cumple R1–R4 (ts 1,30 s, Mp 4,4 %, ess 0,18 mm, max 102,7 mm). Robustez: no cumple ts con retardo de 120 ms (3,03 s), ruido de 2 mm (4,9 s) ni firmware sin tabla (4,7 s, Mp 23,8 %). Provisional hasta tener la Etapa B. |
 | E — Preparación y generación de código | **Completada (2026-11-06, MATLAB R2026a).** `Controller_BoP.slx` separado de la planta (12 entradas al bloque, 3 salidas). E1: igual al MIL bit a bit. Code Generation Advisor: 0 Fail, 5 Warning justificados. E2: código generado e inspección PASS; tabla modelo ↔ código en `etapaE/tabla_modelo_codigo.md`; el código C compilado con gcc reproduce el MIL (diferencia ≤ 4e-11 rad, por el redondeo de los CSV). |
-| F — SIL | **En curso (2026-11-06).** Primera corrida de F1: falló la compilación SIL por la configuración de hardware de producción (palabras de 32 bits, orden de bytes y redondeo sin definir); se corrige con `etapaE/E3_config_hardware_BoP.m` (solo configuración) y se repiten E1 y E2. Banco `BoP_Test_SIL.slx` por script (F0) y comparación Normal vs SIL (F1) escritos; la planta del banco se probó en Octave en lazo cerrado. Falta correr F0 y F1 en MATLAB. Ver `etapaF/LEEME_etapaF.md`. |
+| F — SIL | **Completada (2026-11-06, MATLAB R2026a).** Banco `BoP_Test_SIL.slx` (ramas Normal y SIL, dos ejes, una planta por rama). **PASS: diferencia 0 e igualdad exacta en 271/271 muestras** de th_cmd, I, saturado y de la planta. Para compilar SIL hizo falta E3 (configuración de hardware; modelo v1.2, E1 y E2 repetidos, código idéntico). Limitación: el ensayo no satura (la saturación se verificó en E1). Ver `etapaF/LEEME_etapaF.md`. |
 | G — PIL | No iniciada |
 | H — Implementación física | No iniciada |
 
@@ -203,4 +203,21 @@ Problemas detectados: ninguno que bloquee. Observaciones para H en la tabla mode
 Decisiones tomadas: modelo de un eje con Reusable function; double; parámetros ExportedGlobal.
 Qué debe conservarse: Controller_BoP.slx (referencia intocable), codigo_generado/, resultados/.
 Siguiente etapa: F — SIL (banco Normal vs SIL con planta en Simulink).
+```
+
+```
+Etapa: F — SIL (cierre, 2026-11-06)
+Completada: Sí
+Resultados obtenidos: igualdad exacta Normal vs SIL en 271/271 muestras de las 10 señales
+  (th_cmd, I, saturado de cada eje; x_hat, x, y de la planta). Ensayo tipo D4, 9 s.
+Archivos generados: etapaF/BoP_Test_SIL.slx, etapaF/resultados/ (F0, F1, CSV, .mat),
+  etapaE/E3_config_hardware_BoP.m y Controller_BoP.slx v1.2.
+Datos pendientes: ninguno para F.
+Problemas detectados: la primera compilación SIL falló por la configuración de hardware de
+  producción (resuelto con E3, sin cambiar el algoritmo); la planta del banco necesitó un
+  ajuste para la generación de código.
+Decisiones tomadas: planta del banco simplificada (actuador directo en ángulo de plato, retardo
+  entero), suficiente para comparar el controlador.
+Qué debe conservarse: BoP_Test_SIL.slx, resultados/, Controller_BoP.slx v1.2.
+Siguiente etapa: G — PIL (banco separado con la ESP32); en paralelo, B con el prototipo.
 ```
