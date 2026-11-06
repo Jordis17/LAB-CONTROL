@@ -14,6 +14,35 @@ por el puerto serie, la ESP32 ejecuta `Controller_BoP_step` y devuelve las salid
 comportamiento. **No es** una validación con la planta real: no hay cámara, ni servos, ni la
 temporización de 30 fps en tiempo real (CLAUDE.md, sección 5).
 
+## El paquete de Arduino no habilita PIL en la ESP32 (2026-11-06)
+
+Evidencia (`resultados/G0_consola.txt`, `G0b_consola.txt`, `G0c_consola.txt`):
+
+1. La única conexión PIL del paquete, "Arduino Board" (`arduinoregistry/registerpil.m`), se
+   declara compatible solo si la placa tiene `boardInfo.IsPilSupported = true`.
+2. Due, Mega 2560, Uno, Nano 33 IoT y Teensy 4.1 lo tienen en `true`. La clase de nuestra placa,
+   `ESP32WROOMdevkitC_38Board` (variante *ESP32-WROOM-DevKitC(38 pin)*), lo tiene en **0**.
+3. Además, con la variante de la ESP32 vacía, `GetBoard` falla con `Index exceeds array bounds`.
+   Ese fue el error de las primeras corridas de G0. Ahora G0 elige la variante
+   (`funciones/g_variante_esp32.m`).
+
+Esto contesta lo que CLAUDE.md dejaba **PENDIENTE**: con R2026a, el PIL oficial no está
+habilitado para la ESP32.
+
+**Alternativa de ingeniería (ruta elegida, porque el equipo no tiene otra placa):**
+`pil_esp32/rtwTargetInfo.m` registra una configuración de conexión PIL propia, "ESP32 BoP
+(Arduino PIL)". Usa la misma clase de conexión del paquete
+(`codertarget.arduinotarget.pil.ConnectivityConfig`), que compila con la toolchain ESP32 del
+paquete, graba la placa y se comunica por el puerto serie, y la declara compatible con modelos
+cuya placa sea una ESP32. Es el mecanismo documentado por MathWorks para agregar PIL a un
+procesador (*Create PIL Target Connectivity Configuration*). No se modifica ningún archivo del
+paquete.
+
+Como MathWorks no probó esta combinación, el resultado vale por la comparación, no por la
+herramienta. Si la ESP32 devuelve exactamente lo mismo que el modelo en todas las muestras, el
+código corrió en su procesador y calculó lo mismo. Si la ruta falla, el plan B es escribir
+también el lado de comunicación y carga (rtiostream propio).
+
 ## Modelo para PIL
 
 `Controller_BoP_ESP32.slx` es una **copia** de `etapaE/Controller_BoP.slx` (que no se toca) en

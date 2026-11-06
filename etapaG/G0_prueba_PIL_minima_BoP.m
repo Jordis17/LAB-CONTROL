@@ -22,6 +22,10 @@ clearvars; close all; clc;
 
 % Puerto serie de la ESP32 en esta PC (ls /dev/ttyUSB* /dev/ttyACM*)
 puerto = '/dev/ttyUSB0';
+% El paquete de Arduino no habilita PIL en la ESP32 (IsPilSupported = 0, G0c).
+% true: registra la conexion PIL propia de pil_esp32/rtwTargetInfo.m, que
+% reutiliza la del paquete para Arduino (ver LEEME_etapaG.md).
+usar_pil_propio = true;
 
 carpeta = fileparts(mfilename('fullpath'));
 raiz = fileparts(carpeta);
@@ -48,6 +52,12 @@ try
 catch err
     if strcmp(err.identifier, 'G0:SinArduino'), rethrow(err); end
     fprintf('AVISO: no se pudo listar los paquetes (%s). Se sigue igual.\n', err.message);
+end
+
+if usar_pil_propio
+    addpath(fullfile(carpeta,'pil_esp32'));
+    sl_refresh_customizations;
+    fprintf('Conexion PIL propia registrada: pil_esp32/rtwTargetInfo.m\n');
 end
 
 %% 2. Copia para la ESP32

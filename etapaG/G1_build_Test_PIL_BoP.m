@@ -31,6 +31,8 @@ carpeta = fileparts(mfilename('fullpath'));
 raiz = fileparts(carpeta);
 addpath(carpeta, fullfile(raiz,'etapaF','funciones'), fullfile(raiz,'etapaE'), ...
         fullfile(raiz,'etapaC','funciones'), fullfile(raiz,'etapaA'), fullfile(raiz,'etapaA','funciones'));
+% Conexion PIL propia para la ESP32 (el paquete no la habilita; ver LEEME_etapaG.md)
+addpath(fullfile(carpeta,'pil_esp32'));  sl_refresh_customizations;
 dirRes = fullfile(carpeta,'resultados');
 if ~isfolder(dirRes), mkdir(dirRes); end
 archivoConsola = fullfile(dirRes,'G1_consola.txt');
