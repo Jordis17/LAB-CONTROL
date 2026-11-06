@@ -49,6 +49,11 @@ def medir_periodo(cap, n=300):
     print(f"  p95       {periodos[int(0.95 * len(periodos))]:7.2f}")
     print(f"  maximo    {periodos[-1]:7.2f}")
 
+    nominal = 1000.0 / config.FRAME_FPS
+    cerca = sum(1 for p in periodos if abs(p - nominal) <= 5.0) / len(periodos)
+    perdidos = sum(1 for p in periodos if p > 1.5 * nominal) / len(periodos)
+    print(f"\n  {cerca * 100:.1f} % de los periodos dentro de +-5 ms del nominal ({nominal:.1f} ms)")
+    print(f"  {perdidos * 100:.1f} % de los periodos > 1,5 x nominal (cuadro perdido)")
     dentro = sum(1 for p in periodos if abs(p - med) <= 5.0) / len(periodos)
     print(f"\n  {dentro * 100:.1f} % de los periodos dentro de +-5 ms de la media")
     print("  Criterio del plan: 95 % dentro de +-5 ms.",
@@ -137,11 +142,13 @@ def main():
     p.add_argument("--period", action="store_true", help="periodo entre frames")
     p.add_argument("--latency", action="store_true", help="latencia extremo a extremo")
     p.add_argument("-n", type=int, default=None)
+    p.add_argument("--buffers", type=int, default=None,
+                   help="buffers de captura (por defecto CAMERA_BUFFERS de config.py)")
     a = p.parse_args()
     if not a.period and not a.latency:
         a.period = a.latency = True
 
-    cap = abrir_camara()
+    cap = abrir_camara(buffers=a.buffers)
     if cap is None:
         return 1
     try:
@@ -154,7 +161,8 @@ def main():
         cv2.destroyAllWindows()
     print(f"\nConfiguracion usada: {config.FRAME_WIDTH}x{config.FRAME_HEIGHT}, "
           f"{config.FOURCC}, exposicion {config.EXPOSURE_ABS} "
-          f"(= {config.EXPOSURE_ABS / 10:.1f} ms)")
+          f"(= {config.EXPOSURE_ABS / 10:.1f} ms), buffers "
+          f"{a.buffers if a.buffers is not None else config.CAMERA_BUFFERS}")
     return 0
 
 
