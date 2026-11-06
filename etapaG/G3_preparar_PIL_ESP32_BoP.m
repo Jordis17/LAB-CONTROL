@@ -48,16 +48,24 @@ close_system(mdl, 0);                     % sin guardar: GenCodeOnly no queda en
 dirCod = fullfile(dirBuild, [mdl '_ert_rtw']);
 
 %% 2. Comparacion con el codigo de la Etapa E
-norm = @(t) regexprep(regexprep(regexprep(t, '/\*.*?\*/', ''), '//[^\n]*', ''), '\s+', ' ');
-a = norm(strrep(fileread(fullfile(dirCod,[mdl '.c'])), mdl, 'Controller_BoP'));
-b = norm(fileread(fullfile(raiz,'etapaE','codigo_generado','Controller_BoP.c')));
-fprintf('\nControlador ESP32 vs Etapa E (Controller_BoP.c, sin comentarios ni nombre del modelo): %s\n', ...
-    pasa_falla(strcmp(a, b)));
+% Se comparan por separado: (a) el conjunto de #include (el orden puede
+% cambiar con la placa) y (b) el resto del codigo, sin comentarios ni el
+% nombre del modelo.
+tA = strrep(fileread(fullfile(dirCod,[mdl '.c'])), mdl, 'Controller_BoP');
+tB = fileread(fullfile(raiz,'etapaE','codigo_generado','Controller_BoP.c'));
+incA = sort(regexp(tA, '#include\s*[<"][^>"]+[>"]', 'match'));
+incB = sort(regexp(tB, '#include\s*[<"][^>"]+[>"]', 'match'));
+norm = @(t) strtrim(regexprep(regexprep(regexprep(regexprep(t, '/\*.*?\*/', ''), '//[^\n]*', ''), ...
+    '#include\s*[<"][^>"]+[>"]', ''), '\s+', ' '));
+a = norm(tA);  b = norm(tB);
+fprintf('\nControlador ESP32 vs Etapa E (Controller_BoP.c):\n');
+fprintf('  mismos #include (sin importar el orden): %s\n', pasa_falla(isequal(incA, incB)));
+fprintf('  mismo codigo (sin comentarios, includes ni nombre del modelo): %s\n', pasa_falla(strcmp(a, b)));
 if ~strcmp(a, b)
-    fprintf('  Difieren. Primeros caracteres distintos:\n');
     n = min(numel(a), numel(b));  i = find(a(1:n) ~= b(1:n), 1);
     if isempty(i), i = n; end
-    fprintf('  ESP32 : ...%s...\n  EtapaE: ...%s...\n', a(max(1,i-80):min(end,i+120)), b(max(1,i-80):min(end,i+120)));
+    fprintf('  Primeros caracteres distintos:\n  ESP32 : ...%s...\n  EtapaE: ...%s...\n', ...
+        a(max(1,i-80):min(end,i+160)), b(max(1,i-80):min(end,i+160)));
 end
 h = fileread(fullfile(dirCod,[mdl '.h']));
 p = regexp(h, 'extern void Controller_BoP_ESP32_(step|initialize)\([^;]*;', 'match');
@@ -98,6 +106,10 @@ dirBin = fullfile(dirBuild, 'bop_pil_esp32_bin');
 cmdC = sprintf('"%s" compile --config-file "%s" --fqbn %s --build-path "%s" "%s" 2>&1', cli, cfg, fqbn, dirBin, dirSk);
 fprintf('\n%s\n', cmdC);
 [st, out] = system(cmdC);  fprintf('%s\n', out);
+if st ~= 0 && contains(out, "No module named 'serial'")
+    error('G3:pyserial', ['Compilo, pero esptool.py (Python) necesita pyserial para armar la imagen. ' ...
+        'En una terminal: sudo apt install python3-serial   y repitan G3.']);
+end
 if st ~= 0, error('G3:Compilar', 'arduino-cli compile fallo (codigo %d). Manden la consola completa.', st); end
 cmdU = sprintf('"%s" upload --config-file "%s" --fqbn %s -p %s --input-dir "%s" "%s" 2>&1', cli, cfg, fqbn, puerto, dirBin, dirSk);
 fprintf('\n%s\n', cmdU);
