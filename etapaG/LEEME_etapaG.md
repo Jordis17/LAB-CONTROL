@@ -60,14 +60,25 @@ interfaces de comunicación ni protocolo PIL definidos.
 
 | Qué corre en la ESP32 | Qué sigue en la PC (MATLAB) |
 |---|---|
-| El código C **generado** de `Controller_BoP_ESP32` (mismo algoritmo y parámetros que `Controller_BoP`; G3 lo compara con el de la Etapa E), compilado con la toolchain Xtensa del paquete de Arduino (`arduino-cli`, FQBN `esp32:esp32:esp32`). Dos instancias, una por eje. | La planta (`planta_bop_paso`, la del banco SIL), la referencia, la rama Normal y la comparación |
+| **Exactamente** el código C de `etapaE/codigo_generado`, el mismo verificado en SIL (G3 comprueba que la copia sea idéntica byte a byte), compilado con la toolchain Xtensa del paquete de Arduino (`arduino-cli`, FQBN `esp32:esp32:esp32`). Dos instancias, una por eje. | La planta (`planta_bop_paso`, la del banco SIL), la referencia, la rama Normal y la comparación |
 
 `pil_esp32/bop_pil_esp32/bop_pil_esp32.ino` **no contiene el algoritmo**. Solo hace de puente
 serie: recibe `r`, `x_hat`, `v_hat` y `habilitado` como double IEEE de 8 bytes (sin
-redondeo), llama `Controller_BoP_ESP32_step` y devuelve `th_cmd`, `I`, `saturado` y los ciclos
+redondeo), llama `Controller_BoP_step` y devuelve `th_cmd`, `I`, `saturado` y los ciclos
 de CPU que tardó la llamada. El protocolo está descrito al principio del sketch. Es el mismo
 esquema del PIL de Simulink (el código en el procesador y lo demás en la PC), con un
 comunicador propio.
+
+**Por qué no se usa el código generado con la placa ESP32** (`Controller_BoP_ESP32`, G3 del
+2026-11-06): no es idéntico al verificado en SIL, porque cambiar la placa hizo que Embedded Coder
+agregara una variable temporal (`tmp_0`), y además depende de encabezados de Simulink
+(`rtw_continuous.h`) que no compilan fuera de MATLAB. La Etapa G pide conservar sin cambios lo
+validado. Lo que se verifica es que **ese** código, compilado para Xtensa, calcule lo mismo en
+la ESP32.
+
+**Prueba previa (Claude, 2026-11-06):** el sketch compilado en la PC con un Arduino simulado
+responde bien al protocolo: el paso de prueba (x = 10 mm, r = 0, v = 0) da th = Kp·10 =
+0,0059549 rad.
 
 **Banco en lazo cerrado (G5).** Tiene dos ramas, Normal y PIL, cada una con su propia planta.
 Comparten la referencia, la habilitación, la condición inicial, Ts, el ruido y la duración. El

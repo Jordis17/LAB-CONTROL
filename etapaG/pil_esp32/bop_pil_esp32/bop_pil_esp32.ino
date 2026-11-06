@@ -1,10 +1,11 @@
 // PIL de Controller_BoP en la ESP32 (Etapa G, Ball on Plate).
 //
 // Corre en la ESP32 el codigo C GENERADO por Embedded Coder a partir de
-// Controller_BoP_ESP32.slx (copia de etapaE/Controller_BoP.slx con la placa
-// ESP32). G3_preparar_PIL_ESP32_BoP.m copia ese codigo en esta carpeta.
+// etapaE/Controller_BoP.slx: exactamente etapaE/codigo_generado, el mismo
+// codigo verificado en SIL (Etapa F). G3_preparar_PIL_ESP32_BoP.m lo copia
+// en esta carpeta sin modificarlo.
 // Este archivo NO contiene el algoritmo: solo recibe entradas por el puerto
-// serie, llama Controller_BoP_ESP32_step y devuelve las salidas.
+// serie, llama Controller_BoP_step y devuelve las salidas.
 //
 // Dos instancias (eje X = 0, eje Y = 1), cada una con su estado (Reusable function).
 //
@@ -17,12 +18,12 @@
 // ciclos: ciclos de CPU (240 MHz) que tardo la llamada a _step.
 
 extern "C" {
-#include "Controller_BoP_ESP32.h"
+#include "Controller_BoP.h"
 }
 #include <string.h>
 
-static RT_MODEL_Controller_BoP_ESP32_T M[2];
-static DW_Controller_BoP_ESP32_T DW[2];
+static RT_MODEL_Controller_BoP_T M[2];
+static DW_Controller_BoP_T DW[2];
 static real_T U_r[2], U_x[2], U_v[2], Y_th[2], Y_I[2];
 static boolean_T U_h[2], Y_s[2];
 
@@ -30,7 +31,7 @@ static void reiniciar() {
   memset(M, 0, sizeof(M));
   for (int e = 0; e < 2; e++) {
     M[e].dwork = &DW[e];
-    Controller_BoP_ESP32_initialize(&M[e], &U_r[e], &U_x[e], &U_v[e], &U_h[e],
+    Controller_BoP_initialize(&M[e], &U_r[e], &U_x[e], &U_v[e], &U_h[e],
                                     &Y_th[e], &Y_I[e], &Y_s[e]);
   }
 }
@@ -82,7 +83,7 @@ void loop() {
     memcpy(&v, p + 17, 8);
     boolean_T hab = (p[25] != 0);
     uint32_t c0 = ESP.getCycleCount();
-    Controller_BoP_ESP32_step(&M[e], r, x, v, hab, &th, &I, &sat);
+    Controller_BoP_step(&M[e], r, x, v, hab, &th, &I, &sat);
     uint32_t dc = ESP.getCycleCount() - c0;
     uint8_t b[23];
     b[0] = 0x5A; b[1] = 'S';
