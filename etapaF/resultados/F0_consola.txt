@@ -1,0 +1,9 @@
+ETAPA F - F0_build_Test_SIL_BoP   (2026-11-06 10:35:16)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+Generado funciones/planta_bop_param.m (planta del banco)
+Rama Normal: Ctrl_X_Normal y Ctrl_Y_Normal en modo "Normal", planta propia Planta_Normal
+Rama SIL   : Ctrl_X_SIL y Ctrl_Y_SIL en modo "Software-in-the-loop (SIL)", planta propia Planta_SIL
+
+Banco guardado: /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaF/BoP_Test_SIL.slx
+FIN F0
+F1_comparar_Normal_SIL_BoP

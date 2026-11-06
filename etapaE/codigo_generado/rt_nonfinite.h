@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'Controller_BoP'.
  *
- * Model version                  : 1.1
+ * Model version                  : 1.2
  * Simulink Coder version         : 26.1 (R2026a) 20-Nov-2025
- * C/C++ source code generated on : Fri Nov  6 10:15:43 2026
+ * C/C++ source code generated on : Fri Nov  6 10:38:38 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Generic->32-bit Embedded Processor

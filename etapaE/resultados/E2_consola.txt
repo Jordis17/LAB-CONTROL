@@ -1,4 +1,4 @@
-ETAPA E - E2_generar_codigo_BoP   (2026-11-06 10:15:40)
+ETAPA E - E2_generar_codigo_BoP   (2026-11-06 10:40:37)
 MATLAB 26.1.0.3346908 (R2026a) Update 5
 Configuracion de generacion:
   SystemTargetFile         ert.tlc
@@ -6,60 +6,26 @@ Configuracion de generacion:
   ProdHWDeviceType         Generic->32-bit Embedded Processor
   ProdBitPerInt            32
   ProdBitPerDouble         64
-  ProdEndianess            Unspecified
+  ProdEndianess            LittleEndian
   ObjectivePriorities      Execution efficiency, Traceability
   Solver                   FixedStepDiscrete
   FixedStep                Ts_ctrl
 AVISO: existe /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP_ert_rtw de una generacion anterior (fuera de build/).
        No se usa; se puede borrar junto con etapaE/slprj si existe.
-### Unable to find Simulink cache file "Controller_BoP.slxc".
+### Skipped unpacking from Simulink cache file "Controller_BoP.slxc" because the relevant build artifacts on disk are up to date.
 ### Searching for referenced models in model 'Controller_BoP'.
 ### Total of 1 models to build.
 ### Starting build procedure for: Controller_BoP
 ### Generating code and artifacts to 'Model specific' folder structure
 ### Generating code into build folder: /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw
-### Invoking Target Language Compiler on Controller_BoP.rtw
-### Using System Target File: /usr/local/MATLAB/R2026a/rtw/c/ert/ert.tlc
-### Loading TLC function libraries
-.......
-### Generating TLC interface API for custom data
-.
-### Initial pass through model to cache user defined code
-.
-### Caching model source code
-....................................................
-### Writing header file Controller_BoP_types.h
-### Writing source file Controller_BoP.c
-.
-### Writing header file Controller_BoP_private.h
-### Writing header file Controller_BoP.h
-### Writing header file rtwtypes.h
-### Writing header file rtGetNaN.h
-### Writing source file rtGetNaN.c
-.
-### Writing header file rt_nonfinite.h
-### Writing source file rt_nonfinite.c
-### Writing header file rt_defines.h
-### Writing source file ert_main.c
-.
-### TLC code generation complete (took 0.823s).
-### Creating HTML report file <a href="matlab:rtw.report.open('Controller_BoP','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw')">index.html</a>
-### Saving binary information cache.
-### Using toolchain: GNU gcc/g++ | gmake (64-bit Linux)
-### Creating '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw/Controller_BoP.mk' ...
+### Generated code for 'Controller_BoP' is up to date because no structural, parameter or code replacement library changes were found.
+### Skipping makefile generation and compilation because /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP is up to date.
 ### Successful completion of code generation for: Controller_BoP
-### Simulink cache artifacts for 'Controller_BoP' were created in '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP.slxc'.
 
 Build Summary
 
-Top model targets:
-
-Model           Build Reason                                         Status           Build Duration
-====================================================================================================
-Controller_BoP  Information cache folder or artifacts were missing.  Code generated.  0h 0m 5.7409s
-
-1 of 1 models built (0 models already up to date)
-Build duration: 0h 0m 6.3875s
+0 of 1 models built (1 models already up to date)
+Build duration: 0h 0m 1.7226s
 Codigo generado en /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build/Controller_BoP_ert_rtw
 Copiados a codigo_generado/: Controller_BoP.c, Controller_BoP.h, Controller_BoP_private.h, Controller_BoP_types.h, ert_main.c, rtGetNaN.c, rtGetNaN.h, rt_defines.h, rt_nonfinite.c, rt_nonfinite.h, rtwtypes.h
 
@@ -158,3 +124,4 @@ Inspeccion automatica: PASS
 Pendiente manual: revisar el reporte html (codigo_generado/html) y completar la
 tabla de correspondencia modelo <-> codigo con estas lineas.
 FIN E2
+F1_comparar_Normal_SIL_BoP

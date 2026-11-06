@@ -1,0 +1,10 @@
+ETAPA E - E3_config_hardware_BoP   (2026-11-06 10:38:07)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+Version del modelo antes: 1.1
+  ProdEndianess      Unspecified  -> LittleEndian
+  ProdIntDivRoundTo  Undefined    -> Zero
+  PortableWordSizes  off          -> on
+Version del modelo despues: 1.2
+Guardado. Repetir ahora E1_verificar_equivalencia_BoP y E2_generar_codigo_BoP.
+FIN E3
+E1_verificar_equivalencia_BoP

@@ -1,0 +1,40 @@
+ETAPA F - F1_comparar_Normal_SIL_BoP   (2026-11-06 10:43:56)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+  Ctrl_X_Normal  modo: Normal
+  Ctrl_Y_Normal  modo: Normal
+  Ctrl_X_SIL     modo: Software-in-the-loop (SIL)
+  Ctrl_Y_SIL     modo: Software-in-the-loop (SIL)
+Simulando (la primera vez compila el codigo SIL)...
+### Searching for referenced models in model 'BoP_Test_SIL'.
+### Total of 1 models to build.
+### Model reference code generation target for Controller_BoP is up to date.
+
+Build Summary
+
+0 of 1 models built (1 models already up to date)
+Build duration: 0h 0m 0.44833s
+### Preparing to start SIL simulation ...
+### Skipping makefile generation and compilation because /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaF/build/slprj/ert/Controller_BoP/coderassumptions/pwslib/Controller_BoP_ca.a is up to date.
+### Skipping makefile generation and compilation because /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaF/build/slprj/ert/Controller_BoP/sil/Controller_BoP is up to date.
+### Starting SIL simulation for component: Controller_BoP
+### Starting SIL simulation for component: Controller_BoP
+### Application stopped
+### Stopping SIL simulation for component: Controller_BoP
+### Application stopped
+### Stopping SIL simulation for component: Controller_BoP
+
+  senal   unidad   max|SIL-Normal|      RMSE      iguales/total
+  thx     rad                   0              0      271/271
+  thy     rad                   0              0      271/271
+  Ix      rad                   0              0      271/271
+  Iy      rad                   0              0      271/271
+  satx    -                     0              0      271/271
+  saty    -                     0              0      271/271
+  xhx     mm                    0              0      271/271
+  xhy     mm                    0              0      271/271
+  x       mm                    0              0      271/271
+  y       mm                    0              0      271/271
+
+Criterio (th e I: max|dif| <= 1e-12; saturado: 0 diferencias): PASS
+Senales de la planta: max|dif| x = 0 mm, y = 0 mm
+FIN F1

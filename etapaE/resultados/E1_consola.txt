@@ -1,4 +1,4 @@
-ETAPA E - E1_verificar_equivalencia_BoP   (2026-11-06 09:46:03)
+ETAPA E - E1_verificar_equivalencia_BoP   (2026-11-06 10:38:09)
 Version: 26.1.0.3346908 (R2026a) Update 5
 Caso D1_requisitos  eje 1: 194 cuadros, saturado en 0, habilitado desde el cuadro 16
 Caso D2_sat_con_AW  eje 1: 179 cuadros, saturado en 9, habilitado desde el cuadro 1
@@ -24,6 +24,4 @@ Caso D4_dos_ejes    eje 2: 269 cuadros, saturado en 0, habilitado desde el cuadr
 
 Resultado: Parte A PASS, Parte B PASS
 FIN E1
-Updating Model Advisor cache...
-Model Advisor cache updated. For new customizations, to update the cache, use the Advisor.Manager.refresh_customizations method.
 E2_generar_codigo_BoP
