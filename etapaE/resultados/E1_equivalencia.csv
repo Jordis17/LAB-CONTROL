@@ -1,0 +1,6 @@
+caso,eje,A_th_maxdif,A_th_rmse,A_th_igual,A_I_maxdif,A_I_rmse,A_sat_distintos,B_th_maxdif,B_th_rmse,B_th_igual,B_I_maxdif,B_I_rmse,B_sat_distintos
+D1_requisitos,1,0,0,1,0,0,0,0,0,1,0,0,0
+D2_sat_con_AW,1,0,0,1,0,0,0,0,0,1,0,0,0
+D3_desnivel,1,0,0,1,0,0,0,0,0,1,0,0,0
+D4_dos_ejes,1,0,0,1,0,0,0,0,0,1,0,0,0
+D4_dos_ejes,2,0,0,1,0,0,0,0,0,1,0,0,0

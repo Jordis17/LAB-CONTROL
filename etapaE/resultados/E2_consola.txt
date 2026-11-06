@@ -1,0 +1,41 @@
+ETAPA E - E2_generar_codigo_BoP   (2026-11-06 09:54:44)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+Configuracion de generacion:
+  SystemTargetFile         ert.tlc
+  CodeInterfacePackaging   Reusable function
+  ProdHWDeviceType         Generic->32-bit Embedded Processor
+  ProdBitPerInt            32
+  ProdBitPerDouble         64
+  ProdEndianess            Unspecified
+  ObjectivePriorities      Execution efficiency, Traceability
+  Solver                   FixedStepDiscrete
+  FixedStep                Ts_ctrl
+{Error using coder.internal.slBuildAll
+MATLAB session parameter 'CodeGenFolder' is set to
+/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/build
+and the current directory is
+/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE,
+which contains a code generation folder. For clarity about the
+location of the latest generated code, before you start a build, you
+may:
+
+Error in coder.internal.slBuildAll
+
+Error in coder.internal.slBuildAll
+
+Error in coder.internal.codegenAndCompile
+
+Error in coder.internal.buildSimulinkModel
+
+Error in slbuild
+
+Error in slbuild
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('E2_generar_codigo_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E2_generar_codigo_BoP.m', 53)" style="font-weight:bold">E2_generar_codigo_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E2_generar_codigo_BoP.m',53,0)">line 53</a>)
+slbuild(mdl);
+^^^^^^^^^^^^^
+Suggested Actions:
+    • Delete build artifacts in current folder '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP_ert_rtw'. - <a href="matlab:coder.internal.removeDirectory('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP_ert_rtw');">Fix</a>
+    • Navigate to a folder that does not contain a code generation folder. Then, rebuild.
+ - <a href="matlab:interactive_actions_helper.displayMStack([struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/slBuildAll.p','line',0,'name','coder.internal.slBuildAll'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/slBuildAll.p','line',0,'name','coder.internal.slBuildAll'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/slBuildAll.p','line',0,'name','coder.internal.slBuildAll'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/codegenAndCompile.p','line',0,'name','coder.internal.codegenAndCompile'),struct('file','/usr/local/MATLAB/R2026a/toolbox/coder/simulinkcoder_core/+coder/+internal/buildSimulinkModel.p','line',0,'name','coder.internal.buildSimulinkModel'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/core/general/slbuild.p','line',0,'name','slbuild'),struct('file','/usr/local/MATLAB/R2026a/toolbox/simulink/core/general/slbuild.p','line',0,'name','slbuild'),struct('file','/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E2_generar_codigo_BoP.m','line',53,'name','E2_generar_codigo_BoP')]);">Show complete stack trace</a>
+} 

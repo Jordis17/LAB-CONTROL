@@ -1,0 +1,31 @@
+ETAPA E - E0_build_Controller_BoP   (2026-11-06 09:37:17)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+Parametros cargados de etapaC/resultados/C1_controlador.mat (Ts_ctrl = 0.033333 s)
+Bloque ley_control: 12 entradas, 3 salidas
+Hardware de produccion: Generic->32-bit Embedded Processor (ESP32: Xtensa LX6, 32 bits)
+Objetivos del Code Generation Advisor: Execution efficiency, Traceability
+[Warning: Automated layout might not improve upon original layout.] 
+[> In Simulink.BlockDiagram.arrangeSystem
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('E0_build_Controller_BoP', '/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E0_build_Controller_BoP.m', 132)" style="font-weight:bold">E0_build_Controller_BoP</a> (<a href="matlab: opentoline('/home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/E0_build_Controller_BoP.m',132,0)">line 132</a>)] 
+
+Modelo guardado: /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaE/Controller_BoP.slx
+
+Interfaz:
+  entrada 1: r_mm         double
+  entrada 2: x_hat_mm     double
+  entrada 3: v_hat_mm_s   double
+  entrada 4: habilitado   boolean
+  salida  1: th_cmd_rad
+  salida  2: I_rad
+  salida  3: saturado
+Parametros (valor, workspace base):
+  BoP_Kp      = 0.0005954888325   Ganancia proporcional [rad/mm]
+  BoP_Ki      = 0.000396992555   Ganancia integral continua [rad/(mm s)]
+  BoP_Kd      = 0.0004516187306   Ganancia derivativa, sobre v_hat del Kalman [rad/(mm/s)]
+  BoP_Ts      = 0.03333333333   Periodo usado en la integral [s]
+  BoP_th_lim  = 0.1745329252   Saturacion de la inclinacion pedida [rad]
+  BoP_e_clip  = 30   Recorte del error que entra al integrador [mm]
+  BoP_v_int   = 25   Umbral de bola quieta [mm/s]
+  BoP_Nq      = 4   Cuadros seguidos con la bola quieta para integrar [-]
+Configuracion: FixedStepDiscrete, paso Ts_ctrl, ert.tlc, Reusable function
+FIN E0

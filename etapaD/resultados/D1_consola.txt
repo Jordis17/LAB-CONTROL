@@ -1,0 +1,93 @@
+ETAPA D - D1_MIL_BoP   (2026-11-06 09:36:55)
+MATLAB 26.1.0.3346908 (R2026a) Update 5
+
+=== Parametros de la planta (A0_parametros_BoP) ===
+  g            =   9810.0 mm/s^2
+  r_bola       =    20.00 mm      MEDIDO
+  c_rod        =   0.7143 -       NOMINAL 5/7 (identificar en la Etapa B)
+  k = J/(m r^2)=   0.4000 -       derivado de c
+  h_sup        =    49.00 mm      cara superior del plato sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  h            =    69.00 mm      centro de la bola sobre la junta, DISENO (pivote supuesto a media altura de la junta)
+  d            =    70.00 mm      DISENO
+  r_brazo      =    24.00 mm      DISENO
+  z_rot        =    26.20 mm      DISENO (derivado)
+  H_serv       =   136.00 mm      DISENO (derivado)
+  L_var        =   162.20 mm      DISENO
+  sigma_brazo  =       -1         DISENO (artefacto del ensamble)
+  phi_max      =    45.00 deg     HOJA_DATOS
+  omega_srv    =    600.0 deg/s   HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+  T_pwm        =   0.0200 s
+  Ts           =   0.0333 s       PENDIENTE medir (nominal 30 fps)
+  retardo      =   0.0750 s       ESTIMADO a priori, no medido
+  H_cam        =    450.0 mm      MEDIDO
+  x_max        =    127.0 mm
+
+Controlador (C1, 2026-11-06 09:36:55): Kp = 0.03412 deg/mm, Kd = 0.02588 deg/(mm/s), Ki = 0.02275 deg/(mm s),
+  th_lim = 10.0 deg, e_clip = 30 mm, v_int = 25 mm/s, Nq = 4, Kalman sigma_a = 500, sigma_m = 1
+Actuador: medido (relacion servo-plato; ver etapaD/funciones/bop_actuador.m)
+Simulacion: dt = Ts/33, retardo total 0.075 s (medicion 0.065 s + PWM), servo omega_n = 50 rad/s,
+  ruido de camara 1.00 mm (semilla 1), velocidad del servo 600 deg/s.
+
+=== D1. Ensayo de requisitos: x0 = 100 mm, r = 0 ===
+    x0 = 99.4 mm, r = 0.0 mm: tr = 0.77 s, ts = 1.30 s, Mp = 4.4 %, ess = 0.18 mm
+    max|x_hat| = 100.6 mm, max|x| plato = 102.7 mm, th_cmd en [-1.87, 3.79] deg, saturado 0.0 % (0.00 s), std th en reposo 0.281 deg
+  Verificacion de requisitos:
+    R1 ts  =  1.30 s   <= 3.0 s   -> CUMPLE
+    R2 Mp  =   4.4 %   <= 20 %    -> CUMPLE
+    R3 ess =  0.18 mm  <= 3.0 mm  -> CUMPLE
+    R4 max|x| (plato) = 102.7 mm <= 127 mm -> CUMPLE
+
+=== D2. Saturacion y anti-windup: empujon de 420 mm/s desde el centro, desnivel 1 deg ===
+  (1) actuador ideal, sin saturacion
+    max|x_hat| = 117.7 mm, max|x| plato = 127.1 mm, th_cmd en [-4.69, 12.42] deg, u en [-4.69, 12.42] deg
+    saturado 0.0 % del tiempo (0.00 s); integrador en [-1.032, 0.000] deg; |x_hat| < 3 mm desde 5.40 s; ess = 1.48 mm
+    AVISO: la bola pasa |x| = 127 mm.
+  (2) saturado, sin anti-windup
+    max|x_hat| = 125.1 mm, max|x| plato = 133.0 mm, th_cmd en [-4.47, 10.00] deg, u en [-4.47, 12.44] deg
+    saturado 5.0 % del tiempo (0.30 s); integrador en [-1.041, 0.000] deg; |x_hat| < 3 mm desde 5.70 s; ess = 4.49 mm
+    AVISO: la bola pasa |x| = 127 mm.
+  (3) saturado, con anti-windup
+    max|x_hat| = 125.1 mm, max|x| plato = 133.0 mm, th_cmd en [-4.47, 10.00] deg, u en [-4.47, 12.44] deg
+    saturado 5.0 % del tiempo (0.30 s); integrador en [-1.041, 0.000] deg; |x_hat| < 3 mm desde 5.70 s; ess = 4.49 mm
+    AVISO: la bola pasa |x| = 127 mm.
+  (2b) PID clasico, saturado, sin anti-windup
+    max|x_hat| = 125.1 mm, max|x| plato = 133.0 mm, th_cmd en [-4.03, 10.00] deg, u en [-4.03, 12.62] deg
+    saturado 5.6 % del tiempo (0.33 s); integrador en [-1.175, 1.808] deg; |x_hat| < 3 mm desde NaN s; ess = 2.97 mm
+    AVISO: la bola pasa |x| = 127 mm.
+  (3b) PID clasico, saturado, con anti-windup
+    max|x_hat| = 125.1 mm, max|x| plato = 133.0 mm, th_cmd en [-3.93, 10.00] deg, u en [-3.93, 12.45] deg
+    saturado 5.0 % del tiempo (0.30 s); integrador en [-1.153, 1.342] deg; |x_hat| < 3 mm desde NaN s; ess = 2.40 mm
+    AVISO: la bola pasa |x| = 127 mm.
+
+=== D3. Perturbacion: desnivel de 1 deg en X, bola en el centro ===
+  max|x_hat| = 29.0 mm, ess (ultimo s) = 0.27 mm, recupera |x_hat| < 3 mm a los 7.43 s
+  Error que dejaria un PD: desnivel/Kp = 29.3 mm
+
+=== D4. Dos ejes: (80, -60) -> (0, 0) y a los 4,5 s -> (50, 50) ===
+  Eje X, tramo 1 (x0 = 79 -> 0):  tr = 0.77 s, ts = 3.37 s, Mp = 5.4 %, ess = 2.23 mm, th en [-1.6, 3.1] deg
+  Eje X, tramo 2 (0 -> 50):         tr = 0.63 s, ts = 4.00 s, Mp = 14.1 %, ess = 1.46 mm, th en [-2.1, 1.5] deg
+  Eje Y, tramo 1 (x0 = -59 -> 0):  tr = 0.73 s, ts = 3.43 s, Mp = 9.4 %, ess = 2.61 mm, th en [-2.4, 1.5] deg
+  Eje Y, tramo 2 (0 -> 50):         tr = 0.63 s, ts = 4.20 s, Mp = 16.7 %, ess = 3.04 mm, th en [-1.9, 1.3] deg
+  max distancia al centro (marco del plato): 102.7 mm
+
+=== D5. Robustez: ensayo D1 con un parametro cambiado a la vez ===
+  caso                     ts[s]   Mp[%]  ess[mm]  max|x|[mm]  std th ss[deg]  cumple
+  nominal                   1.30     4.4    0.18      102.7         0.281      CUMPLE
+  retardo 120 ms            3.03     5.0    0.14      102.6         0.290      NO CUMPLE
+  c = 0,685                 1.30     4.2    0.25      102.6         0.280      CUMPLE
+  h_sup = 40 mm             1.30     4.5    0.18      102.3         0.281      CUMPLE
+  h_sup = 60 mm             1.30     4.4    0.18      103.1         0.281      CUMPLE
+  servos a 6 V              1.30     4.4    0.18      102.7         0.281      CUMPLE
+  servo lento (wn = 30)     1.17     4.8    0.11      102.1         0.279      CUMPLE
+  ruido 0,3 mm              1.30     3.0    0.08      102.5         0.084      CUMPLE
+  ruido 2 mm                4.90     6.5    0.96      102.9         0.564      NO CUMPLE
+  actuador del diseno       1.30     4.3    0.15      102.9         0.281      CUMPLE
+  firmware sin tabla        4.73    23.8    0.78       80.2         0.296      NO CUMPLE
+
+=== D6. Planta lineal vs no lineal en lazo cerrado ===
+  Ensayo D1: lineal ts = 1.30 s, Mp = 4.0 %, max|x| = 102.5 mm | no lineal ts = 1.30 s, Mp = 4.4 %, max|x| = 102.7 mm | max|x_nl - x_lin| = 1.76 mm
+  Ensayo D2: lineal ts = NaN s, Mp = NaN %, max|x| = 127.8 mm | no lineal ts = NaN s, Mp = NaN %, max|x| = 133.0 mm | max|x_nl - x_lin| = 9.92 mm
+
+Resultados en /home/ablopez@estudiantes.ie.tec.ac.cr/Downloads/git/LAB_Control/LAB-CONTROL/etapaD/resultados
+FIN D1
+cd ../etapaE, E0_build_Controller_BoP, E1_verificar_equivalencia_BoP
