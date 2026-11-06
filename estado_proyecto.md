@@ -24,7 +24,7 @@
 | C — Diseño del controlador | **Corrida en MATLAB (2026-11-06)**: Kp 0,03412 °/mm, Kd 0,02588 °/(mm/s), Ki 0,02275 °/(mm·s), θ_lim 10°, PM 40,9°, GM +11,8/−12,6 dB, estable. Provisional hasta tener la Etapa B. |
 | D — MIL | **Corrida en MATLAB (2026-11-06)** con el actuador medido: D1 cumple R1–R4 (ts 1,30 s, Mp 4,4 %, ess 0,18 mm, max 102,7 mm). Robustez: no cumple ts con retardo de 120 ms (3,03 s), ruido de 2 mm (4,9 s) ni firmware sin tabla (4,7 s, Mp 23,8 %). Provisional hasta tener la Etapa B. |
 | E — Preparación y generación de código | **Completada (2026-11-06, MATLAB R2026a).** `Controller_BoP.slx` separado de la planta (12 entradas al bloque, 3 salidas). E1: igual al MIL bit a bit. Code Generation Advisor: 0 Fail, 5 Warning justificados. E2: código generado e inspección PASS; tabla modelo ↔ código en `etapaE/tabla_modelo_codigo.md`; el código C compilado con gcc reproduce el MIL (diferencia ≤ 4e-11 rad, por el redondeo de los CSV). |
-| F — SIL | No iniciada |
+| F — SIL | **En curso (2026-11-06).** Banco `BoP_Test_SIL.slx` por script (F0) y comparación Normal vs SIL (F1) escritos; la planta del banco se probó en Octave en lazo cerrado. Falta correr F0 y F1 en MATLAB. Ver `etapaF/LEEME_etapaF.md`. |
 | G — PIL | No iniciada |
 | H — Implementación física | No iniciada |
 
