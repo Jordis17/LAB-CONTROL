@@ -8,7 +8,8 @@ function rtwTargetInfo(tr)
 % ESP32WROOMdevkitC_38Board esa propiedad es 0 (G0c, 2026-11-06), asi que la
 % ESP32 queda sin conexion PIL.
 %
-% Que hace: registra "ESP32 BoP (Arduino PIL)", que usa la MISMA clase de
+% Que hace: registra "ESP32 BoP (Arduino PIL)", que usa una subclase sin cambios
+% (+bop_pil/ConnectivityConfigESP32.m) de la clase de
 % conexion del paquete (codertarget.arduinotarget.pil.ConnectivityConfig:
 % compilacion con la toolchain ESP32 del paquete, carga y comunicacion serie)
 % y la declara compatible solo con modelos cuya placa sea una ESP32.
@@ -22,7 +23,7 @@ end
 function config = loc_crear
 config = rtw.connectivity.ConfigRegistry;
 config.ConfigName = 'ESP32 BoP (Arduino PIL)';
-config.ConfigClass = 'codertarget.arduinotarget.pil.ConnectivityConfig';
+config.ConfigClass = 'bop_pil.ConnectivityConfigESP32';  % subclase sin cambios de la del paquete
 config.isConfigSetCompatibleFcn = @loc_compatible;
 end
 

@@ -31,8 +31,8 @@ habilitado para la ESP32.
 
 **Alternativa de ingeniería (ruta elegida, porque el equipo no tiene otra placa):**
 `pil_esp32/rtwTargetInfo.m` registra una configuración de conexión PIL propia, "ESP32 BoP
-(Arduino PIL)". Usa la misma clase de conexión del paquete
-(`codertarget.arduinotarget.pil.ConnectivityConfig`), que compila con la toolchain ESP32 del
+(Arduino PIL)". Usa una subclase sin cambios (`pil_esp32/+bop_pil/ConnectivityConfigESP32.m`) de la clase de conexión del paquete
+(`codertarget.arduinotarget.pil.ConnectivityConfig`). Hace falta la subclase porque Simulink no deja registrar la misma clase en dos configuraciones, que compila con la toolchain ESP32 del
 paquete, graba la placa y se comunica por el puerto serie, y la declara compatible con modelos
 cuya placa sea una ESP32. Es el mecanismo documentado por MathWorks para agregar PIL a un
 procesador (*Create PIL Target Connectivity Configuration*). No se modifica ningún archivo del
