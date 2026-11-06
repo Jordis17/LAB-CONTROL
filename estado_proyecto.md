@@ -248,3 +248,15 @@ Qué debe conservarse: etapaG/resultados/, pil_esp32/, Controller_BoP_ESP32.slx 
 Siguiente etapa: B — identificación con el prototipo (pendiente desde el inicio). Después,
   actualizar los parámetros, repetir C y D (y E a G si cambian las ganancias) y pasar a H.
 ```
+
+## Mediciones de la cámara (2026-11-06, `datos_prototipo/camara/`)
+
+| Dato | Resultado | Nota |
+|---|---|---|
+| Exposición y balance | Fijos: manual, 5 ms, 4600 K, sin framerate dinámico (`v4l2-ctl --list-ctrls`) | El aviso "no quedó bloqueada" era un error de lectura del pipeline, ya corregido |
+| Periodo, YUYV, 1 buffer | 38,1 ms de media (26,2 fps); 14,7 % de cuadros perdidos | Configuración anterior |
+| Periodo, MJPG, 1 buffer | 48,9 ms (20,5 fps); 46 % de cuadros perdidos | Se descarta MJPG |
+| **Periodo, YUYV, 2 buffers** | **33,25 ms (30,1 fps); desv. 1,9 ms; 0 % perdidos; 100 % dentro de ±5 ms del nominal** | Cumple el criterio. Queda `CAMERA_BUFFERS = 2` |
+| Latencia (YUYV, 1 buffer, incluye el monitor) | Mediana de 59,6 / 60,2 / 60,5 ms (3 corridas) | Falta medirla con 2 buffers |
+| Ruido (bola quieta) | Desv. de 0,12 mm en el centro y 0,09 mm en la esquina | El diseño supuso 1 mm (`MEAS_NOISE_STD_MM`) |
+| Esquina en Y = 132,4 mm | Fuera del rango físico (máximo 127 mm) | **Revisar la calibración** con 5 puntos medidos con regla antes de B1 y B2 |

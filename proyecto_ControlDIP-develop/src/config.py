@@ -16,10 +16,12 @@ FRAME_FPS = 30
 # MJPG o YUYV. Cual conviene se decide con run_benchmark.py --period en cada
 # una de las dos; gana la que de menor periodo y menor jitter.
 FOURCC = "YUYV"
-# Buffers de captura de V4L2. 1 da la menor latencia, pero puede hacer que
-# el driver pierda cuadros (periodos de 66 ms). Se compara con
-# run_benchmark.py --period --buffers N (2026-11-06).
-CAMERA_BUFFERS = 1
+# Buffers de captura de V4L2. Medido el 2026-11-06 (GW600, YUYV 640x480,
+# datos_prototipo/camara/periodo_YUYV_b*.txt): con 1 buffer se pierde el
+# 14,7 % de los cuadros (periodos de 64 ms, 26,2 fps); con 2 y con 4, ninguno
+# (media 33,25 ms, 30,1 fps, desv. 1,9 ms). Se usa 2. PENDIENTE: medir la
+# latencia con 2 buffers (run_benchmark.py --latency --buffers 2).
+CAMERA_BUFFERS = 2
 
 # exposure_time_absolute va en unidades de 100 us, asi que 50 = 5.0 ms.
 # El valor anterior (157 = 15.7 ms) era casi medio periodo de frame: una bola
