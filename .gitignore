@@ -25,6 +25,7 @@ codegen/
 # Carpeta de generacion de E2 (lo que importa se copia a etapaE/codigo_generado/)
 etapaE/build/
 etapaF/build/
+etapaG/build/
 
 # ---- Octave
 octave-workspace
