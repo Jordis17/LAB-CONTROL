@@ -17,7 +17,7 @@ bola siempre rueda cuesta abajo: **|a| = c·g·|sin θ| − f**.
 
 ## 2. Cómo hacer los ensayos (PC con Linux)
 
-**Preparación:**
+**Preparación:** el sketch está en `firmware/prueba_servos/prueba_servos.ino` (necesita la librería ESP32Servo).
 - Carguen en la ESP32 el sketch **`prueba_servos.ino`**, no el del lazo, porque aquí el plato
   tiene que quedarse fijo.
 - La ESP32 va conectada a la PC con Linux. Para mandarle comandos desde una terminal:
