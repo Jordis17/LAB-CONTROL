@@ -118,6 +118,8 @@ set_param(mdl, 'GenCodeOnly', 'on', 'GenerateReport', 'on', 'LaunchReport', 'off
     'CodeInterfacePackaging', 'Reusable function');
 try
     set_param(mdl, 'ProdHWDeviceType', 'Generic->32-bit Embedded Processor');
+    % Agregado el 2026-11-06 (ver E3): necesarios para SIL en la PC y propios de la ESP32
+    set_param(mdl, 'ProdEndianess', 'LittleEndian', 'ProdIntDivRoundTo', 'Zero', 'PortableWordSizes', 'on');
     fprintf('Hardware de produccion: Generic->32-bit Embedded Processor (ESP32: Xtensa LX6, 32 bits)\n');
 catch err
     fprintf('AVISO: no se pudo fijar ProdHWDeviceType (%s)\n', err.message);

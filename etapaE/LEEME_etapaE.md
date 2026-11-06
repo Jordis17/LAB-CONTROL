@@ -116,3 +116,13 @@ correspondencia modelo ↔ código. Esa tabla se completa cuando llegue el códi
 - Confirmar la versión de MATLAB y que estén Embedded Coder y Simulink Coder (salida de `ver`).
 - **ProdHWDeviceType** queda en "Generic → 32-bit Embedded Processor" porque el modelo exacto
   de la placa ESP32 está PENDIENTE. La placa concreta se fija para PIL (Etapa G).
+
+## 7. Configuración de hardware para SIL (E3, 2026-11-06)
+
+La primera corrida de F1 falló porque el SIL compila el código en la PC (64 bits) y la
+configuración de producción era "Generic → 32-bit" con el orden de bytes y el redondeo de la
+división entera sin definir. `E3_config_hardware_BoP.m` fija en `Controller_BoP.slx`:
+`ProdEndianess = LittleEndian` y `ProdIntDivRoundTo = Zero` (propios de la ESP32; eran las
+advertencias 2 y 3 del Advisor) y `PortableWordSizes = on` (para que el mismo código compile en
+la PC). **No cambia el algoritmo.** Como el modelo de referencia cambia de versión, después de
+E3 se repiten E1 y E2. E0 ya incluye estos valores para futuras reconstrucciones.
