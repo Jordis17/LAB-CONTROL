@@ -50,25 +50,25 @@ Para cada eje y cada ángulo:
 
 Ángulos: unos **4°, 6° y 8°** de plato en cada sentido. Con ángulos más chicos, el error de la
 app (~0,1°) pesa demasiado. Comandos aproximados, según la tabla medida (el plato queda
-horizontal con más o menos `X 2.5` e `Y 7`):
+horizontal con más o menos `X 7` e `Y 2.5`). **Desde el 2026-11-09, `prueba_servos.ino` usa GPIO19 para X y GPIO18 para Y, porque los servos estaban cruzados.** Por eso las columnas X e Y de esta tabla quedaron intercambiadas respecto de la versión anterior:
 
 | Inclinación buscada | Eje X | Eje Y |
 |---|---|---|
-| Lado + arriba ~4° | `X -6` | `Y -1` |
-| Lado + arriba ~6° | `X -10` | `Y -4` |
-| Lado + arriba ~8° | `X -13` | `Y -8` |
-| Lado + abajo ~4° | `X 10` | `Y 16` |
-| Lado + abajo ~6° | `X 17` | `Y 21` |
-| Lado + abajo ~8° | `X 25` | `Y 28` |
+| Lado + arriba ~4° | `X -1` | `Y -6` |
+| Lado + arriba ~6° | `X -4` | `Y -10` |
+| Lado + arriba ~8° | `X -8` | `Y -13` |
+| Lado + abajo ~4° | `X 16` | `Y 10` |
+| Lado + abajo ~6° | `X 21` | `Y 17` |
+| Lado + abajo ~8° | `X 28` | `Y 25` |
 
 Lo que importa es el ángulo que **midan**, no que caiga exacto. Son 6 ángulos × 3
 repeticiones × 2 ejes = 36 corridas. Si no alcanza el tiempo, hagan el eje X completo.
 
 ### B2: bola contra el borde
 
-1. Pongan el plato horizontal (`X 2.5`, `Y 7`, revisando con la app) y la bola **quieta contra
+1. Pongan el plato horizontal (`X 7`, `Y 2.5`, revisando con la app) y la bola **quieta contra
    el borde +X**. Registren 3 s. Anoten el ángulo X de la app.
-2. **Bajen el lado +X** a ~4° y después a ~8° (comando X positivo). La bola sigue contra el
+2. **Bajen el lado +X** a ~4° (`X 16`) y después a ~8° (`X 28`). La bola sigue contra el
    borde. Registren 3 s en cada ángulo y anoten la app.
 3. Repitan contra el borde −X (comandos negativos) y, si hay tiempo, con +Y y −Y.
 

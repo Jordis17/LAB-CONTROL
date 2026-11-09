@@ -83,3 +83,16 @@ Lectura:
   en Y según el ajuste (≈ +33 µs y +76 µs).
 - **Para el firmware:** comando_servo = −g⁻¹(θ_cmd), donde g es la relación medida. El signo
   negativo viene de que un pulso mayor baja el lado.
+
+
+## Corrección 2026-11-09: servos cruzados
+
+El equipo confirmó que el servo conectado a **GPIO18** (comando `X` de `prueba_servos.ino` en
+las mediciones) es en realidad el del **lado +Y**, y el de **GPIO19** es el del **lado +X**. Por
+eso, en todas las tablas de esta carpeta:
+- `th_plato_X_deg` / `thx_deg` corresponden al **servo del eje Y** (GPIO18);
+- `th_plato_Y_deg` / `thy_deg` corresponden al **servo del eje X** (GPIO19).
+
+Los archivos no se modifican, porque son el dato crudo. Los firmware usan ahora
+`PIN_X = 19` y `PIN_Y = 18`, con las filas de la tabla intercambiadas: cada fila sigue al servo
+físico con el que se midió. Los comandos que nivelan el plato quedan en X ≈ +6,9° e Y ≈ +2,9°.

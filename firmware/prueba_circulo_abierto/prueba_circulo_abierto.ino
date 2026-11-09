@@ -30,8 +30,8 @@
 #include <ESP32Servo.h>
 #include <math.h>
 
-const int PIN_X = 18;
-const int PIN_Y = 19;
+const int PIN_X = 19;  // (2026-11-09) el servo del lado +X esta en GPIO19 y el del +Y en GPIO18 (estaban cruzados)
+const int PIN_Y = 18;
 const float RAMPA_CICLOS = 10.0f;  // vueltas que tarda la amplitud en llegar a A (rampa de coseno)
 const float A_MAX = 11.0f;         // deg: el plato llega a +-11,3 deg en los dos ejes (tabla medida)
 
@@ -40,8 +40,10 @@ const float A_MAX = 11.0f;         // deg: el plato llega a +-11,3 deg en los do
 const int NTAB = 9;
 const float CMD_TAB[NTAB] = {-40, -30, -20, -10, 0, 10, 20, 30, 40};
 const float TH_TAB[2][NTAB] = {
-  {22.4f, 18.9f, 12.3f, 6.1f, 1.3f, -3.9f, -6.9f, -9.2f, -12.1f},   // eje X
-  {25.9f, 20.8f, 14.9f, 9.2f, 3.5f, -1.5f, -5.8f, -8.5f, -11.3f}    // eje Y
+  // (2026-11-09) Filas intercambiadas: cada fila es la de un SERVO fisico. La columna
+  // thx de la tabla medida es del servo en GPIO18, que resulto ser el del eje Y.
+  {25.9f, 20.8f, 14.9f, 9.2f, 3.5f, -1.5f, -5.8f, -8.5f, -11.3f},   // eje X (servo en GPIO19)
+  {22.4f, 18.9f, 12.3f, 6.1f, 1.3f, -3.9f, -6.9f, -9.2f, -12.1f}    // eje Y (servo en GPIO18)
 };
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;

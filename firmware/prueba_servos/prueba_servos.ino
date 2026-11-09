@@ -5,8 +5,8 @@
 //   C       -> ambos al neutro
 #include <ESP32Servo.h>
 
-const int PIN_X = 18;          // cambiar si se usa otro pin
-const int PIN_Y = 19;
+const int PIN_X = 19;          // cambiar si se usa otro pin  // (2026-11-09) el servo del lado +X esta en GPIO19 y el del +Y en GPIO18 (estaban cruzados)
+const int PIN_Y = 18;
 const int US_NEUTRO = 1500;    // pulso del neutro [us]
 const float US_POR_GRADO = 1000.0 / 90.0;   // hoja de datos: 1 ms a 2 ms ~ 90 grados
 const float LIM = 45.0;        // tope fisico del servo [grados]

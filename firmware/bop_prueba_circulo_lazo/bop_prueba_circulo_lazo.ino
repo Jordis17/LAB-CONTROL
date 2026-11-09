@@ -42,8 +42,8 @@
 #include <math.h>
 
 // ---------------------------------------------------------------- Pines ---
-const int PIN_X   = 18;   // senal servo X
-const int PIN_Y   = 19;   // senal servo Y
+const int PIN_X   = 19;   // senal servo X  // (2026-11-09) el servo del lado +X esta en GPIO19 y el del +Y en GPIO18 (estaban cruzados)
+const int PIN_Y   = 18;   // senal servo Y
 const int PIN_LED = 2;    // LED azul de la placa
 const int PIN_BTN = 0;    // boton BOOT (activo en bajo)
 
@@ -99,8 +99,10 @@ const float SALTO_MM = 60.0f;        // mm por cuadro (1800 mm/s): mas que esto 
 const int NTAB = 9;
 const float CMD_TAB[NTAB] = {-40, -30, -20, -10, 0, 10, 20, 30, 40};
 const float TH_TAB[2][NTAB] = {
-  {22.4f, 18.9f, 12.3f, 6.1f, 1.3f, -3.9f, -6.9f, -9.2f, -12.1f},   // eje X
-  {25.9f, 20.8f, 14.9f, 9.2f, 3.5f, -1.5f, -5.8f, -8.5f, -11.3f}    // eje Y
+  // (2026-11-09) Filas intercambiadas: cada fila es la de un SERVO fisico. La columna
+  // thx de la tabla medida es del servo en GPIO18, que resulto ser el del eje Y.
+  {25.9f, 20.8f, 14.9f, 9.2f, 3.5f, -1.5f, -5.8f, -8.5f, -11.3f},   // eje X (servo en GPIO19)
+  {22.4f, 18.9f, 12.3f, 6.1f, 1.3f, -3.9f, -6.9f, -9.2f, -12.1f}    // eje Y (servo en GPIO18)
 };
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;

@@ -307,3 +307,15 @@ Firmware `bop_prueba_circulo_lazo` con telemetría y `MEAS_NOISE_STD_MM = 1.0`. 
    parámetros. Hay que repetir el ensayo con el firmware corregido.
 5. **Calibración:** la visión reporta hasta ±158 mm, y el máximo físico es 127 mm. Sigue
    pendiente la comprobación con 5 puntos medidos con regla.
+
+### Servos cruzados (2026-11-09)
+
+En el video del modo centro, la bola quedaba pegada al borde Y ≈ +120 mm. El equipo confirmó que
+**el servo de GPIO18 es el del eje Y y el de GPIO19 el del eje X**: el firmware tenía los pines al
+revés, así que cada eje se corregía moviendo el otro.
+- Corregido en todos los firmware (`PIN_X = 19`, `PIN_Y = 18`, filas de la tabla servo → plato
+  intercambiadas para que cada una siga a su servo físico).
+- Tablas de comandos de `etapaB/LEEME_etapaB.md`, `docs/conexiones_esp32_servos.html` y
+  `datos_prototipo/mecanica/LEEME.md` actualizados.
+- Probablemente esto también explica el comportamiento errático de las pruebas anteriores.
+  Pendiente: probar el modo centro con el firmware corregido.
