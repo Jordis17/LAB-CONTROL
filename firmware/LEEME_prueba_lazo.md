@@ -195,3 +195,7 @@ banderas, inclinación aplicada y salida de la ley por eje, integradores, refere
 la x recibida. `main_vision.py` la guarda en las columnas `tel_*` del log. El formato está al
 principio del `.ino`. La usa `etapaB/B3_identificar_lazo_cerrado_BoP.m`. Los firmware v1 y v2 no
 mandan telemetría y siguen funcionando igual: las columnas quedan vacías.
+
+**Lectura serie (2026-11-09).** Con la lectura byte a byte, la ESP32 atendía una trama cada 40 ms
+y el lazo trabajaba con 0,6 s de atraso (`estado_proyecto.md`). `bop_prueba_circulo_lazo` ahora
+lee en bloque y usa solo la trama más nueva. **Los firmware v1 y v2 siguen con la lectura vieja.**

@@ -39,7 +39,10 @@ BORDE = 110;                 % mm: se descartan ventanas con la bola mas afuera 
 A_MAX = 2500;                % mm/s^2: aceleracion medida (segunda diferencia de x_raw) que el plato
                              % no puede producir (c g sin 11 deg ~ 1400): mano, choque o falsa deteccion
 N_IC = 6;                    % cuadros al inicio de cada ventana de validacion para estimar x0 y v0
-taus = 0:0.005:0.200;        % s, grilla del retardo
+MOV_MIN = 15;                % mm: recorrido minimo de la bola en la ventana (en algun eje); con la
+                             % bola quieta c no se puede estimar (log 2026-11-09: daba c < 0 en Y)
+taus = -0.040:0.005:0.250;   % s, grilla del retardo (puede ser algo negativo: la orden
+                             % se aplica antes de que la PC reciba la telemetria)
 dtf = 1e-3;                  % s, paso de integracion
 
 carpeta = fileparts(mfilename('fullpath'));
@@ -72,14 +75,14 @@ for i = 1:numel(E)
     if ~isfield(L,'tel_thx') || all(isnan(L.tel_thx))
         fprintf('  %-32s SIN telemetria (firmware sin tel_*): se descarta\n', E(i).archivo);  continue
     end
-    [th, s, coinc] = b3_alinear_telemetria(L);
+    [th, atraso, coinc] = b3_alinear_telemetria(L);
     t = L.t - L.t(1);
     nw = round(W/median(diff(t)));
     % aceleracion medida por segunda diferencia (independiente del modelo), sobre
     % la posicion corregida por la inclinacion: cuando el plato gira rapido la
     % camara ve moverse la bola aunque no se mueva sobre el plato (paralaje).
-    % Inclinacion aproximada en cada cuadro: la pedida dos cuadros antes (~70 ms).
-    thc = deg2rad([zeros(2,2); th(1:end-2,:)]);  thc(isnan(thc)) = 0;
+    % Inclinacion aproximada en cada cuadro: la ultima orden recibida.
+    thc = deg2rad(th);  thc(isnan(thc)) = 0;
     xc = b_corregir_inclinacion(SIGNO_VIS(1)*L.x_raw, thc(:,1), P);
     yc = b_corregir_inclinacion(SIGNO_VIS(2)*L.y_raw, thc(:,2), P);
     acc = zeros(L.n, 1);
@@ -94,19 +97,30 @@ for i = 1:numel(E)
     win = zeros(0,2);  k = 1;
     while k + nw - 1 <= L.n - 3
         r = k:(k+nw-1);
-        ok = all(L.detectada(r) == 1) && all(~isnan(th(max(1,r(1)-6):r(end),1))) && ...
+        ok = all(L.detectada(r) == 1) && all(~isnan(th(max(1,r(1)-12):r(end),1))) && ...
              all(abs(L.x_raw(r)) < BORDE) && all(abs(L.y_raw(r)) < BORDE);
         if ok && any(acc(max(2,r(1)-2):r(end)) > A_MAX), ok = false; end
+        if ok && max(max(L.x_raw(r)) - min(L.x_raw(r)), max(L.y_raw(r)) - min(L.y_raw(r))) < MOV_MIN, ok = false; end
         if ok, win(end+1,:) = [r(1) r(end)]; k = k + nw; else, k = k + 1; end %#ok<AGROW>
     end
     D(end+1) = struct('L',L,'th',th,'uso',E(i).uso,'win',win,'nombre',E(i).archivo); %#ok<SAGROW>
-    fprintf('  %-32s %-5s %5d cuadros, corrimiento de telemetria %d (eco coincide %.1f %%), %d ventanas, th: %.1f a %.1f deg\n', ...
-        E(i).archivo, E(i).uso, L.n, s, 100*coinc, size(win,1), min(th(:)), max(th(:)));
+    fprintf('  %-32s %-5s %5d cuadros, %d ventanas, th: %.1f a %.1f deg\n', ...
+        E(i).archivo, E(i).uso, L.n, size(win,1), min(th(:)), max(th(:)));
+    fprintf('    atraso de los datos con que trabajo la ESP32 (eco de x, bola en movimiento): %g cuadros (%.0f %% de ecos encontrados)\n', atraso, 100*coinc);
+    if atraso > 2
+        fprintf('    AVISO: la ESP32 trabajo con datos atrasados %g cuadros (~%.0f ms): problema de comunicacion, no de la planta.\n', atraso, 1000*atraso*median(diff(t)));
+    end
     fprintf('    cuadros con aceleracion medida > %g mm/s^2 (mano, choque o falsa deteccion): %d; sus ventanas se descartan\n', A_MAX, n_mano);
-    if coinc < 0.9, fprintf('    AVISO: el eco de la telemetria coincide poco; revisar el log.\n'); end
 end
 id = find(strcmp({D.uso}, 'ident'));  va = find(strcmp({D.uso}, 'valid'));
 if isempty(id), error('B3:SinIdent','No hay logs "ident" con telemetria.'); end
+nwin = sum(arrayfun(@(d) size(D(d).win,1), id));
+if nwin < 10
+    fprintf(['\nDATOS INSUFICIENTES: solo %d ventanas utiles en los logs "ident" (minimo 10).\n' ...
+             'Hace falta mas tiempo con la bola rodando lejos del borde (circulos, empujones suaves).\n' ...
+             'No se reportan parametros para no dar numeros sin respaldo.\nFIN B3\n'], nwin);
+    return
+end
 
 %% 2. Identificacion: grilla en tau, minimos cuadrados en c, b y condiciones iniciales
 sse = zeros(numel(taus), 2);  par = zeros(numel(taus), 2, 2);  nobs = 0;

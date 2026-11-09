@@ -1,27 +1,37 @@
-function [th, s, coincide] = b3_alinear_telemetria(L)
-%B3_ALINEAR_TELEMETRIA Inclinacion pedida al plato en cada cuadro del log.
+function [th, atraso, coincide] = b3_alinear_telemetria(L)
+%B3_ALINEAR_TELEMETRIA Inclinacion pedida al plato en el instante de cada fila del log.
 %
-%   [th, s, coincide] = b3_alinear_telemetria(L)
+%   [th, atraso, coincide] = b3_alinear_telemetria(L)
 %
-% En el log de main_vision.py, cada fila guarda la ultima telemetria que llego
-% ANTES de mandar la trama de esa fila, o sea la respuesta a una trama
-% anterior. El eco tel_x_rx (x que recibio la ESP32) dice a cual: se busca el
-% corrimiento s (0 a 3 filas) para el que tel_x_rx(k) = x(k - s).
-% th (n x 2, deg): th(j,:) = [tel_thx tel_thy] de la respuesta a la trama j,
-% es decir, la inclinacion que la ESP32 mando al plato despues de recibir el
-% cuadro j (convencion del firmware: th > 0 levanta el lado del servo).
-% coincide: fraccion de filas cuyo eco coincide con ese corrimiento.
+% th (n x 2, deg): ultima orden de inclinacion que la ESP32 mando al plato y
+% que la PC ya habia recibido al capturar la fila k (tel_thx, tel_thy,
+% retenida en las filas sin telemetria). La ESP32 manda la telemetria apenas
+% mueve el plato, asi que esa orden esta aplicada desde un poco antes de t(k);
+% la diferencia (y la respuesta del servo) la absorbe el retardo tau de B3.
+% Esta es la entrada fisica al plato, aunque la ESP32 haya trabajado con datos
+% atrasados (lo que paso en el log del 2026-11-09 12:06).
+%
+% atraso: diagnostico del atraso de los datos con los que trabajo la ESP32, en
+% cuadros: la mediana de (k - j) con x(j) = eco tel_x_rx(k), buscando hasta 40
+% filas atras, solo con la bola en movimiento (si esta quieta el eco coincide
+% con cualquier fila). coincide: fraccion de ecos encontrados.
 n = L.n;
-mejor = -1;  s = 1;
-for cand = 0:3
-    k = (1+cand):n;
-    ok = abs(L.tel_x_rx(k) - L.x(k-cand)) < 0.015;
-    f = sum(ok)/max(1, sum(~isnan(L.tel_x_rx(k))));
-    if f > mejor, mejor = f;  s = cand; end
-end
-coincide = mejor;
 th = NaN(n, 2);
-j = 1:(n-s);
-th(j,1) = L.tel_thx(j+s);
-th(j,2) = L.tel_thy(j+s);
+ultimo = [NaN NaN];
+for k = 1:n
+    if ~isnan(L.tel_thx(k)), ultimo = [L.tel_thx(k) L.tel_thy(k)]; end
+    th(k,:) = ultimo;
+end
+lags = [];  nt = 0;
+for k = 2:n
+    if isnan(L.tel_x_rx(k)) || isnan(L.vx(k)) || abs(L.vx(k)) < 80, continue; end
+    nt = nt + 1;
+    for s = 1:40
+        j = k - s;
+        if j < 1, break; end
+        if abs(L.tel_x_rx(k) - L.x(j)) < 0.011, lags(end+1) = s; break; end %#ok<AGROW>
+    end
+end
+if isempty(lags), atraso = NaN; else, atraso = median(lags); end
+coincide = numel(lags)/max(1, nt);
 end

@@ -94,6 +94,17 @@ class TestTelemetria(unittest.TestCase):
         self.assertAlmostEqual(t["thx"], 1.5, places=5)
         self.assertAlmostEqual(t["x_rx"], 12.5, places=5)
 
+    def test_parse_formato_2(self):
+        cuerpo = struct.pack('<BBII9fHHI', 1, 0, 9, 500, *([0.5] * 9), 3, 7, 41000)
+        x = 0
+        for b in cuerpo:
+            x ^= b
+        t = SerialTransmitter._parse_telemetria(bytes([0xBC]) + cuerpo + bytes([x, 0x66]))
+        self.assertEqual(len(cuerpo) + 3, 57)
+        self.assertEqual(t["n"], 9)
+        self.assertEqual(t["descartadas"], 3)
+        self.assertEqual(t["loop_us"], 41000)
+
     def test_checksum_malo(self):
         b = bytearray(self.trama());  b[20] ^= 0xFF
         self.assertIsNone(SerialTransmitter._parse_telemetria(bytes(b)))

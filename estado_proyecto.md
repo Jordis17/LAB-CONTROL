@@ -277,3 +277,33 @@ Siguiente etapa: B — identificación con el prototipo (pendiente desde el inic
   - Es la causa más probable del "delay" y de las caídas que se vieron en el prototipo el
     2026-11-09.
   - El controlador se diseñó y verificó con 1,0 (Etapas C a G).
+
+### Análisis del log real `sesion_20261109_120621.csv` (2026-11-09)
+
+Firmware `bop_prueba_circulo_lazo` con telemetría y `MEAS_NOISE_STD_MM = 1.0`. Duración 241 s:
+86 s desarmado y 155 s en modo centro. **El modo círculo no se activó.**
+
+1. **Causa del "delay": la ESP32 procesaba 25 tramas por segundo (una cada 40,0 ms exactos)
+   y la PC manda 30.** El buffer de recepción se llenaba y el lazo trabajaba con datos de
+   **19 cuadros (unos 0,6 s) de atraso**. Lo prueba el eco `tel_x_rx`: coincide con la x de
+   15 a 23 filas antes. Además se perdía el 16 % de las tramas.
+   - Probablemente pasaba lo mismo con los firmware v1 y v2, que leen igual (byte a byte y una
+     trama por vuelta).
+   - **Arreglo en `bop_prueba_circulo_lazo`:** lectura en bloque sin espera; se procesa solo la
+     trama más nueva y se descartan las viejas.
+   - La telemetría pasa al formato 2 (0xBC, 57 bytes), que agrega las tramas descartadas, los
+     checksums malos y el tiempo máximo de `loop()`. Columnas `tel_descartadas`, `tel_malas` y
+     `tel_loop_us` del log.
+2. **Rozamiento de la bola.** En modo centro, la bola se quedó quieta en x = 12 mm durante 11 s
+   mientras el integrador llevaba el plato de 0,4° a 3° (I_MAX). Después se soltó de golpe y,
+   con 0,6 s de atraso, el lazo entró en una oscilación de ±140 mm con el plato saturado en
+   ±10°, con rebotes en el borde y la bola cayéndose.
+   - Que aguante 3° sugiere bastante resistencia a la rodadura (bola impresa en 3D, con capas) o
+     una marca o raya en el plato. Hay que revisarlo.
+3. **Signos de los ejes: correctos.** La regresión de la aceleración medida contra
+   −g·sen(θ) da c > 0 en X y en Y. El c negativo que dio B3 al principio salía de ventanas con
+   la bola quieta, y ahora B3 exige 15 mm de recorrido por ventana.
+4. **B3 con este log:** solo 3 ventanas útiles, datos insuficientes, no se reportan
+   parámetros. Hay que repetir el ensayo con el firmware corregido.
+5. **Calibración:** la visión reporta hasta ±158 mm, y el máximo físico es 127 mm. Sigue
+   pendiente la comprobación con 5 puntos medidos con regla.

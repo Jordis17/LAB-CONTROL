@@ -1,7 +1,8 @@
 function [Phi, xr, tr] = b3_regresores(t, xm, th_deg, tau, ini, fin, P, sv, dtf)
 %B3_REGRESORES Regresores de una ventana para xdd = -c g sin(th(t - tau)) + b.
 %
-% Ventana de cuadros ini..fin. th_deg(j) se aplica (retencion de orden cero)
+% Ventana de cuadros ini..fin. th_deg(j) es la orden de inclinacion conocida en
+% la fila j (b3_alinear_telemetria); se toma aplicada (retencion de orden cero)
 % desde t(j) + tau hasta t(j+1) + tau. Devuelve, para cada cuadro de la ventana:
 %   xr   posicion sobre el plato (mm), corrigiendo la medicion de la camara con
 %        la inclinacion real en ese instante (b_corregir_inclinacion, Etapa A);

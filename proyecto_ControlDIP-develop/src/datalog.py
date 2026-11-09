@@ -18,7 +18,8 @@ class DataLogger:
     CAMPOS = ["t", "dt", "fps", "detectada", "x_raw", "y_raw",
               "x", "y", "vx", "vy", "area", "circularidad", "enviado",
               "tel_modo", "tel_banderas", "tel_n", "tel_t_ms", "tel_thx", "tel_thy",
-              "tel_leyx", "tel_leyy", "tel_Ix", "tel_Iy", "tel_rx", "tel_ry", "tel_x_rx"]
+              "tel_leyx", "tel_leyy", "tel_Ix", "tel_Iy", "tel_rx", "tel_ry", "tel_x_rx",
+              "tel_descartadas", "tel_malas", "tel_loop_us"]
 
     def __init__(self, carpeta: str = None, nombre: str = None):
         carpeta = carpeta or config.LOG_DIR

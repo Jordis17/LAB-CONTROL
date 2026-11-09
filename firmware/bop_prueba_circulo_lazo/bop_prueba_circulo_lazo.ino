@@ -24,15 +24,19 @@
 // Uso: igual que el v2, con main_vision.py mandando las tramas (921600 baud).
 //
 // TELEMETRIA (2026-11-09, para identificar la planta en lazo cerrado): por cada
-// trama recibida, la ESP32 contesta por el mismo puerto con 49 bytes que
+// trama procesada, la ESP32 contesta por el mismo puerto con 57 bytes que
 // main_vision.py guarda en el log (columnas tel_*):
-//   [0] 0xBB  [1] modo  [2] banderas (bit0 sat X, bit1 sat Y, bit2 cuadro ignorado por salto)
+//   [0] 0xBC  [1] modo  [2] banderas (bit0 sat X, bit1 sat Y, bit2 cuadro ignorado por salto)
 //   [3..6] n_tramas (uint32)  [7..10] millis (uint32)
 //   [11..46] 9 float32: th_out X, th_out Y (deg, plato pedido tras el limite de
 //            velocidad = lo que va a la tabla y al servo), th_ley X, th_ley Y
 //            (deg, salida de la ley antes del limite), I X, I Y (deg),
 //            r X, r Y (mm, referencia), x recibido (mm, eco para alinear con el log)
-//   [47] xor de los bytes 1..46   [48] 0x66
+//   [47..48] tramas viejas descartadas en esta lectura (uint16)
+//   [49..50] tramas con checksum malo desde el arranque (uint16)
+//   [51..54] duracion maxima de loop() desde la telemetria anterior (us, uint32)
+//   [55] xor de los bytes 1..54   [56] 0x66
+//   (version anterior: 0xBB, 49 bytes, sin los campos 47..54)
 //
 #include <ESP32Servo.h>
 #include <math.h>
@@ -181,35 +185,65 @@ uint8_t buf[20];
 int nbuf = 0;
 
 // Devuelve true cuando hay una trama completa y valida en buf.
+// (2026-11-09) Lee TODO lo que llego, en bloque y sin esperar, y se queda con
+// la trama valida MAS NUEVA. Antes se leia byte a byte (Serial.read()) y se
+// procesaba una sola trama por vuelta: la ESP32 atendia una trama cada 40 ms
+// exactos (25 por s) mientras la PC manda 30 por s, el buffer de recepcion se
+// llenaba (~20 tramas) y el lazo trabajaba con datos de 0,5 a 0,7 s de atraso
+// (log sesion_20261109_120621, eco tel_x_rx). Ahora, si hay atraso, las tramas
+// viejas se descartan y se cuentan.
+uint8_t buf_nueva[20];
+uint16_t descartadas = 0;          // tramas validas viejas descartadas en la ultima lectura
 bool leerTrama() {
-  while (Serial.available()) {
-    uint8_t b = Serial.read();
-    if (nbuf == 0 && b != 0xAA) continue;
-    buf[nbuf++] = b;
-    if (nbuf == 20) {
-      nbuf = 0;
-      uint8_t x = 0;
-      for (int i = 1; i <= 17; i++) x ^= buf[i];
-      if (buf[19] == 0x55 && buf[18] == x) return true;
-      n_malas++;
-      // resincronizar: buscar otro 0xAA dentro de lo recibido
-      for (int i = 1; i < 20; i++) {
-        if (buf[i] == 0xAA) {
-          int k = 0;
-          for (int j = i; j < 20; j++) buf[k++] = buf[j];
-          nbuf = k;
-          break;
+  static uint8_t rx[512];
+  bool hay = false;
+  int nuevas = 0;
+  descartadas = 0;
+  while (true) {
+    int k = Serial.available();
+    if (k <= 0) break;
+    if (k > (int)sizeof(rx)) k = sizeof(rx);
+    int leidos = Serial.read(rx, k);          // en bloque, sin esperar
+    if (leidos <= 0) break;
+    for (int q = 0; q < leidos; q++) {
+      uint8_t b = rx[q];
+      if (nbuf == 0 && b != 0xAA) continue;
+      buf[nbuf++] = b;
+      if (nbuf == 20) {
+        nbuf = 0;
+        uint8_t x = 0;
+        for (int i = 1; i <= 17; i++) x ^= buf[i];
+        if (buf[19] == 0x55 && buf[18] == x) {
+          memcpy(buf_nueva, buf, 20);
+          hay = true;
+          nuevas++;
+          continue;
+        }
+        n_malas++;
+        // resincronizar: buscar otro 0xAA dentro de lo recibido
+        for (int i = 1; i < 20; i++) {
+          if (buf[i] == 0xAA) {
+            int m = 0;
+            for (int j = i; j < 20; j++) buf[m++] = buf[j];
+            nbuf = m;
+            break;
+          }
         }
       }
     }
   }
-  return false;
+  if (hay) {
+    memcpy(buf, buf_nueva, 20);
+    descartadas = nuevas - 1;
+  }
+  return hay;
 }
 
 // -------------------------------------------------------- Telemetria ---
+uint32_t loop_max_us = 0;          // duracion maxima de loop() desde la ultima telemetria
 void enviarTelemetria(float x_rx) {
-  uint8_t b[49];
-  b[0] = 0xBB;
+  uint8_t b[57];
+  b[0] = 0xBC;                     // formato 2 (57 bytes); 0xBB era el de 49 bytes
   b[1] = (uint8_t)modo;
   b[2] = (sat_e[0] ? 1 : 0) | (sat_e[1] ? 2 : 0) | (ignorado ? 4 : 0);
   uint32_t ms = millis();
@@ -217,11 +251,16 @@ void enviarTelemetria(float x_rx) {
   memcpy(b + 7, &ms, 4);
   float f[9] = {th_out[0], th_out[1], th_ley[0], th_ley[1], I[0], I[1], r_tel[0], r_tel[1], x_rx};
   memcpy(b + 11, f, 36);
+  uint16_t malas16 = (uint16_t)(n_malas & 0xFFFF);
+  memcpy(b + 47, &descartadas, 2);
+  memcpy(b + 49, &malas16, 2);
+  memcpy(b + 51, &loop_max_us, 4);
+  loop_max_us = 0;
   uint8_t x = 0;
-  for (int i = 1; i <= 46; i++) x ^= b[i];
-  b[47] = x;
-  b[48] = 0x66;
-  Serial.write(b, 49);
+  for (int i = 1; i <= 54; i++) x ^= b[i];
+  b[55] = x;
+  b[56] = 0x66;
+  Serial.write(b, 57);
 }
 
 // ------------------------------------------------------------ Setup ---
@@ -240,6 +279,10 @@ void setup() {
 
 // ------------------------------------------------------------- Loop ---
 void loop() {
+  static uint32_t us_prev = micros();
+  uint32_t us_ahora = micros();
+  if (us_ahora - us_prev > loop_max_us) loop_max_us = us_ahora - us_prev;
+  us_prev = us_ahora;
   uint32_t ahora = millis();
 
   // Boton BOOT: arma / desarma (con antirrebote)

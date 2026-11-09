@@ -128,7 +128,10 @@ def main():
                         "tel_leyx": f"{tel['leyx']:.4f}", "tel_leyy": f"{tel['leyy']:.4f}",
                         "tel_Ix": f"{tel['Ix']:.5f}", "tel_Iy": f"{tel['Iy']:.5f}",
                         "tel_rx": f"{tel['rx']:.2f}", "tel_ry": f"{tel['ry']:.2f}",
-                        "tel_x_rx": f"{tel['x_rx']:.2f}"}))
+                        "tel_x_rx": f"{tel['x_rx']:.2f}",
+                        "tel_descartadas": tel.get("descartadas", ""),
+                        "tel_malas": tel.get("malas", ""),
+                        "tel_loop_us": tel.get("loop_us", "")}))
 
             n += 1
             if n % 30 == 0:

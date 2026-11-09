@@ -92,23 +92,31 @@ class SerialTransmitter:
             return False
 
     # ----------------------------------------------------------- telemetria --
-    TEL_LEN = 49
+    # Formatos del firmware bop_prueba_circulo_lazo (ver el .ino):
+    #   0xBB: 49 bytes;  0xBC: 57 bytes (agrega descartadas, malas y loop_us)
+    TEL_LARGOS = {0xBB: 49, 0xBC: 57}
     TEL_CAMPOS = ("modo", "banderas", "n", "t_ms", "thx", "thy", "leyx", "leyy",
                   "Ix", "Iy", "rx", "ry", "x_rx")
 
     @classmethod
     def _parse_telemetria(cls, b: bytes):
-        """Trama de 49 bytes del firmware (bop_prueba_circulo_lazo): ver el .ino."""
-        if len(b) != cls.TEL_LEN or b[0] != 0xBB or b[-1] != 0x66:
+        """Trama de telemetria de la ESP32, o None si no es valida."""
+        if not b or b[0] not in cls.TEL_LARGOS:
+            return None
+        n_bytes = cls.TEL_LARGOS[b[0]]
+        if len(b) != n_bytes or b[-1] != 0x66:
             return None
         x = 0
-        for byte in b[1:47]:
+        for byte in b[1:n_bytes - 2]:
             x ^= byte
-        if x != b[47]:
+        if x != b[n_bytes - 2]:
             return None
         modo, banderas, n, t_ms = struct.unpack('<BBII', b[1:11])
         f = struct.unpack('<9f', b[11:47])
-        return dict(zip(cls.TEL_CAMPOS, (modo, banderas, n, t_ms) + f))
+        t = dict(zip(cls.TEL_CAMPOS, (modo, banderas, n, t_ms) + f))
+        if b[0] == 0xBC:
+            t["descartadas"], t["malas"], t["loop_us"] = struct.unpack('<HHI', b[47:55])
+        return t
 
     def leer_telemetria(self):
         """Lee lo que mando la ESP32 y devuelve la ultima trama valida, o None.
@@ -126,22 +134,23 @@ class SerialTransmitter:
             return None
         ultima = None
         while True:
-            i = self._rx.find(0xBB)
+            i = next((q for q, c in enumerate(self._rx) if c in self.TEL_LARGOS), -1)
             if i < 0:
                 self._rx.clear()
                 break
             if i > 0:
                 del self._rx[:i]
-            if len(self._rx) < self.TEL_LEN:
+            largo = self.TEL_LARGOS[self._rx[0]]
+            if len(self._rx) < largo:
                 break
-            t = self._parse_telemetria(bytes(self._rx[:self.TEL_LEN]))
+            t = self._parse_telemetria(bytes(self._rx[:largo]))
             if t is None:
                 self.telemetria_malas += 1
                 del self._rx[0]           # resincronizar
                 continue
             ultima = t
             self.telemetria_ok += 1
-            del self._rx[:self.TEL_LEN]
+            del self._rx[:largo]
         if len(self._rx) > 4096:          # basura sin cabecera valida
             self._rx.clear()
         return ultima
