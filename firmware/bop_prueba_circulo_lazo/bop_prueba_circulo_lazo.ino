@@ -67,7 +67,8 @@ const float TAU_PRED = 0.075f; // s: compensacion del retardo de la camara en mo
 int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo
 float t_circ = 0.0f;           // s desde que se entro al modo circulo (cuenta por trama)
 // --- v2: protecciones de la prueba funcional
-const float SLEW_DEG = 3.0f;         // deg por cuadro (= 90 deg/s a 30 fps)
+const float SLEW_DEG = 6.0f;         // deg por cuadro (= 180 deg/s a 30 fps). v2 usa 3; con 6 la bola
+                                     // empujada a 500 mm/s se frena a 125 mm en vez de 138 (simulacion 2026-11-09)
 const float E_ZONA   = 40.0f;        // mm: solo se integra con |error| menor que esto
 const float I_MAX    = 3.0f;         // deg: tope del integrador
 const float SALTO_MM = 60.0f;        // mm por cuadro (1800 mm/s): mas que esto es una falsa deteccion
