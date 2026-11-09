@@ -138,3 +138,54 @@ Con los CSV se calculan las mismas métricas del MIL (ts, Mp, ess) y se comparan
 **Qué mandar:** los CSV de `logs/` de las corridas donde pasó el brinco. La columna
 `detectada` muestra si la bola se perdió justo antes, que es lo que confirma o descarta la
 explicación del campo de la cámara.
+
+## Pruebas de movimiento circular (2026-11-09)
+
+Son pruebas funcionales. No están en el MIL ni en el código generado.
+
+### `prueba_circulo_abierto/` — solo motores, sin cámara
+
+- El plato mantiene una inclinación fija A, pero la dirección de esa inclinación gira con
+  periodo T: θx = A·cos(2πt/T) y θy = A·sin(2πt/T). Usa la tabla servo → plato medida.
+- Comandos por el Monitor Serie (115200 baud):
+
+  | Comando | Qué hace |
+  |---|---|
+  | `S` | Arranca o detiene |
+  | `A 3` | Amplitud en grados de plato |
+  | `T 2.5` | Periodo de una vuelta en segundos |
+  | `R` | Invierte el sentido de giro |
+  | `C` | Deja el plato horizontal |
+
+- Una bola describe idealmente un círculo de radio R = c·g·A/ω². Por ejemplo, A = 3,1° con
+  T = 2,5 s da R ≈ 60 mm. El sketch imprime el radio esperado.
+- **En lazo abierto la bola termina yéndose.** La órbita es solo marginalmente estable y un
+  desnivel de 0,2° ya la empuja a unos 24 mm/s².
+- La amplitud sube con una rampa de coseno de 10 vueltas. En simulación, con el modelo lineal y
+  la bola soltada en el centro, el centro de la órbita queda corrido unos 10 mm; con una rampa
+  lineal quedaba corrido 60 mm.
+- Sirve para ver los dos servos y la tabla trabajando juntos.
+
+### `bop_prueba_circulo_lazo/` — la bola sigue una circunferencia (lazo cerrado)
+
+- Es una copia del v2 con la referencia r(t) = R·(cos ωt, sin ωt). Por defecto R = 60 mm y
+  T = 4 s; el radio crece en rampa durante 3 s.
+- Con la referencia en movimiento, el derivativo actúa sobre (v̂ − v_ref) y se suma la
+  prealimentación θ_ff = −a_ref/(c·g), que sale del modelo de la Etapa A.
+- Con la referencia quieta, la ley es igual a la del v2.
+- El botón BOOT cicla los modos:
+
+  | Modo | LED |
+  |---|---|
+  | Desarmado | Apagado |
+  | Centro | Encendido |
+  | Círculo | Parpadeo lento |
+
+- Se usa igual que el v2, con `main_vision.py` mandando las tramas.
+- **Simulación previa** (Claude, modelo lineal con 75 ms de retardo, Ts = 1/30 s, límite de
+  velocidad del plato, sin ruido): después del transitorio, la bola recorre un círculo de
+  64,7 mm con un error de seguimiento de unos 12 mm, que es casi todo atraso por el retardo.
+  - Sin la prealimentación, el error sube a 24 mm.
+  - Sin la prealimentación y sin v_ref, sube a 57 mm.
+- **No es una medición.** En el prototipo influyen c (todavía nominal), el desnivel, el ruido y
+  el retardo real.
