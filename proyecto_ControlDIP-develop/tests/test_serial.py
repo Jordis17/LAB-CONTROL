@@ -75,5 +75,44 @@ class TestSerialTransmitter(unittest.TestCase):
         self.assertTrue(puerto.close.called)
 
 
+
+
+class TestTelemetria(unittest.TestCase):
+    @staticmethod
+    def trama(modo=2, banderas=1, n=7, t_ms=1234, f=(1.5, -2.0, 1.6, -2.1, 0.01, -0.02, 30.0, 40.0, 12.5)):
+        cuerpo = struct.pack('<BBII9f', modo, banderas, n, t_ms, *f)
+        x = 0
+        for b in cuerpo:
+            x ^= b
+        return bytes([0xBB]) + cuerpo + bytes([x, 0x66])
+
+    def test_parse(self):
+        t = SerialTransmitter._parse_telemetria(self.trama())
+        self.assertEqual(len(self.trama()), 49)
+        self.assertEqual(t["modo"], 2)
+        self.assertEqual(t["n"], 7)
+        self.assertAlmostEqual(t["thx"], 1.5, places=5)
+        self.assertAlmostEqual(t["x_rx"], 12.5, places=5)
+
+    def test_checksum_malo(self):
+        b = bytearray(self.trama());  b[20] ^= 0xFF
+        self.assertIsNone(SerialTransmitter._parse_telemetria(bytes(b)))
+
+    @patch('src.communication.transmitter.serial.Serial')
+    def test_leer_con_basura_y_dos_tramas(self, mock_serial):
+        tx = SerialTransmitter(port="/dev/ttyUSB0")
+        datos = b"\x00\x12basura" + self.trama(n=1) + self.trama(n=2)[:20]
+        tx.serial_port = MagicMock()
+        tx.serial_port.in_waiting = len(datos)
+        tx.serial_port.read.return_value = datos
+        t = tx.leer_telemetria()
+        self.assertEqual(t["n"], 1)
+        resto = self.trama(n=2)[20:]
+        tx.serial_port.in_waiting = len(resto)
+        tx.serial_port.read.return_value = resto
+        self.assertEqual(tx.leer_telemetria()["n"], 2)
+        self.assertEqual(tx.telemetria_ok, 2)
+
+
 if __name__ == '__main__':
     unittest.main()

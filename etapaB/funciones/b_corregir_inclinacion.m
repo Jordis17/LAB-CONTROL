@@ -11,5 +11,5 @@ function x = b_corregir_inclinacion(Xm, th, P)
 % th [rad] con signo (th > 0 levanta el lado +), Xm y x en mm.
 H = P.H_cam;  rb = P.r_bola;  h = P.h;  hs = P.h_sup;
 c = cos(th);  s = sin(th);
-x = (Xm.*(H + hs - h*c) + h*s*(H - rb)) ./ (c*(H - rb) + Xm*s);
+x = (Xm.*(H + hs - h*c) + h*s.*(H - rb)) ./ (c.*(H - rb) + Xm.*s);   % th puede ser un vector
 end

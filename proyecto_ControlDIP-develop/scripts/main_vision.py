@@ -107,6 +107,7 @@ def main():
                     # Coasting corto: la prediccion sigue siendo util.
                     estado = 1
 
+            tel = tx.leer_telemetria() if tx else None
             enviado = tx.send(estado, x, y, vx, vy) if tx else False
 
             if log is not None:
@@ -119,7 +120,15 @@ def main():
                     vx=f"{vx:.1f}", vy=f"{vy:.1f}",
                     area=f"{detector.last_area:.0f}",
                     circularidad=f"{detector.last_circularity:.3f}",
-                    enviado=int(enviado))
+                    enviado=int(enviado),
+                    **({} if tel is None else {
+                        "tel_modo": tel["modo"], "tel_banderas": tel["banderas"],
+                        "tel_n": tel["n"], "tel_t_ms": tel["t_ms"],
+                        "tel_thx": f"{tel['thx']:.4f}", "tel_thy": f"{tel['thy']:.4f}",
+                        "tel_leyx": f"{tel['leyx']:.4f}", "tel_leyy": f"{tel['leyy']:.4f}",
+                        "tel_Ix": f"{tel['Ix']:.5f}", "tel_Iy": f"{tel['Iy']:.5f}",
+                        "tel_rx": f"{tel['rx']:.2f}", "tel_ry": f"{tel['ry']:.2f}",
+                        "tel_x_rx": f"{tel['x_rx']:.2f}"}))
 
             n += 1
             if n % 30 == 0:

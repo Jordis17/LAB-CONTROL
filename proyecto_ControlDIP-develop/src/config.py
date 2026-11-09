@@ -63,9 +63,16 @@ ROI_MARGIN_PX = 25
 OUT_OF_PLATE_MARGIN_MM = 25.0
 
 # ---------------------------------------------------------------- Filtro --
-# MEDIR: dejar la bola quieta en el centro, grabar >=500 muestras y calcular
-# la desviacion estandar en mm. Este valor es la raiz de R.
-MEAS_NOISE_STD_MM = 0.11
+# Raiz de R del Kalman, en mm. NO es solo el ruido con la bola quieta (medido:
+# 0,12 mm en el centro y 0,09 mm en la esquina, datos_prototipo/camara/): la
+# medicion tambien se mueve ~1,2 mm por grado cuando el plato se inclina
+# (paralaje: la bola esta 69 mm sobre el pivote) y eso no esta en el filtro.
+# Con 0,11 el filtro le cree a esos saltos, la velocidad estimada los sigue y,
+# en simulacion, el lazo oscila con el plato al maximo de velocidad cuadro a
+# cuadro y la bola se desvia 40 a 70 mm (2026-11-09). Con 1,0 (el valor con el
+# que se diseno y verifico el controlador, Etapas C a G) el lazo queda estable.
+# Se cambia solo junto con un rediseno del controlador.
+MEAS_NOISE_STD_MM = 1.0
 
 # Aceleracion no modelada, en mm/s^2. El limite fisico es
 # (5/7)*9810*sen(14 deg) = 1700 mm/s^2, que es lo que el plato puede imponer.

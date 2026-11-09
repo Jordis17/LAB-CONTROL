@@ -25,6 +25,9 @@ class SerialTransmitter:
         self.enviados = 0
         self.fallos = 0
         self._ultimo_intento = 0.0
+        self._rx = bytearray()
+        self.telemetria_ok = 0
+        self.telemetria_malas = 0
         self._connect()
         if obligatorio and not self.is_connected:
             raise RuntimeError(
@@ -88,6 +91,61 @@ class SerialTransmitter:
             self.serial_port = None
             return False
 
+    # ----------------------------------------------------------- telemetria --
+    TEL_LEN = 49
+    TEL_CAMPOS = ("modo", "banderas", "n", "t_ms", "thx", "thy", "leyx", "leyy",
+                  "Ix", "Iy", "rx", "ry", "x_rx")
+
+    @classmethod
+    def _parse_telemetria(cls, b: bytes):
+        """Trama de 49 bytes del firmware (bop_prueba_circulo_lazo): ver el .ino."""
+        if len(b) != cls.TEL_LEN or b[0] != 0xBB or b[-1] != 0x66:
+            return None
+        x = 0
+        for byte in b[1:47]:
+            x ^= byte
+        if x != b[47]:
+            return None
+        modo, banderas, n, t_ms = struct.unpack('<BBII', b[1:11])
+        f = struct.unpack('<9f', b[11:47])
+        return dict(zip(cls.TEL_CAMPOS, (modo, banderas, n, t_ms) + f))
+
+    def leer_telemetria(self):
+        """Lee lo que mando la ESP32 y devuelve la ultima trama valida, o None.
+
+        No bloquea (timeout=0). Si el firmware no manda telemetria (v1, v2),
+        siempre devuelve None y el lazo sigue igual.
+        """
+        if not self.is_connected:
+            return None
+        try:
+            k = self.serial_port.in_waiting
+            if k:
+                self._rx += self.serial_port.read(k)
+        except (serial.SerialException, OSError):
+            return None
+        ultima = None
+        while True:
+            i = self._rx.find(0xBB)
+            if i < 0:
+                self._rx.clear()
+                break
+            if i > 0:
+                del self._rx[:i]
+            if len(self._rx) < self.TEL_LEN:
+                break
+            t = self._parse_telemetria(bytes(self._rx[:self.TEL_LEN]))
+            if t is None:
+                self.telemetria_malas += 1
+                del self._rx[0]           # resincronizar
+                continue
+            ultima = t
+            self.telemetria_ok += 1
+            del self._rx[:self.TEL_LEN]
+        if len(self._rx) > 4096:          # basura sin cabecera valida
+            self._rx.clear()
+        return ultima
+
     def send_idle(self):
         """Trama de 'sin bola'. Le dice a la ESP32 que lleve el plato a cero."""
         self.send(0, 0.0, 0.0, 0.0, 0.0)
@@ -109,7 +167,8 @@ class SerialTransmitter:
             except Exception:
                 pass
         self.serial_port = None
-        print(f"Serial cerrado. Tramas enviadas: {self.enviados}, fallos: {self.fallos}")
+        print(f"Serial cerrado. Tramas enviadas: {self.enviados}, fallos: {self.fallos}, "
+              f"telemetria recibida: {self.telemetria_ok} (malas: {self.telemetria_malas})")
 
     def __enter__(self):
         return self

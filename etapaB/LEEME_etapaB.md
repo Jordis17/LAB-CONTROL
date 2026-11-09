@@ -122,3 +122,64 @@ mediciones y no están en el repo.**
 - B2 recuperó h_sup = 55,8 mm.
 - Con ángulos de ~3,5°, el error de 0,1° de la app ya pesa tanto como la diferencia entre
   modelos. De ahí la recomendación de usar 4° o más.
+
+
+## 6. B3: identificación en lazo cerrado (2026-11-09)
+
+Se identifica con el controlador funcionando. El firmware `bop_prueba_circulo_lazo` devuelve en
+cada cuadro la inclinación que mandó al plato. `main_vision.py` la guarda en las columnas `tel_*`
+del log, y `B3_identificar_lazo_cerrado_BoP.m` ajusta, por eje:
+
+    ẍ = −c·g·sen(θ(t − τ)) + b
+
+| Parámetro | Qué es |
+|---|---|
+| c | Rodadura **efectiva**. Incluye la ganancia real de la tabla servo → plato; en lazo cerrado no se pueden separar (B1 sí lo hace) |
+| b | Aceleración constante. Se reporta como desnivel equivalente en grados |
+| τ | Retardo desde la captura del cuadro hasta que el plato se mueve (cálculo, serie, PWM y servo) |
+
+**Método:**
+- Ventanas de 1 s con la bola detectada, lejos del borde y sin empujones. Una ventana se
+  descarta si la aceleración medida es mayor a la que el plato puede producir, calculada sobre la
+  posición corregida por la inclinación. Ese criterio no depende del modelo.
+- Con τ fijo, el modelo es lineal en c, b y en las condiciones iniciales de cada ventana, así que
+  se resuelve por mínimos cuadrados. τ se elige en una grilla de 0 a 200 ms.
+- **Validación con otros logs:** x0 y v0 se estiman con los 6 primeros cuadros de cada ventana y
+  el resto se predice sin reajustar. Se reportan RMSE, MAE, sesgo, R², FIT y la estructura del
+  residuo, del modelo identificado y del nominal.
+
+**Ensayo** (firmware `bop_prueba_circulo_lazo`, `main_vision.py` con serial):
+1. Unos 30 s en modo centro, con 4 o 5 empujones **suaves**.
+2. Unas 5 vueltas en círculo.
+3. Repetir todo en un segundo log.
+
+Copiar los logs a `datos_prototipo/etapaB/` y anotarlos en `datos_prototipo/etapaB/lazo_cerrado.csv`:
+```
+archivo,uso,observaciones
+sesion_20261110_101500.csv,ident,centro + circulo T 5 s
+sesion_20261110_102000.csv,valid,centro + circulo T 4 s
+```
+
+**Prueba con datos sintéticos (Claude, Octave, 2026-11-09; no son mediciones).** Los logs se
+generaron con el simulador del firmware, la telemetría corrida una fila y 1 mm de ruido en el
+Kalman. Valores verdaderos: c = 0,68; desnivel de +0,40° en X y −0,25° en Y; τ ≈ 85 ms.
+
+| Parámetro | Verdadero | Identificado |
+|---|---|---|
+| c X / Y | 0,68 / 0,68 | 0,652 / 0,689 |
+| Desnivel X / Y | equivalente a b = −47 / +30 mm/s² | b = −46,6 / +30,8 mm/s² |
+| τ | ≈ 85 ms | 110 ms común; por eje, 70 ms en X y 140 ms en Y |
+
+- En la validación, el modelo identificado predice mejor que el nominal: RMSE de 7,2 contra
+  12,6 mm en X y de 4,6 contra 7,1 mm en Y.
+- **τ queda poco preciso** con este tipo de ensayo. Conviene hacer círculos a dos velocidades
+  para excitarlo mejor.
+
+**Hallazgo de la prueba (afecta al prototipo):**
+- Con `MEAS_NOISE_STD_MM = 0,11`, el valor medido con la bola quieta, el Kalman le cree a la
+  medición. Pero la medición salta unos 1,2 mm por grado cuando el plato se inclina (paralaje),
+  y la velocidad estimada sigue esos saltos.
+- En simulación, el lazo oscila con el plato al máximo de velocidad cuadro a cuadro, y la bola se
+  desvía de 40 a 70 mm.
+- Con 1,0 mm, que es el valor del diseño, queda estable. `config.py` volvió a 1,0.
+- El ruido con la bola quieta no es el error de medición relevante cuando el plato se mueve.

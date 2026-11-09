@@ -261,3 +261,19 @@ Siguiente etapa: B — identificación con el prototipo (pendiente desde el inic
 | **Latencia (YUYV, 2 buffers, incluye el monitor)** | **Mediana de 57,8 y 60,3 ms** (corridas 2 y 3); mínimo de 26 a 30 ms | El segundo buffer **no agrega latencia**. La corrida 1 se descarta: los primeros 8 destellos no se detectaron o dieron 390 a 630 ms porque la cámara todavía no apuntaba bien; los últimos 7 dan 56 a 62 ms. Con ~60 ms (cota superior) hay margen frente a los 75 ms del diseño |
 | Ruido (bola quieta) | Desv. de 0,12 mm en el centro y 0,09 mm en la esquina | El diseño supuso 1 mm (`MEAS_NOISE_STD_MM`) |
 | Esquina en Y = 132,4 mm | Fuera del rango físico (máximo 127 mm) | **Revisar la calibración** con 5 puntos medidos con regla antes de B1 y B2 |
+
+## Identificación en lazo cerrado y ruido del Kalman (2026-11-09)
+
+- **Telemetría.** El firmware `bop_prueba_circulo_lazo` devuelve en cada cuadro la inclinación
+  aplicada. Columnas nuevas del log de `main_vision.py`, al final y en este orden: `tel_modo,
+  tel_banderas, tel_n, tel_t_ms, tel_thx, tel_thy, tel_leyx, tel_leyy, tel_Ix, tel_Iy, tel_rx,
+  tel_ry, tel_x_rx`. La fila k guarda la respuesta a la trama k−1, y el eco `tel_x_rx` lo comprueba.
+- **B3.** `etapaB/B3_identificar_lazo_cerrado_BoP.m` identifica c efectivo, desnivel y τ con los
+  logs `ident` y valida con los `valid`. Se probó con datos sintéticos y falta correrlo con datos
+  reales. Ver `etapaB/LEEME_etapaB.md`, sección 6.
+- **`MEAS_NOISE_STD_MM` volvió a 1,0** (estaba en 0,11 desde el commit `17beb84`).
+  - En simulación, 0,11 hace oscilar el lazo por el paralaje: el plato llega al máximo de
+    velocidad cuadro a cuadro y la bola se desvía de 40 a 70 mm.
+  - Es la causa más probable del "delay" y de las caídas que se vieron en el prototipo el
+    2026-11-09.
+  - El controlador se diseñó y verificó con 1,0 (Etapas C a G).

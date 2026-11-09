@@ -23,6 +23,17 @@
 //
 // Uso: igual que el v2, con main_vision.py mandando las tramas (921600 baud).
 //
+// TELEMETRIA (2026-11-09, para identificar la planta en lazo cerrado): por cada
+// trama recibida, la ESP32 contesta por el mismo puerto con 49 bytes que
+// main_vision.py guarda en el log (columnas tel_*):
+//   [0] 0xBB  [1] modo  [2] banderas (bit0 sat X, bit1 sat Y, bit2 cuadro ignorado por salto)
+//   [3..6] n_tramas (uint32)  [7..10] millis (uint32)
+//   [11..46] 9 float32: th_out X, th_out Y (deg, plato pedido tras el limite de
+//            velocidad = lo que va a la tabla y al servo), th_ley X, th_ley Y
+//            (deg, salida de la ley antes del limite), I X, I Y (deg),
+//            r X, r Y (mm, referencia), x recibido (mm, eco para alinear con el log)
+//   [47] xor de los bytes 1..46   [48] 0x66
+//
 #include <ESP32Servo.h>
 #include <math.h>
 
@@ -65,6 +76,10 @@ const float TAU_PRED = 0.075f; // s: compensacion del retardo de la camara en mo
                                // (x_pred = x_hat + v_hat * TAU_PRED). 0 = sin compensacion.
                                // Latencia medida ~60 ms + medio cuadro de calculo.
 int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo
+bool  sat_e[2]  = {false, false};   // telemetria: saturacion en este cuadro
+float th_ley[2] = {0, 0};           // telemetria: salida de la ley (deg)
+float r_tel[2]  = {0, 0};           // telemetria: referencia (mm)
+bool  ignorado  = false;            // telemetria: cuadro ignorado por salto
 float t_circ = 0.0f;           // s desde que se entro al modo circulo (cuenta por trama)
 // --- v2: protecciones de la prueba funcional
 const float SLEW_DEG = 6.0f;         // deg por cuadro (= 180 deg/s a 30 fps). v2 usa 3; con 6 la bola
@@ -147,6 +162,7 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff) {
   if (th > TH_LIM) th = TH_LIM;
   if (th < -TH_LIM) th = -TH_LIM;
   bool saturado = (th != u);
+  sat_e[e] = saturado;
   bool congelar = saturado && ((eps > 0) - (eps < 0)) == ((u > 0) - (u < 0));
   if (fabsf(vh) < V_INT) nq[e]++; else nq[e] = 0;
   if (!congelar && nq[e] >= (NQ > 1 ? NQ : 1) && fabsf(eps) < E_ZONA) {
@@ -190,6 +206,24 @@ bool leerTrama() {
   return false;
 }
 
+// -------------------------------------------------------- Telemetria ---
+void enviarTelemetria(float x_rx) {
+  uint8_t b[49];
+  b[0] = 0xBB;
+  b[1] = (uint8_t)modo;
+  b[2] = (sat_e[0] ? 1 : 0) | (sat_e[1] ? 2 : 0) | (ignorado ? 4 : 0);
+  uint32_t ms = millis();
+  memcpy(b + 3, &n_tramas, 4);
+  memcpy(b + 7, &ms, 4);
+  float f[9] = {th_out[0], th_out[1], th_ley[0], th_ley[1], I[0], I[1], r_tel[0], r_tel[1], x_rx};
+  memcpy(b + 11, f, 36);
+  uint8_t x = 0;
+  for (int i = 1; i <= 46; i++) x ^= b[i];
+  b[47] = x;
+  b[48] = 0x66;
+  Serial.write(b, 49);
+}
+
 // ------------------------------------------------------------ Setup ---
 void setup() {
   Serial.begin(BAUD);
@@ -228,13 +262,18 @@ void loop() {
     uint8_t estado = buf[1];
     float v[4];
     memcpy(v, &buf[2], 16);          // x, y, vx, vy (little-endian, igual que la ESP32)
+    sat_e[0] = sat_e[1] = false;
+    ignorado = false;
     if (!armado || estado == 0) {
       haciaHorizontal();
+      th_ley[0] = th_ley[1] = 0.0f;
+      r_tel[0] = r_tel[1] = 0.0f;
     } else {
       bool salto = hay_prev && (fabsf(v[0] - x_prev[0]) > SALTO_MM || fabsf(v[1] - x_prev[1]) > SALTO_MM);
       if (salto && saltos_seguidos < 3) {
         n_saltos++;                // se ignora el cuadro; el plato queda donde estaba
         saltos_seguidos++;
+        ignorado = true;
       } else {
         saltos_seguidos = 0;       // 3 saltos seguidos: la bola de verdad esta en otro lado
         if (salto) { for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; } }
@@ -257,11 +296,14 @@ void loop() {
           float vh = SIGNO_VIS[e] * v[2 + e];
           if (modo == 2) xh += vh * TAU_PRED;     // donde estara la bola cuando actue el plato
           float th = leyControl(e, xh, vh, r[e], vr[e], ff[e]);
+          th_ley[e] = th;
+          r_tel[e] = r[e];
           moverConLimite(e, th);
         }
         x_prev[0] = v[0];  x_prev[1] = v[1];  hay_prev = true;
       }
     }
+    enviarTelemetria(v[0]);
   }
 
   // Watchdog

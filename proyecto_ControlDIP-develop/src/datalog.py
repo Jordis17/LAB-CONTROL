@@ -10,8 +10,15 @@ from src import config
 class DataLogger:
     """Una fila por ciclo del lazo. Sin esto no hay graficas que mostrar."""
 
+    # Las columnas tel_* son la telemetria de la ESP32 (firmware
+    # bop_prueba_circulo_lazo). Cada fila guarda la ULTIMA trama recibida antes
+    # de enviar la de esa fila, o sea la respuesta a la trama de la fila
+    # ANTERIOR; tel_x_rx (eco de la x recibida) permite comprobar el corrimiento.
+    # Vacias si el firmware no manda telemetria.
     CAMPOS = ["t", "dt", "fps", "detectada", "x_raw", "y_raw",
-              "x", "y", "vx", "vy", "area", "circularidad", "enviado"]
+              "x", "y", "vx", "vy", "area", "circularidad", "enviado",
+              "tel_modo", "tel_banderas", "tel_n", "tel_t_ms", "tel_thx", "tel_thy",
+              "tel_leyx", "tel_leyy", "tel_Ix", "tel_Iy", "tel_rx", "tel_ry", "tel_x_rx"]
 
     def __init__(self, carpeta: str = None, nombre: str = None):
         carpeta = carpeta or config.LOG_DIR

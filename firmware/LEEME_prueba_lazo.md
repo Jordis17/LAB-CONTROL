@@ -189,3 +189,9 @@ Son pruebas funcionales. No están en el MIL ni en el código generado.
   - Sin la prealimentación y sin v_ref, sube a 57 mm.
 - **No es una medición.** En el prototipo influyen c (todavía nominal), el desnivel, el ruido y
   el retardo real.
+
+**Telemetría (2026-11-09).** `bop_prueba_circulo_lazo` contesta cada trama con 49 bytes: modo,
+banderas, inclinación aplicada y salida de la ley por eje, integradores, referencia y un eco de
+la x recibida. `main_vision.py` la guarda en las columnas `tel_*` del log. El formato está al
+principio del `.ino`. La usa `etapaB/B3_identificar_lazo_cerrado_BoP.m`. Los firmware v1 y v2 no
+mandan telemetría y siguen funcionando igual: las columnas quedan vacías.
