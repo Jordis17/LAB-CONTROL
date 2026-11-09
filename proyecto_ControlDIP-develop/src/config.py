@@ -46,6 +46,12 @@ CAMERA_HEIGHT_MM = 450.0
 
 # True si el +Y que entrega la vision no coincide con el +Y mecanico.
 # Se determina empujando la bola a mano hacia el servo Y y viendo si sube.
+# Si la calibracion se cliqueo empezando por otra esquina, los ejes de la camara
+# pueden quedar cruzados respecto del plato. Prueba (2026-11-09): empujar la bola
+# hacia el servo X debe subir X y hacia el servo Y debe subir Y. Si hacia el
+# servo X sube Y y hacia el servo Y sube X: SWAP_XY = True (se aplica antes de
+# INVERT_Y). Lo definitivo es recalibrar con el orden de clics del instructivo.
+SWAP_XY = True
 INVERT_Y = False
 
 # Radio util del centro de la bola: (294/2) - 20 = 127 mm.

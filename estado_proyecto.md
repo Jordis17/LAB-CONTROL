@@ -319,3 +319,18 @@ revés, así que cada eje se corregía moviendo el otro.
   `datos_prototipo/mecanica/LEEME.md` actualizados.
 - Probablemente esto también explica el comportamiento errático de las pruebas anteriores.
   Pendiente: probar el modo centro con el firmware corregido.
+
+### Ejes de la cámara cruzados (2026-11-09)
+
+- Corrección: lo de los servos cruzados resultó incorrecto. Con el cambio de pines la bola se
+  pegaba a las esquinas de una diagonal.
+- Pruebas del equipo: con `X 20` baja el lado derecho y con `Y 20` el de arriba. Al empujar la
+  bola **a la derecha sube la Y de la cámara**, y **hacia arriba sube la X**. Los **ejes de la
+  cámara están cruzados**, con los signos bien: la calibración se cliqueó empezando por otra
+  esquina.
+- **Arreglo inmediato:** `SWAP_XY = True` en `src/config.py`; el detector intercambia x e y.
+- **Arreglo definitivo:** recalibrar con el orden de clics por servos (instructivo 2.7 y
+  `calibrate_camera.py`) y dejar `SWAP_XY = False`.
+- Pines: hay que ver si el cambio a GPIO19/18 queda. Con `X 20` baja el lado derecho y con
+  `Y 20` el de arriba, en el firmware nuevo (X = GPIO19). Si "derecha" es el lado del servo X,
+  los pines nuevos están bien. Por confirmar con la prueba del modo centro.

@@ -59,8 +59,13 @@ def main():
         return 1
 
     print("\n--- FASE 2: SELECCION DE PUNTOS ---")
-    print("Clique la ESQUINA EXTERIOR de cada marca, en sentido horario,")
-    print("empezando por la marca que quede arriba a la izquierda en la imagen.")
+    print("Clique la ESQUINA EXTERIOR de cada marca, en ESTE ORDEN (por los servos,")
+    print("no por la imagen):")
+    print("  1) la esquina mas lejos de los dos servos          (-X,-Y)")
+    print("  2) la del lado del servo X, lejos del servo Y      (+X,-Y)  <- marca chica")
+    print("  3) la esquina entre los dos servos                 (+X,+Y)")
+    print("  4) la del lado del servo Y, lejos del servo X      (-X,+Y)")
+    print("Con este orden no hace falta SWAP_XY ni INVERT_Y (dejarlos en False).")
     print("La marca pequena (patron de alineacion) va entre el servo X (+X) y -Y.")
     print("'r' reinicia, 'c' confirma, 'q' sale.")
 
@@ -78,7 +83,7 @@ def main():
                 cv2.line(img, puntos[i - 1], puntos[i], (255, 0, 0), 2)
         if len(puntos) == 4:
             cv2.line(img, puntos[3], puntos[0], (255, 0, 0), 2)
-        cv2.putText(img, "ESQUINA EXTERIOR de cada marca, horario",
+        cv2.putText(img, "ESQ. EXTERIOR: 1 lejos servos, 2 marca chica, 3 entre servos, 4",
                     (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
         cv2.imshow("Calibracion de puntos", img)
 

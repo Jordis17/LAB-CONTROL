@@ -290,9 +290,16 @@ python scripts/calibrate_camera.py
 ```
 
 - Fase 1: `s` para capturar.
-- Fase 2: cliquear la **esquina exterior** de cada marca, **en sentido horario**, empezando por
-  la marca de arriba a la izquierda en la imagen. La marca pequeña va entre el servo X (+X) y
-  −Y. `r` reinicia y `c` confirma.
+- Fase 2: cliquear la **esquina exterior** de cada marca **en este orden**. El orden depende de
+  los **servos**, no de cómo se vea la imagen; corregido el 2026-11-09, porque el orden por la
+  imagen cruzó los ejes:
+  1. la esquina **más lejos de los dos servos**, (−X, −Y);
+  2. la del **lado del servo X**, lejos del servo Y, (+X, −Y): es la **marca chica**;
+  3. la esquina **entre los dos servos**, (+X, +Y);
+  4. la del **lado del servo Y**, lejos del servo X, (−X, +Y).
+
+  `r` reinicia y `c` confirma. Con este orden, `SWAP_XY` e `INVERT_Y` van en `False` en
+  `src/config.py`.
 - Copien la consola, sobre todo los lados en píxeles, la diferencia en porcentaje y la escala
   en px/mm, a `calibracion_camara.txt`.
 - Se genera `calibration.npz`: **guárdenlo**.

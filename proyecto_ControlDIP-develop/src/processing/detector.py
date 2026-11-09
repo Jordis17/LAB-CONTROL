@@ -162,6 +162,8 @@ class BallDetector:
         x *= self.scale
         y *= self.scale
 
+        if getattr(config, "SWAP_XY", False):
+            x, y = y, x
         if config.INVERT_Y:
             y = -y
 
