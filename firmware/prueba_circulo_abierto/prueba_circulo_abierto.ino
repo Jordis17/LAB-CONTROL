@@ -21,7 +21,7 @@
 //
 // Monitor Serie a 115200, "Ambos NL & CR". Comandos:
 //   S        arrancar / detener (al detener, la amplitud baja en rampa y el plato queda horizontal)
-//   A 3      amplitud de la inclinacion del plato en grados (0 a 10)
+//   A 3      amplitud de la inclinacion del plato en grados (0 a 11)
 //   T 2.5    periodo de una vuelta en segundos (1 a 10)
 //   R        cambia el sentido de giro
 //   C        para de inmediato y deja el plato horizontal
@@ -33,7 +33,7 @@
 const int PIN_X = 18;
 const int PIN_Y = 19;
 const float RAMPA_CICLOS = 10.0f;  // vueltas que tarda la amplitud en llegar a A (rampa de coseno)
-const float A_MAX = 10.0f;         // deg
+const float A_MAX = 11.0f;         // deg: el plato llega a +-11,3 deg en los dos ejes (tabla medida)
 
 // Relacion servo -> plato MEDIDA (2026-11-04, v2), la misma del firmware v2.
 // Convencion: th > 0 levanta el lado del servo. Un comando positivo BAJA el lado.
