@@ -1,0 +1,33 @@
+Camara /dev/video0: automatismos bloqueados y verificados.
+Camara abierta: 640x480 @ 30 fps, formato YUYV, buffers 2 (pedidos 2)
+
+--- Latencia de extremo a extremo ---
+Apunte la camara a esta ventana, a pantalla completa si puede,
+y no la mueva. Se haran 15 destellos.
+
+  destello  1:   53.6 ms
+  destello  2:   60.9 ms
+  destello  3:   60.3 ms
+  destello  4:   62.1 ms
+  destello  5:   60.5 ms
+  destello  6:   60.7 ms
+  destello  7:   60.6 ms
+  destello  8:   58.1 ms
+  destello  9:   57.9 ms
+  destello 10:   56.3 ms
+  destello 11:   56.6 ms
+  destello 12:   60.5 ms
+  destello 13:   30.2 ms
+  destello 14:   61.4 ms
+  destello 15:   56.0 ms
+
+  mediana    60.3 ms
+  minimo     30.2 ms
+  maximo     62.1 ms
+
+  Este valor incluye la latencia del monitor, asi que es una cota
+  superior. Criterio del plan: media < 60 ms, desviacion < 10 ms.
+  Si sale alto, pruebe: FOURCC YUYV en vez de MJPG, menor
+  resolucion, exposicion mas corta con mas luz.
+
+Configuracion usada: 640x480, YUYV, exposicion 50 (= 5.0 ms), buffers 2
