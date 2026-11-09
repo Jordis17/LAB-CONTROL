@@ -386,3 +386,10 @@ Se midió de nuevo, porque el equipo había reajustado los brazos: `datos_protot
 - Holgura: hasta 0,8° en X y 2,4° en Y.
 - Todos los firmware usan la tabla v3. Falta repetir el ensayo automático para ver c efectivo y
   τ con la tabla nueva.
+
+### Recalibración de la cámara con el orden por servos (2026-11-09)
+
+El equipo recalibró con el orden de clics por servos (instructivo 2.7) y dejó `SWAP_XY = False`
+(commit `e25e427`). Configuración vigente de `config.py`: `SWAP_XY = False`, `INVERT_Y = False`,
+`CAMERA_BUFFERS = 2`, `MEAS_NOISE_STD_MM = 1.0`. Pendiente: confirmar la escala, con la bola
+contra un borde en ≈ ±127 mm (antes llegaba a ~150).
