@@ -199,3 +199,22 @@ mandan telemetría y siguen funcionando igual: las columnas quedan vacías.
 **Lectura serie (2026-11-09).** Con la lectura byte a byte, la ESP32 atendía una trama cada 40 ms
 y el lazo trabajaba con 0,6 s de atraso (`estado_proyecto.md`). `bop_prueba_circulo_lazo` ahora
 lee en bloque y usa solo la trama más nueva. **Los firmware v1 y v2 siguen con la lectura vieja.**
+
+### Ensayo automático (modo 3, 2026-11-09)
+
+Hay que presionar BOOT tres veces: desarmado → centro → círculo → **ensayo**. En el ensayo el
+LED da destellos cortos y la ESP32 hace sola esta secuencia de 70 s:
+
+| Fase | Tiempo | Qué hace | Para qué |
+|---|---|---|---|
+| 1 | 0 a 5 s | Centro | Condición inicial |
+| 2 | 5 a 25 s | Escalones de referencia de 40 mm: +X, −X, +Y, −Y (4 s cada uno) y centro | Tiempo de establecimiento y sobreimpulso reales contra el MIL |
+| 3 | 25 a 45 s | Centro + perturbación pseudoaleatoria de ±1,5° por eje, que cambia cada 0,3 s | Identificación (B3): entrada conocida e independiente del ruido |
+| 4 | 45 a 57 s | Círculo de 50 mm, 6 s por vuelta | Seguimiento e identificación |
+| 5 | 57 a 65 s | Círculo de 50 mm, 4 s por vuelta | Ídem, más rápido |
+| 6 | 65 a 70 s | Centro, y después pasa solo a modo centro | |
+
+- La fase va en los bits 4 a 7 de `tel_banderas`.
+- `tel_thx` / `tel_thy` incluyen la perturbación; `tel_leyx` / `tel_leyy` son solo la ley.
+- Simulación previa (modelo lineal, 75 ms de retardo, desnivel de 0,4° / −0,3°): la bola no pasa
+  de 61 mm del centro y el plato no pasa de 4,2°. No es una medición.

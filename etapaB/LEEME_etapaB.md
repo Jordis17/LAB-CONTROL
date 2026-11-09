@@ -148,7 +148,11 @@ del log, y `B3_identificar_lazo_cerrado_BoP.m` ajusta, por eje:
   el resto se predice sin reajustar. Se reportan RMSE, MAE, sesgo, R², FIT y la estructura del
   residuo, del modelo identificado y del nominal.
 
-**Ensayo** (firmware `bop_prueba_circulo_lazo`, `main_vision.py` con serial):
+**Ensayo recomendado (2026-11-09): el automático**, modo 3 del firmware, BOOT tres veces. Hace
+escalones, una perturbación pseudoaleatoria y círculos, sin intervención
+(`firmware/LEEME_prueba_lazo.md`). Hacen falta dos corridas: una `ident` y una `valid`.
+
+**Ensayo manual (alternativa)** (firmware `bop_prueba_circulo_lazo`, `main_vision.py` con serial):
 1. Unos 30 s en modo centro, con 4 o 5 empujones **suaves**.
 2. Unas 5 vueltas en círculo.
 3. Repetir todo en un segundo log.

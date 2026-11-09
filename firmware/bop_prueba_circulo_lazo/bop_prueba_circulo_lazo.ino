@@ -17,7 +17,9 @@
 // identica a la del v2.
 //
 // Boton BOOT (GPIO0), cada pulsacion pasa al modo siguiente:
-//   DESARMADO (LED apagado) -> CENTRO (LED encendido) -> CIRCULO (LED parpadeo lento) -> DESARMADO
+//   DESARMADO (LED apagado) -> CENTRO (LED encendido) -> CIRCULO (LED parpadeo lento)
+//   -> ENSAYO AUTOMATICO (LED destellos cortos, 70 s, ver "Ensayo automatico") -> DESARMADO
+//   Al terminar el ensayo pasa solo a CENTRO.
 // Al entrar en CIRCULO el radio crece en rampa durante RAMPA_S segundos.
 // Lo demas (watchdog, sin bola, filtro de saltos, limite de velocidad) es igual al v2.
 //
@@ -26,7 +28,8 @@
 // TELEMETRIA (2026-11-09, para identificar la planta en lazo cerrado): por cada
 // trama procesada, la ESP32 contesta por el mismo puerto con 57 bytes que
 // main_vision.py guarda en el log (columnas tel_*):
-//   [0] 0xBC  [1] modo  [2] banderas (bit0 sat X, bit1 sat Y, bit2 cuadro ignorado por salto)
+//   [0] 0xBC  [1] modo  [2] banderas (bit0 sat X, bit1 sat Y, bit2 cuadro ignorado por salto,
+//            bits 4-7 fase del ensayo automatico)
 //   [3..6] n_tramas (uint32)  [7..10] millis (uint32)
 //   [11..46] 9 float32: th_out X, th_out Y (deg, plato pedido tras el limite de
 //            velocidad = lo que va a la tabla y al servo), th_ley X, th_ley Y
@@ -79,7 +82,26 @@ const float G_MM    = 9810.0f;        // mm/s^2
 const float TAU_PRED = 0.075f; // s: compensacion del retardo de la camara en modo circulo
                                // (x_pred = x_hat + v_hat * TAU_PRED). 0 = sin compensacion.
                                // Latencia medida ~60 ms + medio cuadro de calculo.
-int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo
+int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo, 3 ensayo automatico
+// ------------------------------------------- Ensayo automatico (modo 3) ---
+// Secuencia fija (s desde que se entra al modo 3), sin intervencion:
+//   fase 1   0- 5  centro
+//   fase 2   5-25  escalones de referencia de ESC_MM: +X, -X, +Y, -Y (4 s c/u) y centro (4 s)
+//   fase 3  25-45  centro + perturbacion pseudoaleatoria de +-DITHER_DEG en cada eje,
+//                  cambia cada DITHER_CUADROS cuadros (para identificar: entrada conocida
+//                  e independiente del ruido)
+//   fase 4  45-57  circulo de 50 mm, 6 s por vuelta (2 vueltas)
+//   fase 5  57-65  circulo de 50 mm, 4 s por vuelta (2 vueltas)
+//   fase 6  65-70  centro; al terminar pasa solo a modo CENTRO
+// La fase va en los bits 4-7 de las banderas de la telemetria.
+const float ESC_MM = 40.0f;
+const float DITHER_DEG = 1.5f;
+const int   DITHER_CUADROS = 9;     // 0,3 s
+float t_ens = 0.0f;
+int   fase = 0;
+uint16_t lfsr[2] = {0xACE1u, 0x1D2Bu};
+float dither[2] = {0, 0};
+int   n_dither = 0;
 bool  sat_e[2]  = {false, false};   // telemetria: saturacion en este cuadro
 float th_ley[2] = {0, 0};           // telemetria: salida de la ley (deg)
 float r_tel[2]  = {0, 0};           // telemetria: referencia (mm)
@@ -247,7 +269,7 @@ void enviarTelemetria(float x_rx) {
   uint8_t b[57];
   b[0] = 0xBC;                     // formato 2 (57 bytes); 0xBB era el de 49 bytes
   b[1] = (uint8_t)modo;
-  b[2] = (sat_e[0] ? 1 : 0) | (sat_e[1] ? 2 : 0) | (ignorado ? 4 : 0);
+  b[2] = (sat_e[0] ? 1 : 0) | (sat_e[1] ? 2 : 0) | (ignorado ? 4 : 0) | ((fase & 0x0F) << 4);
   uint32_t ms = millis();
   memcpy(b + 3, &n_tramas, 4);
   memcpy(b + 7, &ms, 4);
@@ -263,6 +285,57 @@ void enviarTelemetria(float x_rx) {
   b[55] = x;
   b[56] = 0x66;
   Serial.write(b, 57);
+}
+
+// Referencia circular de radio R (con rampa de RAMPA_S) y periodo T, en el instante t.
+void refCirculo(float R, float T, float t, float r[2], float vr[2], float ff[2]) {
+  float w = SENTIDO * 2.0f * PI / T;
+  float Rk = R * fminf(1.0f, t / RAMPA_S);
+  float ang = w * t;
+  r[0] = Rk * cosf(ang);          r[1] = Rk * sinf(ang);
+  vr[0] = -Rk * w * sinf(ang);    vr[1] = Rk * w * cosf(ang);
+  for (int e = 0; e < 2; e++) {
+    float a_ref = -w * w * r[e];                              // mm/s^2
+    ff[e] = -a_ref / (C_ROD * G_MM) * 180.0f / PI;            // deg
+  }
+}
+
+// Bit pseudoaleatorio (LFSR de 16 bits, polinomio x^16+x^14+x^13+x^11+1).
+int bitPRBS(int e) {
+  uint16_t b = ((lfsr[e] >> 0) ^ (lfsr[e] >> 2) ^ (lfsr[e] >> 3) ^ (lfsr[e] >> 5)) & 1u;
+  lfsr[e] = (lfsr[e] >> 1) | (b << 15);
+  return b;
+}
+
+// Ensayo automatico: referencia y perturbacion en el instante t (s). Devuelve false al terminar.
+bool refEnsayo(float t, float r[2], float vr[2], float ff[2], float dth[2], bool &circulo) {
+  r[0] = r[1] = vr[0] = vr[1] = ff[0] = ff[1] = dth[0] = dth[1] = 0.0f;
+  circulo = false;
+  if (t < 5.0f) { fase = 1; return true; }
+  if (t < 25.0f) {
+    fase = 2;
+    int k = (int)((t - 5.0f) / 4.0f);       // 0..4
+    if (k == 0) r[0] = ESC_MM;
+    else if (k == 1) r[0] = -ESC_MM;
+    else if (k == 2) r[1] = ESC_MM;
+    else if (k == 3) r[1] = -ESC_MM;
+    return true;
+  }
+  if (t < 45.0f) {
+    fase = 3;
+    if (n_dither <= 0) {
+      for (int e = 0; e < 2; e++) dither[e] = bitPRBS(e) ? DITHER_DEG : -DITHER_DEG;
+      n_dither = DITHER_CUADROS;
+    }
+    n_dither--;
+    dth[0] = dither[0];  dth[1] = dither[1];
+    return true;
+  }
+  if (t < 57.0f) { fase = 4; circulo = true; refCirculo(50.0f, 6.0f, t - 45.0f, r, vr, ff); return true; }
+  if (t < 65.0f) { fase = 5; circulo = true; refCirculo(50.0f, 4.0f, t - 57.0f, r, vr, ff); return true; }
+  if (t < 70.0f) { fase = 6; return true; }
+  fase = 0;
+  return false;
 }
 
 // ------------------------------------------------------------ Setup ---
@@ -292,9 +365,10 @@ void loop() {
   static uint32_t t_btn = 0;
   bool btn = digitalRead(PIN_BTN);
   if (btn == LOW && btn_prev == HIGH && ahora - t_btn > 300) {
-    modo = (modo + 1) % 3;
+    modo = (modo + 1) % 4;
     armado = (modo > 0);
     t_circ = 0.0f;
+    t_ens = 0.0f;  fase = 0;  n_dither = 0;
     t_btn = ahora;
     for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; }   // sin integral al cambiar de modo
     hay_prev = false;
@@ -322,28 +396,33 @@ void loop() {
       } else {
         saltos_seguidos = 0;       // 3 saltos seguidos: la bola de verdad esta en otro lado
         if (salto) { for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; } }
-        // Referencia: centro (modo 1) o circulo (modo 2)
-        float r[2] = {REF[0], REF[1]}, vr[2] = {0, 0}, ff[2] = {0, 0};
+        // Referencia: centro (modo 1), circulo (modo 2) o ensayo automatico (modo 3)
+        float r[2] = {REF[0], REF[1]}, vr[2] = {0, 0}, ff[2] = {0, 0}, dth[2] = {0, 0};
+        bool circulo = false;
         if (modo == 2) {
           t_circ += TS;
-          float w = SENTIDO * 2.0f * PI / T_CIRC;
-          float Rk = R_CIRC * fminf(1.0f, t_circ / RAMPA_S);
-          float ang = w * t_circ;
-          r[0] = Rk * cosf(ang);          r[1] = Rk * sinf(ang);
-          vr[0] = -Rk * w * sinf(ang);    vr[1] = Rk * w * cosf(ang);
-          for (int e = 0; e < 2; e++) {
-            float a_ref = -w * w * r[e];                              // mm/s^2
-            ff[e] = -a_ref / (C_ROD * G_MM) * 180.0f / PI;            // deg
+          circulo = true;
+          refCirculo(R_CIRC, T_CIRC, t_circ, r, vr, ff);
+        } else if (modo == 3) {
+          t_ens += TS;
+          if (!refEnsayo(t_ens, r, vr, ff, dth, circulo)) {
+            modo = 1;                      // termino el ensayo: queda en CENTRO
+            for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; }
           }
+        } else {
+          fase = 0;
         }
         for (int e = 0; e < 2; e++) {
           float xh = SIGNO_VIS[e] * v[e];
           float vh = SIGNO_VIS[e] * v[2 + e];
-          if (modo == 2) xh += vh * TAU_PRED;     // donde estara la bola cuando actue el plato
+          if (circulo) xh += vh * TAU_PRED;       // donde estara la bola cuando actue el plato
           float th = leyControl(e, xh, vh, r[e], vr[e], ff[e]);
           th_ley[e] = th;
           r_tel[e] = r[e];
-          moverConLimite(e, th);
+          float th_tot = th + dth[e];             // perturbacion del ensayo (0 fuera de la fase 3)
+          if (th_tot > TH_LIM) th_tot = TH_LIM;
+          if (th_tot < -TH_LIM) th_tot = -TH_LIM;
+          moverConLimite(e, th_tot);
         }
         x_prev[0] = v[0];  x_prev[1] = v[1];  hay_prev = true;
       }
@@ -361,5 +440,6 @@ void loop() {
   // LED: centro = encendido; circulo = parpadeo lento; sin tramas = parpadeo rapido; desarmado = apagado
   if (sin_tramas) digitalWrite(PIN_LED, (ahora / 100) % 2);
   else if (modo == 2) digitalWrite(PIN_LED, (ahora / 500) % 2);
+  else if (modo == 3) digitalWrite(PIN_LED, ((ahora / 150) % 4) == 0);   // destellos cortos
   else digitalWrite(PIN_LED, armado ? HIGH : LOW);
 }
