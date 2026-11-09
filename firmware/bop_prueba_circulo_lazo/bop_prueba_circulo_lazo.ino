@@ -11,7 +11,9 @@
 //     Etapa A (xdd = -c g th), la inclinacion que produce a_ref es
 //     th_ff = -a_ref / (c g). Sin esto la bola recorre un circulo mas chico y
 //     atrasado.
-// Con la referencia quieta (modo centro) los dos terminos valen 0 y la ley es
+//   - (2026-11-09) en modo circulo, prediccion de la posicion para compensar el
+//     retardo de la camara: x_pred = x_hat + v_hat * TAU_PRED.
+// Con la referencia quieta (modo centro) estos terminos valen 0 y la ley es
 // identica a la del v2.
 //
 // Boton BOOT (GPIO0), cada pulsacion pasa al modo siguiente:
@@ -59,6 +61,9 @@ const float SENTIDO = 1.0f;    // +1 antihorario, -1 horario (en el marco de la 
 const float RAMPA_S = 3.0f;    // s para que el radio llegue a R_CIRC
 const float C_ROD   = 5.0f / 7.0f;    // rodadura nominal (Etapa A; PENDIENTE identificar en B1)
 const float G_MM    = 9810.0f;        // mm/s^2
+const float TAU_PRED = 0.075f; // s: compensacion del retardo de la camara en modo circulo
+                               // (x_pred = x_hat + v_hat * TAU_PRED). 0 = sin compensacion.
+                               // Latencia medida ~60 ms + medio cuadro de calculo.
 int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo
 float t_circ = 0.0f;           // s desde que se entro al modo circulo (cuenta por trama)
 // --- v2: protecciones de la prueba funcional
@@ -249,6 +254,7 @@ void loop() {
         for (int e = 0; e < 2; e++) {
           float xh = SIGNO_VIS[e] * v[e];
           float vh = SIGNO_VIS[e] * v[2 + e];
+          if (modo == 2) xh += vh * TAU_PRED;     // donde estara la bola cuando actue el plato
           float th = leyControl(e, xh, vh, r[e], vr[e], ff[e]);
           moverConLimite(e, th);
         }
