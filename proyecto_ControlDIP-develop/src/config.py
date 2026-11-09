@@ -51,7 +51,7 @@ CAMERA_HEIGHT_MM = 450.0
 # hacia el servo X debe subir X y hacia el servo Y debe subir Y. Si hacia el
 # servo X sube Y y hacia el servo Y sube X: SWAP_XY = True (se aplica antes de
 # INVERT_Y). Lo definitivo es recalibrar con el orden de clics del instructivo.
-SWAP_XY = True
+SWAP_XY = False
 INVERT_Y = False
 
 # Radio util del centro de la bola: (294/2) - 20 = 127 mm.
