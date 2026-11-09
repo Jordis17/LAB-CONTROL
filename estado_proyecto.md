@@ -334,3 +334,45 @@ revés, así que cada eje se corregía moviendo el otro.
 - Pines: hay que ver si el cambio a GPIO19/18 queda. Con `X 20` baja el lado derecho y con
   `Y 20` el de arriba, en el firmware nuevo (X = GPIO19). Si "derecha" es el lado del servo X,
   los pines nuevos están bien. Por confirmar con la prueba del modo centro.
+
+### Primera identificación en lazo cerrado con datos reales (2026-11-09, B3)
+
+Ejes de la cámara corregidos (`SWAP_XY = True`). Ensayo automático (modo 3) en dos logs:
+`sesion_20261109_143311` (ident, completo) y `sesion_20261109_143813` (valid, hasta la fase 4).
+Modelo por eje: ẍ = −c·g·sen(θ(t−τ)) + b − f·sign(ẋ).
+
+| | X | Y |
+|---|---|---|
+| c efectivo (nominal 0,714) | **0,19** | **0,22** |
+| Desnivel equivalente | −0,67° | −1,82° |
+| f (rozamiento), como inclinación mínima para rodar | 41 mm/s², ≈ 1,2° | 37 mm/s², ≈ 1,0° |
+| τ (orden al plato → bola) | 340 ms | 370 ms |
+
+τ común: 370 ms. La curva del error contra τ es plana entre 260 y 410 ms, así que τ es poco
+preciso, pero claramente mayor a 200 ms.
+
+**Validación** con el otro log, prediciendo 0,8 s sin reajustar:
+
+| Eje | Modelo identificado: RMSE / FIT | Nominal: RMSE / FIT |
+|---|---|---|
+| X | 9,1 mm / 69 % | 26,5 mm / 11 % |
+| Y | 10,5 mm / 61 % | 48,3 mm / −78 % |
+
+El residuo tiene autocorrelación de 0,93: al modelo todavía le falta algo, probablemente holgura
+o la dinámica real del servo.
+
+**Lectura:**
+- La bola responde a la inclinación pedida unas **3,5 veces menos** de lo que dice el modelo, y
+  con unos **350 ms de retardo**.
+- Hipótesis principal: **holgura en rótulas y varillas** o servo sin fuerza suficiente. Con
+  órdenes de 1° a 4° el plato se mueve mucho menos de lo pedido y tarde. Falta verificarlo con
+  la app y comandos pequeños (ida y vuelta).
+- Con esto se explica que "le cueste centrar" y que el círculo salga mal: el controlador se
+  diseñó para c = 0,71 y unos 75 ms.
+- **Escalones (fase 2):** la bola se queda a 50 a 115 mm de la referencia por varios segundos
+  con el plato a −2° a −3°. El integrador no ayuda, porque el firmware solo integra con
+  |error| < 40 mm (`E_ZONA`).
+- La ESP32 sigue con `loop()` de 40 ms (25 Hz). Ya no hay atraso acumulado (descarta tramas),
+  pero la causa de los 40 ms sigue sin identificarse.
+- **Parámetros PRELIMINARES:** un solo log de identificación y modelo incompleto. No se pasan a
+  A0 todavía.

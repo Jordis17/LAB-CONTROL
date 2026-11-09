@@ -3,12 +3,14 @@
 % bop_prueba_circulo_lazo, que devuelve en cada cuadro la inclinacion que la
 % ESP32 mando al plato (columnas tel_* del log). Por eje (plato a angulo
 % conocido en cada instante, Etapa A):
-%       xdd = -c g sin(th(t - tau)) + b
+%       xdd = -c g sin(th(t - tau)) + b - f sign(xd)
 %   c    rodadura EFECTIVA: incluye el error de la tabla servo->plato (en lazo
 %        cerrado no se pueden separar; B1 si los separa, porque mide el angulo
 %        con la app);
 %   b    aceleracion constante [mm/s^2]: desnivel del plato (y friccion media);
 %        se reporta tambien como desnivel equivalente asin(b/(c g)) [deg];
+%   f    rozamiento de rodadura [mm/s^2] (Coulomb, con el signo de la velocidad
+%        del Kalman); f / (c g) es la inclinacion minima para que la bola ruede;
 %   tau  retardo desde la captura del cuadro hasta que el plato se mueve [s]
 %        (calculo, serie, PWM y servo; la latencia de la camara queda fuera
 %        porque el log toma el tiempo de la captura).
@@ -41,7 +43,7 @@ A_MAX = 2500;                % mm/s^2: aceleracion medida (segunda diferencia de
 N_IC = 6;                    % cuadros al inicio de cada ventana de validacion para estimar x0 y v0
 MOV_MIN = 15;                % mm: recorrido minimo de la bola en la ventana (en algun eje); con la
                              % bola quieta c no se puede estimar (log 2026-11-09: daba c < 0 en Y)
-taus = -0.040:0.005:0.250;   % s, grilla del retardo (puede ser algo negativo: la orden
+taus = -0.040:0.010:0.500;   % s, grilla del retardo (puede ser algo negativo: la orden
                              % se aplica antes de que la PC reciba la telemetria)
 dtf = 1e-3;                  % s, paso de integracion
 
@@ -123,27 +125,27 @@ if nwin < 10
 end
 
 %% 2. Identificacion: grilla en tau, minimos cuadrados en c, b y condiciones iniciales
-sse = zeros(numel(taus), 2);  par = zeros(numel(taus), 2, 2);  nobs = 0;
+sse = zeros(numel(taus), 2);  par = zeros(numel(taus), 2, 3);  nobs = 0;
 for it = 1:numel(taus)
     for e = 1:2
         bloques = {};
         for d = id
             L = D(d).L;  t = L.t - L.t(1);
-            if e == 2, xm = L.y_raw; else, xm = L.x_raw; end
+            if e == 2, xm = L.y_raw; vk = L.vy; else, xm = L.x_raw; vk = L.vx; end
             for w = 1:size(D(d).win,1)
-                [Phi, xr] = b3_regresores(t, xm, D(d).th(:,e), taus(it), D(d).win(w,1), D(d).win(w,2), P, SIGNO_VIS(e), dtf);
+                [Phi, xr] = b3_regresores(t, xm, D(d).th(:,e), taus(it), D(d).win(w,1), D(d).win(w,2), P, SIGNO_VIS(e), dtf, vk);
                 bloques{end+1} = {Phi, xr}; %#ok<SAGROW>
             end
         end
         nb = numel(bloques);  m = sum(cellfun(@(q) size(q{1},1), bloques));
-        A = zeros(m, 2 + 2*nb);  y = zeros(m,1);  f = 0;
+        A = zeros(m, 3 + 2*nb);  y = zeros(m,1);  f = 0;
         for q = 1:nb
             Phi = bloques{q}{1};  r = f + (1:size(Phi,1));
-            A(r,1:2) = Phi(:,1:2);  A(r, 2+2*q-1:2+2*q) = Phi(:,3:4);  y(r) = bloques{q}{2};
+            A(r,[1 2 3]) = Phi(:,[1 2 5]);  A(r, 3+2*q-1:3+2*q) = Phi(:,3:4);  y(r) = bloques{q}{2};
             f = r(end);
         end
         p = A\y;
-        sse(it,e) = sum((y - A*p).^2);  par(it,e,:) = p(1:2);  nobs = m;
+        sse(it,e) = sum((y - A*p).^2);  par(it,e,:) = p(1:3);  nobs = m;
     end
 end
 % tau comun a los dos ejes (es el mismo lazo): se minimiza la suma de los SSE
@@ -151,7 +153,7 @@ end
 % tener mas movimiento. Tambien se informa el optimo de cada eje por separado.
 [~, ibx] = min(sse(:,1));  [~, iby] = min(sse(:,2));
 [~, ib] = min(sse(:,1)/sse(ibx,1) + sse(:,2)/sse(iby,2));
-tau = taus(ib);  cI = squeeze(par(ib,:,1));  bI = squeeze(par(ib,:,2));
+tau = taus(ib);  cI = squeeze(par(ib,:,1));  bI = squeeze(par(ib,:,2));  fI = squeeze(par(ib,:,3));
 fprintf('\nIdentificacion (%d muestras por eje en ventanas de %.1f s):\n', nobs, W);
 fprintf('  tau = %.0f ms comun (optimo por eje: X %.0f ms, Y %.0f ms; grilla %.0f a %.0f ms)\n', ...
     1000*tau, 1000*taus(ibx), 1000*taus(iby), 1000*taus(1), 1000*taus(end));
@@ -161,15 +163,15 @@ end
 if ib == 1 || ib == numel(taus), fprintf('  AVISO: tau quedo en el extremo de la grilla.\n'); end
 ej = 'XY';
 for e = 1:2
-    fprintf('  eje %s: c = %.4f (nominal 5/7 = %.4f), b = %+.1f mm/s^2 -> desnivel equivalente %+.2f deg, RMSE de ajuste %.2f mm\n', ...
-        ej(e), cI(e), 5/7, bI(e), rad2deg(asin(bI(e)/(cI(e)*P.g))), sqrt(sse(ib,e)/nobs));
+    fprintf('  eje %s: c = %.4f (nominal 5/7 = %.4f), b = %+.1f mm/s^2 -> desnivel equivalente %+.2f deg, f = %.1f mm/s^2 -> inclinacion minima para rodar %.2f deg, RMSE de ajuste %.2f mm\n', ...
+        ej(e), cI(e), 5/7, bI(e), rad2deg(asin(bI(e)/(cI(e)*P.g))), fI(e), rad2deg(asin(min(1, max(-1, fI(e)/(cI(e)*P.g))))), sqrt(sse(ib,e)/nobs));
 end
-fid = fopen(fullfile(dirRes,'B3_tau.csv'),'w');  fprintf(fid,'tau_s,sse_x,sse_y,c_x,c_y,b_x,b_y\n');
-for it = 1:numel(taus), fprintf(fid,'%.3f,%.6g,%.6g,%.6g,%.6g,%.6g,%.6g\n', taus(it), sse(it,:), par(it,:,1), par(it,:,2)); end
+fid = fopen(fullfile(dirRes,'B3_tau.csv'),'w');  fprintf(fid,'tau_s,sse_x,sse_y,c_x,c_y,b_x,b_y,f_x,f_y\n');
+for it = 1:numel(taus), fprintf(fid,'%.3f,%.6g,%.6g,%.6g,%.6g,%.6g,%.6g,%.6g,%.6g\n', taus(it), sse(it,:), par(it,:,1), par(it,:,2), par(it,:,3)); end
 fclose(fid);
 
 %% 3. Validacion: prediccion de 1 s desde el Kalman, sin reajustar
-modelos = {'identificado', cI, bI, tau;  'nominal', [5 5]/7, [0 0], 0.075};
+modelos = {'identificado', cI, bI, tau, fI;  'nominal', [5 5]/7, [0 0], 0.075, [0 0]};
 R = [];  Mval = {};
 if isempty(va)
     fprintf('\nAVISO: no hay logs "valid": falta la validacion con datos distintos.\n');
@@ -180,14 +182,14 @@ else
             yv = [];  yh = [];
             for d = va
                 L = D(d).L;  t = L.t - L.t(1);
-                if e == 1, xm = L.x_raw; xk = L.x; vk = L.vx; else, xm = L.y_raw; xk = L.y; vk = L.vy; end
+                if e == 1, xm = L.x_raw; vk = L.vx; else, xm = L.y_raw; vk = L.vy; end
                 for w = 1:size(D(d).win,1)
                     i0 = D(d).win(w,1);
-                    [Phi, xr, tr] = b3_regresores(t, xm, D(d).th(:,e), modelos{m,4}, i0, D(d).win(w,2), P, SIGNO_VIS(e), dtf);
+                    [Phi, xr, tr] = b3_regresores(t, xm, D(d).th(:,e), modelos{m,4}, i0, D(d).win(w,2), P, SIGNO_VIS(e), dtf, vk);
                     % x0 y v0 con los primeros N_IC cuadros (c, b y tau fijos); se predice el resto
-                    cb = [modelos{m,2}(e); modelos{m,3}(e)];
-                    ic = Phi(1:N_IC,3:4) \ (xr(1:N_IC) - Phi(1:N_IC,1:2)*cb);
-                    pred = Phi*[cb; ic];
+                    cb = [modelos{m,2}(e); modelos{m,3}(e)];  fm = modelos{m,5}(e);
+                    ic = Phi(1:N_IC,3:4) \ (xr(1:N_IC) - Phi(1:N_IC,1:2)*cb - Phi(1:N_IC,5)*fm);
+                    pred = Phi*[cb; ic; fm];
                     q = (N_IC+1):numel(xr);
                     tr = tr(q);  xr = xr(q);  pred = pred(q);
                     yv = [yv; xr];  yh = [yh; pred]; %#ok<AGROW>
@@ -203,13 +205,13 @@ else
     if ~isempty(R), escribir_csv(fullfile(dirRes,'B3_validacion.csv'), {'log','ventana','eje','modelo','t_s','x_med_mm','x_pred_mm'}, R); end
 end
 fid = fopen(fullfile(dirRes,'B3_modelos.csv'),'w');
-fprintf(fid,'modelo,eje,c,b_mm_s2,desnivel_deg,tau_s\n');
+fprintf(fid,'modelo,eje,c,b_mm_s2,desnivel_deg,tau_s,f_mm_s2\n');
 for m = 1:size(modelos,1), for e = 1:2
-    fprintf(fid,'%s,%s,%.6g,%.6g,%.4f,%.3f\n', modelos{m,1}, ej(e), modelos{m,2}(e), modelos{m,3}(e), ...
-        rad2deg(asin(modelos{m,3}(e)/(modelos{m,2}(e)*P.g))), modelos{m,4});
+    fprintf(fid,'%s,%s,%.6g,%.6g,%.4f,%.3f,%.6g\n', modelos{m,1}, ej(e), modelos{m,2}(e), modelos{m,3}(e), ...
+        rad2deg(asin(modelos{m,3}(e)/(modelos{m,2}(e)*P.g))), modelos{m,4}, modelos{m,5}(e));
 end, end
 fclose(fid);
-save(fullfile(dirRes,'B3_resultados.mat'), 'tau', 'cI', 'bI', 'taus', 'sse', 'par', 'Mval', 'SIGNO_VIS', 'W');
+save(fullfile(dirRes,'B3_resultados.mat'), 'tau', 'cI', 'bI', 'fI', 'taus', 'sse', 'par', 'Mval', 'SIGNO_VIS', 'W');
 try
     fig = figure('Visible','off');
     plot(1000*taus, sse(:,1)/sse(ib,1), 1000*taus, sse(:,2)/sse(ib,2));  grid on;

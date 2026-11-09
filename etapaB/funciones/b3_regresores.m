@@ -1,4 +1,4 @@
-function [Phi, xr, tr] = b3_regresores(t, xm, th_deg, tau, ini, fin, P, sv, dtf)
+function [Phi, xr, tr] = b3_regresores(t, xm, th_deg, tau, ini, fin, P, sv, dtf, vk)
 %B3_REGRESORES Regresores de una ventana para xdd = -c g sin(th(t - tau)) + b.
 %
 % Ventana de cuadros ini..fin. th_deg(j) es la orden de inclinacion conocida en
@@ -24,4 +24,12 @@ th_k = deg2rad(th_deg(max(1, interp1(t + tau, (1:numel(t))', t(k), 'previous')))
 th_k(isnan(th_k)) = 0;
 xr = b_corregir_inclinacion(sv*xm(k), th_k, P);
 Phi = [II tr.^2/2 ones(size(tr)) tr];
+% Rozamiento de rodadura (Coulomb): aceleracion -f*sign(v), con el signo de la
+% velocidad del Kalman en cada cuadro (vk). Columna 5: con x = Phi*[c; b; x0; v0; f].
+if nargin >= 10 && ~isempty(vk)
+    sg = sign(sv*vk(idx));  sg(isnan(sg)) = 0;
+    vf = [0; cumsum((-sg(1:end-1) - sg(2:end))/2)*dtf];
+    pf = [0; cumsum((vf(1:end-1) + vf(2:end))/2)*dtf];
+    Phi = [Phi interp1(tt - t0, pf, tr, 'linear', 'extrap')];
+end
 end

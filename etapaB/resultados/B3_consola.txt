@@ -1,0 +1,25 @@
+ETAPA B - B3_identificar_lazo_cerrado_BoP   (2026-11-09 20:49:40)
+
+Logs:
+  sesion_20261109_143311.csv       ident  2754 cuadros, 50 ventanas, th: -7.1 a 4.0 deg
+    atraso de los datos con que trabajo la ESP32 (eco de x, bola en movimiento): 2 cuadros (100 % de ecos encontrados)
+    cuadros con aceleracion medida > 2500 mm/s^2 (mano, choque o falsa deteccion): 86; sus ventanas se descartan
+  sesion_20261109_143813.csv       valid  2039 cuadros, 21 ventanas, th: -7.7 a 3.8 deg
+    atraso de los datos con que trabajo la ESP32 (eco de x, bola en movimiento): 2 cuadros (100 % de ecos encontrados)
+    cuadros con aceleracion medida > 2500 mm/s^2 (mano, choque o falsa deteccion): 79; sus ventanas se descartan
+
+Identificacion (1550 muestras por eje en ventanas de 1.0 s):
+  tau = 370 ms comun (optimo por eje: X 340 ms, Y 370 ms; grilla -40 a 500 ms)
+  eje X: c = 0.1948 (nominal 5/7 = 0.7143), b = -22.3 mm/s^2 -> desnivel equivalente -0.67 deg, f = 40.9 mm/s^2 -> inclinacion minima para rodar 1.23 deg, RMSE de ajuste 1.93 mm
+  eje Y: c = 0.2172 (nominal 5/7 = 0.7143), b = -67.7 mm/s^2 -> desnivel equivalente -1.82 deg, f = 37.4 mm/s^2 -> inclinacion minima para rodar 1.01 deg, RMSE de ajuste 2.11 mm
+
+Validacion (logs "valid"): x0 y v0 con los primeros 6 cuadros de cada ventana y prediccion del resto (0.80 s) sin reajustar:
+  identificado eje X: RMSE 9.10 mm, MAE 5.68, sesgo -0.55, R2 0.906, FIT 69.4 %, autocorr(1) 0.92, tendencia +0.003 mm/muestra
+  identificado eje Y: RMSE 10.51 mm, MAE 7.11, sesgo -0.80, R2 0.851, FIT 61.4 %, autocorr(1) 0.94, tendencia -0.008 mm/muestra
+  nominal      eje X: RMSE 26.53 mm, MAE 17.84, sesgo -16.90, R2 0.212, FIT 11.2 %, autocorr(1) 0.86, tendencia +0.037 mm/muestra
+  nominal      eje Y: RMSE 48.30 mm, MAE 34.57, sesgo -33.40, R2 -2.172, FIT -78.1 %, autocorr(1) 0.84, tendencia -0.043 mm/muestra
+(sin grafica: no hay entorno grafico)
+
+Notas: c es la rodadura EFECTIVA (incluye la ganancia real de la tabla servo->plato).
+Un c negativo en un eje indica el signo de ese eje invertido (SIGNO_VIS o INVERT_Y).
+FIN B3
