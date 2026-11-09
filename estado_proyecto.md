@@ -257,6 +257,7 @@ Siguiente etapa: B — identificación con el prototipo (pendiente desde el inic
 | Periodo, YUYV, 1 buffer | 38,1 ms de media (26,2 fps); 14,7 % de cuadros perdidos | Configuración anterior |
 | Periodo, MJPG, 1 buffer | 48,9 ms (20,5 fps); 46 % de cuadros perdidos | Se descarta MJPG |
 | **Periodo, YUYV, 2 buffers** | **33,25 ms (30,1 fps); desv. 1,9 ms; 0 % perdidos; 100 % dentro de ±5 ms del nominal** | Cumple el criterio. Queda `CAMERA_BUFFERS = 2` |
-| Latencia (YUYV, 1 buffer, incluye el monitor) | Mediana de 59,6 / 60,2 / 60,5 ms (3 corridas) | Falta medirla con 2 buffers |
+| Latencia (YUYV, 1 buffer, incluye el monitor) | Mediana de 59,6 / 60,2 / 60,5 ms (3 corridas) | |
+| **Latencia (YUYV, 2 buffers, incluye el monitor)** | **Mediana de 57,8 y 60,3 ms** (corridas 2 y 3); mínimo de 26 a 30 ms | El segundo buffer **no agrega latencia**. La corrida 1 se descarta: los primeros 8 destellos no se detectaron o dieron 390 a 630 ms porque la cámara todavía no apuntaba bien; los últimos 7 dan 56 a 62 ms. Con ~60 ms (cota superior) hay margen frente a los 75 ms del diseño |
 | Ruido (bola quieta) | Desv. de 0,12 mm en el centro y 0,09 mm en la esquina | El diseño supuso 1 mm (`MEAS_NOISE_STD_MM`) |
 | Esquina en Y = 132,4 mm | Fuera del rango físico (máximo 127 mm) | **Revisar la calibración** con 5 puntos medidos con regla antes de B1 y B2 |

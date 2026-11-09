@@ -19,8 +19,8 @@ FOURCC = "YUYV"
 # Buffers de captura de V4L2. Medido el 2026-11-06 (GW600, YUYV 640x480,
 # datos_prototipo/camara/periodo_YUYV_b*.txt): con 1 buffer se pierde el
 # 14,7 % de los cuadros (periodos de 64 ms, 26,2 fps); con 2 y con 4, ninguno
-# (media 33,25 ms, 30,1 fps, desv. 1,9 ms). Se usa 2. PENDIENTE: medir la
-# latencia con 2 buffers (run_benchmark.py --latency --buffers 2).
+# (media 33,25 ms, 30,1 fps, desv. 1,9 ms). Se usa 2. Latencia con 2 buffers
+# (latencia_b2_*.txt): mediana 57,8 y 60,3 ms, igual que con 1 buffer (~60 ms).
 CAMERA_BUFFERS = 2
 
 # exposure_time_absolute va en unidades de 100 us, asi que 50 = 5.0 ms.
