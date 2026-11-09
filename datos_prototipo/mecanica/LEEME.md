@@ -96,3 +96,26 @@ eso, en todas las tablas de esta carpeta:
 Los archivos no se modifican, porque son el dato crudo. Los firmware usan ahora
 `PIN_X = 19` y `PIN_Y = 18`, con las filas de la tabla intercambiadas: cada fila sigue al servo
 físico con el que se midió. Los comandos que nivelan el plato quedan en X ≈ +6,9° e Y ≈ +2,9°.
+
+
+## `servo_plato_2026-11-09_v3.csv` (vigente desde el 2026-11-09)
+
+Medición nueva después de que el equipo reajustó los brazos de los servos (después del 4 de
+noviembre), con los pines corregidos (X en GPIO19, Y en GPIO18). Barrido de −40 a +40 y de vuelta.
+El eje X se midió con Y = 4 y el Y con X = 11 (los neutros que encontró el equipo).
+
+- Columnas: `app_deg` (lectura de la app) y `th_convencion_deg` (θ > 0 levanta el lado del servo).
+- **Signo:** en X la app coincide con la convención; en **Y está invertido**. Con `Y 20` baja el
+  lado de arriba y la app marca +5, y en la captura con Y = −24,2° la burbuja está corrida
+  hacia el lado de arriba, que está alto.
+
+| | X | Y |
+|---|---|---|
+| Comando que nivela (interpolado) | +9,0 | +6,1 |
+| Pendiente cerca del neutro | 0,47 °/° | 0,46 °/° |
+| Holgura ida − vuelta | 0,3 a 0,8° | 0,4 a 2,4° |
+| Diferencia con la tabla anterior del firmware cerca del neutro | ≈ +0,8° | ≈ +1,6 a +2,0° |
+
+La diferencia con la tabla anterior coincide con el desnivel que identificó B3 (−0,7° en X y
+−1,8° en Y): dos mediciones independientes, una con la app y otra con la cámara, dan lo mismo.
+La pendiente casi no cambió, así que la tabla no explica el c efectivo bajo (0,2) de B3.

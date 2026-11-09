@@ -376,3 +376,13 @@ o la dinámica real del servo.
   pero la causa de los 40 ms sigue sin identificarse.
 - **Parámetros PRELIMINARES:** un solo log de identificación y modelo incompleto. No se pasan a
   A0 todavía.
+
+### Tabla servo → plato v3 (2026-11-09)
+
+Se midió de nuevo, porque el equipo había reajustado los brazos: `datos_prototipo/mecanica/servo_plato_2026-11-09_v3.csv`.
+- La tabla vieja estaba corrida ≈ 0,8° en X y ≈ 1,8° en Y cerca del neutro: es el desnivel que
+  identificó B3.
+- La pendiente casi no cambió (0,47 °/°).
+- Holgura: hasta 0,8° en X y 2,4° en Y.
+- Todos los firmware usan la tabla v3. Falta repetir el ensayo automático para ver c efectivo y
+  τ con la tabla nueva.

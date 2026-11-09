@@ -74,10 +74,11 @@ const float SALTO_MM = 60.0f;        // mm por cuadro (1800 mm/s): mas que esto 
 const int NTAB = 9;
 const float CMD_TAB[NTAB] = {-40, -30, -20, -10, 0, 10, 20, 30, 40};
 const float TH_TAB[2][NTAB] = {
-  // (2026-11-09) Filas intercambiadas: cada fila es la de un SERVO fisico. La columna
-  // thx de la tabla medida es del servo en GPIO18, que resulto ser el del eje Y.
-  {25.9f, 20.8f, 14.9f, 9.2f, 3.5f, -1.5f, -5.8f, -8.5f, -11.3f},   // eje X (servo en GPIO19)
-  {22.4f, 18.9f, 12.3f, 6.1f, 1.3f, -3.9f, -6.9f, -9.2f, -12.1f}    // eje Y (servo en GPIO18)
+  // (2026-11-09, v3) Medida de nuevo despues de reajustar los brazos:
+  // datos_prototipo/mecanica/servo_plato_2026-11-09_v3.csv, promedio de ida y vuelta.
+  // Nivelan el plato: X ~ +9, Y ~ +6. Holgura ida-vuelta: X 0,3-0,8 deg, Y 0,4-2,4 deg.
+  {25.00f, 19.90f, 14.10f, 8.65f, 4.25f, -0.45f, -4.50f, -7.90f, -10.90f},   // eje X (servo en GPIO19)
+  {23.60f, 19.30f, 13.20f, 7.20f, 2.80f, -1.80f, -5.35f, -8.20f, -10.30f}    // eje Y (servo en GPIO18)
 };
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;

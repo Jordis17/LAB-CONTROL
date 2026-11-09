@@ -50,7 +50,7 @@ Para cada eje y cada ángulo:
 
 Ángulos: unos **4°, 6° y 8°** de plato en cada sentido. Con ángulos más chicos, el error de la
 app (~0,1°) pesa demasiado. Comandos aproximados, según la tabla medida (el plato queda
-horizontal con más o menos `X 7` e `Y 2.5`). **Desde el 2026-11-09, `prueba_servos.ino` usa GPIO19 para X y GPIO18 para Y, porque los servos estaban cruzados.** Por eso las columnas X e Y de esta tabla quedaron intercambiadas respecto de la versión anterior:
+horizontal con más o menos `X 9` e `Y 6` (tabla v3 del 2026-11-09; la tabla de comandos de abajo es de la medición anterior, así que usen el ángulo que midan con la app). **Desde el 2026-11-09, `prueba_servos.ino` usa GPIO19 para X y GPIO18 para Y, porque los servos estaban cruzados.** Por eso las columnas X e Y de esta tabla quedaron intercambiadas respecto de la versión anterior:
 
 | Inclinación buscada | Eje X | Eje Y |
 |---|---|---|
