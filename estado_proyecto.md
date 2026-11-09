@@ -393,3 +393,32 @@ El equipo recalibró con el orden de clics por servos (instructivo 2.7) y dejó 
 (commit `e25e427`). Configuración vigente de `config.py`: `SWAP_XY = False`, `INVERT_Y = False`,
 `CAMERA_BUFFERS = 2`, `MEAS_NOISE_STD_MM = 1.0`. Pendiente: confirmar la escala, con la bola
 contra un borde en ≈ ±127 mm (antes llegaba a ~150).
+
+### Segunda identificación en lazo cerrado (2026-11-09, tabla v3 y cámara recalibrada)
+
+Logs `sesion_20261109_164915` y `sesion_20261109_165209`: ensayo automático completo, bola
+detectada el 100 % del tiempo. B3, identificando con cada log y validando con el otro:
+
+| | X (164915 / 165209) | Y (164915 / 165209) |
+|---|---|---|
+| c efectivo | 0,16 / 0,12 | 0,24 / 0,21 |
+| b (aceleración constante) | +68 / +77 mm/s² | +100 / +71 mm/s² |
+| Equilibrio, b/(c·g), en grados pedidos | +2,5 / +3,7 | +2,5 / +2,0 |
+| Rozamiento, en grados pedidos | 1,0 / 1,9 | 1,0 / 1,5 |
+| τ | 340 / 270 ms | 310 / 370 ms |
+
+**Validación cruzada** (FIT): 53 % / 80 % en X y 82 % / 72 % en Y, contra −306 % y −20 % del
+modelo nominal.
+
+**Lectura:**
+- b es robusto y se ve directamente en los logs: la bola queda quieta con el plato pedido a
+  +2° a +3°. La tabla v3 de la app tiene un sesgo de ese orden. Es posible que el celular no
+  apoye plano, y además el neutro que encontró el equipo (X 11, Y 4) difiere un grado del
+  cruce por cero de su propio barrido (X 9, Y 6).
+  - **Corrección:** `TH_TRIM = +2,5°` por eje en `bop_prueba_circulo_lazo`, sumado antes de la
+    tabla. La telemetría `th_out` no lo incluye.
+- c efectivo bajo (0,12 a 0,24) y τ de unos 0,3 s se repiten en las dos corridas y en los dos
+  ejes. Hipótesis: holgura (medida hasta 2,4° en Y) y respuesta del servo a cambios pequeños.
+  La perturbación del ensayo (±1,5°) está dentro de la holgura.
+- **Siguiente paso:** probar el trim; si centra bien, rediseñar el controlador (Etapas C y D)
+  con el modelo identificado (c ≈ 0,2, τ ≈ 0,3 s, rozamiento ≈ 1°).

@@ -127,6 +127,12 @@ const float TH_TAB[2][NTAB] = {
   {25.00f, 19.90f, 14.10f, 8.65f, 4.25f, -0.45f, -4.50f, -7.90f, -10.90f},   // eje X (servo en GPIO19)
   {23.60f, 19.30f, 13.20f, 7.20f, 2.80f, -1.80f, -5.35f, -8.20f, -10.30f}    // eje Y (servo en GPIO18)
 };
+// (2026-11-09) Correccion fija del nivel, medida con la BOLA y no con la app: en los
+// ensayos automaticos 164915 y 165209 (tabla v3) la bola quedaba quieta con el plato
+// pedido a +2 a +3 deg en los dos ejes, y B3 da una aceleracion constante de +68 a +100
+// mm/s^2 (equilibrio en ~+2,5 deg pedidos). La tabla de la app tiene un sesgo de ese orden.
+// Se suma a la inclinacion pedida antes de la tabla (la telemetria th_out NO la incluye).
+const float TH_TRIM[2] = {2.5f, 2.5f};   // deg, ejes X e Y
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;
 
@@ -159,7 +165,7 @@ float comandoDesdePlato(int e, float th) {
 }
 
 void moverPlato(int e, float th_deg) {
-  float c = comandoDesdePlato(e, th_deg);
+  float c = comandoDesdePlato(e, th_deg + TH_TRIM[e]);
   if (c > 40.0f) c = 40.0f;
   if (c < -40.0f) c = -40.0f;
   servo[e].writeMicroseconds((int)lroundf(US_NEUTRO + c * US_POR_GRADO));
