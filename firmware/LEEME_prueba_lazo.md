@@ -239,3 +239,9 @@ BOOT cuatro veces: centro → círculo → ensayo → **mapeo**. El LED da un do
 1°, los dos controladores, c = 0,2 y 0,57): la bola no pasó de **91 a 98 mm** del centro (el
 borde está a ~129 mm). Hubo que achicar la versión inicial: con puntos a 70 mm, perturbación de
 ±2,5° y el círculo de 50 mm a 4 s, la bola llegaba al borde. No es una medición.
+
+### `bop_mapeo/` (2026-11-13)
+
+Es el mismo firmware que `bop_prueba_circulo_lazo`, pero **una pulsación de BOOT arranca
+directamente el ensayo** y otra desarma. `MODO_BOOT = 4` corre el mapeo completo (por defecto) y
+`MODO_BOOT = 3` el ensayo automático corto. Al terminar queda en modo centro.
