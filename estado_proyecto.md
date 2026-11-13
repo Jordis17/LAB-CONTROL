@@ -542,3 +542,36 @@ Validación (FIT): 71 % y 74 %, contra 47 % y 49 % del nominal.
   como fuera de `E_ZONA` (40 mm) se congelaba, anulaba al proporcional: el plato quedaba en
   −0,07°, dentro de la zona muerta. **Corregido:** fuera de `E_ZONA` el integrador se descarga
   con τ = 1,5 s.
+
+### Rediseño preliminar con el modelo identificado (2026-11-13)
+
+Masa de la bola de ping pong: **2,7 g (valor típico, no medido)**. No influye en la dinámica de
+rodadura.
+
+**Modelo de diseño:** retardo total ≈ **0,44 s** = cámara 0,04 + datos de la ESP32 0,07 (dos
+cuadros, por el `loop()` de 40 ms) + orden → bola 0,33 (B3). c efectivo de 0,2 (movimientos
+chicos) a 0,57 (grandes). Zona muerta de ≈ 1°.
+
+**Márgenes con retardo puro de 0,44 s** (cálculo de esta sesión, Python):
+
+| Controlador | c = 0,15 | c = 0,2 | c = 0,3 | c = 0,45 | c = 0,57 |
+|---|---|---|---|---|---|
+| Original (Etapa C) | PM 12° | PM 12° | PM 10° | PM 2° | **PM −6° (inestable)** |
+| Rediseño c = 0,3, te = 0,44 | PM 41° | PM 43° | PM 43° | PM 38° | PM 32° (GM 5,2 dB) |
+
+Rediseño: Kp = 0,00727 °/mm, Kd = 0,0184 °/(mm/s), Ki = Kp/5 (Ti = 5 s), ω = 0,95 rad/s.
+
+**Simulación con zona muerta de 1°** (desde 80 mm): sin compensación, el rediseño no mueve la
+bola (pide 0,58°, menos que la zona muerta). Con **compensación de zona muerta de 1°** centra
+en 7 a 9 s sin sobrepaso, con c = 0,2 y con c = 0,57.
+
+**Firmware de prueba:** `CONJUNTO` 0 (original) o 1 (rediseño, por defecto) y `COMP_DB = 1°`
+(se aplica con |error| > `ZONA_MM`). Hay que **compararlos en el prototipo** con el ensayo
+automático: escalones (fase 2) y círculos.
+
+**Implicación para los requisitos:** con 0,44 s de retardo, **R1 (ts ≤ 3 s) no se puede
+cumplir** con un controlador robusto. Hay que documentarlo con estos datos en el informe, o
+bajar el retardo: menos holgura en el mecanismo y `loop()` de la ESP32 más rápido.
+
+Pendiente para cerrar formalmente: actualizar A0 (bola y retardo identificados), C1 y D1 con
+el rediseño, y después regenerar el código y repetir E a G en MATLAB.

@@ -62,9 +62,23 @@ const float SIGNO_VIS[2] = {+1.0f, +1.0f};
 
 // --------------------------------------------- Controlador (Etapa C, C1) ---
 // Unidades: mm, mm/s, GRADOS de plato. Valores de etapaC (2026-11-04).
-const float KP     = 0.034118997f;   // deg/mm
-const float KD     = 0.025875847f;   // deg/(mm/s)
-const float KI     = 0.022745998f;   // deg/(mm s)
+// (2026-11-13) Dos juegos de ganancias para comparar en el prototipo (CONJUNTO):
+//  0 = ORIGINAL (Etapa C, disenado para c = 0,714 y te = 0,13 s). Con el retardo real
+//      (~0,44 s) el analisis lineal da PM 12 deg con c = 0,2 e inestable con c = 0,57.
+//  1 = REDISENO con el modelo identificado (B3): asignacion de polos igual que en C1
+//      (zeta 0,7, a = 1) con c = 0,3 y te = 0,44 s; PM >= 31 deg y GM >= 5 dB para c en
+//      [0,15; 0,57]. Mas lento (simulacion: centra desde 80 mm en 7 a 9 s, sin sobrepaso).
+// Retardo total ~0,44 s = camara 0,04 + datos de la ESP32 0,07 + orden->bola 0,33 (B3).
+const int CONJUNTO = 1;
+const float KP_SET[2] = {0.034118997f, 0.007274f};   // deg/mm
+const float KD_SET[2] = {0.025875847f, 0.018436f};   // deg/(mm/s)
+const float KI_SET[2] = {0.022745998f, 0.001455f};   // deg/(mm s)  (rediseno: Ti = 5 s)
+const float KP = KP_SET[CONJUNTO];
+const float KD = KD_SET[CONJUNTO];
+const float KI = KI_SET[CONJUNTO];
+// Compensacion de la zona muerta de la transmision (~1 deg en B3, igual con las dos bolas):
+// si el error supera ZONA_MM, se suma sign(u)*COMP_DB a la inclinacion pedida.
+const float COMP_DB = 1.0f;   // deg (0 = sin compensacion)
 const float TS     = 1.0f / 30.0f;   // s (periodo de diseno)
 const float TH_LIM = 10.0f;          // deg, saturacion de la inclinacion pedida
 const float E_CLIP = 30.0f;          // mm, recorte del error del integrador
@@ -222,6 +236,9 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bo
     else eps = (eps > 0) ? eps - ZONA_MM : eps + ZONA_MM;
   }
   float u = KP * eps + I[e] + KD * (vh - vref) + th_ff;
+  float eps_bruto = xh - r;
+  if (COMP_DB > 0.0f && fabsf(eps_bruto) > ZONA_MM && fabsf(u) > 0.05f)
+    u += (u > 0) ? COMP_DB : -COMP_DB;            // compensacion de zona muerta
   float th = u;
   if (th > TH_LIM) th = TH_LIM;
   if (th < -TH_LIM) th = -TH_LIM;
