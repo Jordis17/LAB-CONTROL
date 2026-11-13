@@ -462,3 +462,22 @@ tiempo.
 - El ajuste del firmware de prueba llega a su límite: lo que queda (amplificación por el
   retardo, corrimiento por holgura) se resuelve con el **rediseño del controlador** (Etapas C y
   D, con el modelo identificado) y con el **ajuste mecánico del eje Y**.
+
+### Círculo lento (T = 6 s, TH_TRIM = {0,45; 1,2}) (2026-11-13, `sesion_20261113_101245`)
+
+**330 s seguidos de círculo sin caídas**, con la bola detectada el 100 % del tiempo.
+- Centro de la órbita: (30, 9) mm. Radio: 87 mm (p10 64, p90 108) para 60 pedidos. Error
+  mediano de 42 mm.
+- **Repetibilidad del centro en X** según el trim: 0° → +30 mm, 0,9° → −31 mm,
+  0,45° → +30 mm. **No es monótono**, así que el centro de la órbita no lo fija el nivel.
+- En Y el centro varió entre +9 y +31 mm de una corrida a otra con trims parecidos.
+- Bajar la velocidad de T = 4 s a 6 s redujo poco el radio (93 → 87 mm).
+- **Conclusión:** lo que queda (órbita corrida unos ±30 mm de una corrida a otra, radio 1,4 a
+  1,5 veces el pedido, órbita irregular) es **no lineal**: holgura (hasta 2,4° en Y) más
+  rozamiento (~1°). Ni el nivel ni la prealimentación lo corrigen de forma sistemática. Se cierra
+  el ajuste del firmware de prueba.
+- **Orden de lo que sigue:**
+  1. reducir la holgura mecánica, sobre todo la de Y;
+  2. repetir dos ensayos automáticos y la identificación (B3);
+  3. rediseñar el controlador con ese modelo (Etapas C y D) y regenerar el código (E a G).
+- El rediseño va después del ajuste mecánico porque la holgura cambia el modelo.
