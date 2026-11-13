@@ -636,3 +636,15 @@ controladores y repetir B3 en varias posiciones.
   bordes nuevos rozando).
 - La compensación de zona muerta con signo hacía **vibrar el plato ±1° cuadro a cuadro**. Se
   cambió a una compensación suave: COMP_DB·sat(u/0,3°).
+
+### Servo Y más duro (2026-11-13)
+
+- El equipo confirma que **el plato es plano** y que la bola rueda libre con los servos
+  apagados. El **servo Y se siente más duro que el X desde que se compró**.
+- Coincide con los datos: el eje Y tiene más holgura (2,4° contra 0,8°) y más retardo
+  (0,41 s contra 0,27 s), y casi todas las zonas de traba están del lado −Y, donde el servo Y
+  tiene que levantar el plato.
+- **Solución de fondo:** cambiar el servo Y y volver a medir su tabla.
+- **Parche en el firmware:** compensación de zona muerta por eje (X 1°, Y 2°) y despegue por
+  eje (X 1°/s, Y 2°/s).
+- Para el informe: la asimetría entre los ejes viene del actuador y está medida.

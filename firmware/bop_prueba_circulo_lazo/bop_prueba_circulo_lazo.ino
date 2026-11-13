@@ -79,12 +79,16 @@ const float KD = KD_SET[CONJUNTO];
 const float KI = KI_SET[CONJUNTO];
 // Compensacion de la zona muerta de la transmision (~1 deg en B3, igual con las dos bolas):
 // si el error supera ZONA_MM, se suma sign(u)*COMP_DB a la inclinacion pedida.
-const float COMP_DB = 1.0f;   // deg (0 = sin compensacion)
+// (2026-11-13) Por eje: el servo Y es mas duro desde que se compro (equipo) y en los datos
+// tiene mas holgura (2,4 contra 0,8 deg), mas retardo (0,41 contra 0,27 s) y es donde la
+// bola se traba. Parche hasta cambiar el servo Y.
+const float COMP_DB_EJE[2] = {1.0f, 2.0f};   // deg, ejes X e Y (0 = sin compensacion)
+const float COMP_DB = 1.0f;   // (se conserva el nombre; se usa COMP_DB_EJE)
 // (2026-11-13) Despegue: en el mapeo sesion_20261113_121542 la bola de ping pong quedo
 // quieta 80 s con el plato pedido a ~2 deg y 100 s con 4,2 deg (la camara si veia la bola:
 // misma area y circularidad). Si la bola esta quieta lejos de la referencia, se suma una
 // inclinacion extra que crece a DESP_RATE hasta DESP_MAX y se quita al moverse.
-const float DESP_RATE = 1.0f;   // deg/s
+const float DESP_RATE_EJE[2] = {1.0f, 2.0f};   // deg/s, ejes X e Y (Y: servo mas duro)
 const float DESP_MAX  = 5.0f;   // deg
 const float DESP_V    = 5.0f;   // mm/s: por debajo, la bola se considera quieta
 float desp[2] = {0, 0};
@@ -250,16 +254,16 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bo
   float eps_bruto = xh - r;
   // compensacion de zona muerta SUAVE (2026-11-13): la version con signo saltaba de +1 a
   // -1 deg cuando u cruzaba 0 y el plato vibraba +-1 deg cuadro a cuadro (log 132508).
-  if (COMP_DB > 0.0f && fabsf(eps_bruto) > ZONA_MM) {
+  if (COMP_DB_EJE[e] > 0.0f && fabsf(eps_bruto) > ZONA_MM) {
     float k = u / 0.3f;                            // llega a la compensacion completa con |u| = 0,3 deg
     if (k > 1.0f) k = 1.0f;
     if (k < -1.0f) k = -1.0f;
-    u += COMP_DB * k;
+    u += COMP_DB_EJE[e] * k;
   }
   // despegue: bola quieta lejos de la referencia -> inclinacion extra creciente
   if (fabsf(vh) < DESP_V && fabsf(eps_bruto) > 2.0f * ZONA_MM) {
     float sg = (eps_bruto > 0) ? 1.0f : -1.0f;      // el plato sube del lado de la bola
-    desp[e] += sg * DESP_RATE * TS;
+    desp[e] += sg * DESP_RATE_EJE[e] * TS;
     if (desp[e] > DESP_MAX) desp[e] = DESP_MAX;
     if (desp[e] < -DESP_MAX) desp[e] = -DESP_MAX;
   } else {
