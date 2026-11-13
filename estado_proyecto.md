@@ -648,3 +648,15 @@ controladores y repetir B3 en varias posiciones.
 - **Parche en el firmware:** compensación de zona muerta por eje (X 1°, Y 2°) y despegue por
   eje (X 1°/s, Y 2°/s).
 - Para el informe: la asimetría entre los ejes viene del actuador y está medida.
+
+### Ensayo corto tras lubricar un servo (2026-11-13, `sesion_20261113_150437`)
+
+Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensación por eje.
+- **El eje X empeoró:** c efectivo 0,06 (antes 0,19) y zona muerta ≈ 2,5° (antes 1,2°). En
+  modo centro, la bola quedó en x ≈ −110 mm durante 100 s mientras se pedían −1,5° a −3,8° en X.
+  Los círculos quedaron corridos a (−95, −70) mm.
+- Eje Y sin cambios claros: c 0,24.
+- **Hipótesis:** el brazo del servo X (GPIO19, lado derecho) resbala sobre el eje, por
+  lubricante en las estrías o por un tornillo aflojado. Pendiente: revisión del equipo y repetir
+  el ensayo corto.
+- B3 con este log (validando con `112242`): FIT de 71 % y 70 %, contra 66 % y 51 % del nominal.
