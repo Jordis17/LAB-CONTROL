@@ -512,3 +512,33 @@ se caía: en los logs de círculo estuvo cerca del borde (más de 115 mm del cen
   - Consecuencia: el error estacionario puede llegar a 5 mm, contra R3 de 3 mm. Se revisa en el
     rediseño.
   - No se aplica en el círculo ni en el ensayo automático.
+
+### Bola de ping pong: primeros datos (2026-11-13)
+
+**Círculo** (`sesion_20261113_105517`; R = 45 mm, T = 4 s; 152 s): centro en **(6, −4) mm**,
+radio medio de 45 mm (p10 18, p90 73), error mediano de 30 mm, **sin tocar el borde** y bola
+detectada el 100 % del tiempo. El centrado mejoró mucho respecto de la bola de PLA, pero la
+órbita sigue irregular.
+
+**Ensayo automático** (`sesion_20261113_105834`), identificando con B3 y validando con el
+círculo:
+
+| | X | Y |
+|---|---|---|
+| c efectivo | 0,19 | 0,22 |
+| Desnivel | −0,04° | +0,12° |
+| "Rozamiento", en grados pedidos | 1,2° | 1,0° |
+| τ | 270 ms | 410 ms |
+
+Validación (FIT): 71 % y 74 %, contra 47 % y 49 % del nominal.
+
+- **Con una bola lisa y liviana salen el mismo c efectivo (≈ 0,2) y el mismo "rozamiento"
+  (≈ 1°) que con la de PLA.** Entonces no son de la bola: son del **mecanismo**. Ese "f" es en
+  realidad la **zona muerta** de la transmisión (holgura y servo), y la respuesta reducida a
+  movimientos chicos viene de lo mismo.
+- El desnivel ya es ≈ 0 en los dos ejes: el trim {0,45; 1,2} está bien.
+- **Defecto del firmware encontrado:** después del ensayo, en modo centro, la bola quedó 20 s
+  quieta a x = −57 mm. El integrador estaba en +1,7° (acumulado con la bola del otro lado) y,
+  como fuera de `E_ZONA` (40 mm) se congelaba, anulaba al proporcional: el plato quedaba en
+  −0,07°, dentro de la zona muerta. **Corregido:** fuera de `E_ZONA` el integrador se descarga
+  con τ = 1,5 s.

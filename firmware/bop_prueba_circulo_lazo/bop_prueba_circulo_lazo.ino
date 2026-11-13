@@ -117,6 +117,11 @@ const float SLEW_DEG = 6.0f;         // deg por cuadro (= 180 deg/s a 30 fps). v
                                      // empujada a 500 mm/s se frena a 125 mm en vez de 138 (simulacion 2026-11-09)
 const float E_ZONA   = 40.0f;        // mm: solo se integra con |error| menor que esto
 const float I_MAX    = 3.0f;         // deg: tope del integrador
+// (2026-11-13) Fuera de E_ZONA el integrador ya no queda congelado: se descarga con esta
+// constante de tiempo. En sesion_20261113_105834 la bola quedo 20 s quieta a x = -57 mm
+// porque el integrador seguia en +1,7 deg (acumulado con la bola del otro lado) y anulaba
+// al proporcional (-1,77 deg): plato a -0,07 deg, por debajo de la zona muerta del mecanismo.
+const float TAU_DESCARGA = 1.5f;     // s
 const float SALTO_MM = 60.0f;        // mm por cuadro (1800 mm/s): mas que esto es una falsa deteccion
 
 // ---------------------- Relacion servo -> plato MEDIDA (2026-11-04, v2) ---
@@ -224,6 +229,7 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bo
   sat_e[e] = saturado;
   bool congelar = saturado && ((eps > 0) - (eps < 0)) == ((u > 0) - (u < 0));
   if (fabsf(vh) < V_INT) nq[e]++; else nq[e] = 0;
+  if (fabsf(eps) >= E_ZONA) I[e] *= (1.0f - TS / TAU_DESCARGA);   // descarga lejos de la referencia
   if (!congelar && !en_zona && nq[e] >= (NQ > 1 ? NQ : 1) && fabsf(eps) < E_ZONA) {
     float ec = eps;
     if (ec > E_CLIP) ec = E_CLIP;
