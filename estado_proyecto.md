@@ -447,3 +447,18 @@ tiempo.
   diferencia apoya la hipótesis de la **holgura**: los movimientos pequeños y rápidos se pierden
   en el juego mecánico.
 - La prealimentación del círculo pasa a usar c = 0,57.
+
+### Círculo con TH_TRIM = {0,9; 1,2} (2026-11-13, `sesion_20261113_094845`)
+
+176 s sin caídas. Centro de la órbita en (−31, +27) mm y radio de 93 mm.
+- **X:** el centro pasó de +30 a −31 mm al subir el trim de 0 a 0,9°, así que el valor justo
+  es ≈ 0,45°.
+- **Y:** el centro casi no cambió con el trim (+31 → +27 mm). No es nivel; probablemente es la
+  holgura de Y.
+- **Radio:** no cambió al usar c = 0,57 en la prealimentación (94 → 93 mm). La explicación
+  más probable es la amplificación del lazo con retardo a esa frecuencia (T = 4 s), no la
+  prealimentación. El balance radial de la entrada anterior no basta para estimar c.
+- Cambios: `TH_TRIM = {0,45; 1,2}` y `T_CIRC = 6 s`.
+- El ajuste del firmware de prueba llega a su límite: lo que queda (amplificación por el
+  retardo, corrimiento por holgura) se resuelve con el **rediseño del controlador** (Etapas C y
+  D, con el modelo identificado) y con el **ajuste mecánico del eje Y**.

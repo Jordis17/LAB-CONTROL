@@ -74,7 +74,8 @@ float REF[2] = {0.0f, 0.0f};         // referencia (mm): centro del plato
 
 // ------------------------------------------------ Trayectoria circular ---
 const float R_CIRC  = 60.0f;   // mm, radio (el util del plato es +-127 mm)
-const float T_CIRC  = 4.0f;    // s por vuelta (mas lento = mas facil de seguir)
+const float T_CIRC  = 6.0f;    // s por vuelta (2026-11-13: con 4 s la bola salia a ~94 mm para 60
+                               // pedidos, efecto del retardo del lazo; mas lento = menos amplificacion)
 const float SENTIDO = 1.0f;    // +1 antihorario, -1 horario (en el marco de la vision)
 const float RAMPA_S = 3.0f;    // s para que el radio llegue a R_CIRC
 // (2026-11-13) Solo para la prealimentacion del circulo. En el circulo de
@@ -141,7 +142,10 @@ const float TH_TAB[2][NTAB] = {
 // restar en promedio -2,6 (X) y -1,5 (Y): el nivel real esta en ~0 (X) y ~+1 (Y).
 // (2026-11-13, sesion_20261113_093155) la ley sumo en promedio +0,94 (X) y +0,23 (Y)
 // durante 160 s de circulo: se pasan al trim.
-const float TH_TRIM[2] = {0.9f, 1.2f};   // deg, ejes X e Y
+// (2026-11-13, sesion_20261113_094845) con X = 0,9 el centro de la orbita paso de +30 a
+// -31 mm: el valor justo en X esta en el medio. En Y el centro casi no cambio con el trim
+// (+31 -> +27 mm): ese corrimiento no es de nivel (probable holgura de Y, hasta 2,4 deg).
+const float TH_TRIM[2] = {0.45f, 1.2f};   // deg, ejes X e Y
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;
 
