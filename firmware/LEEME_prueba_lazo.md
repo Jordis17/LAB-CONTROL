@@ -265,3 +265,21 @@ Simulación previa (planta ẍ = −c·g·sin θ(t−τ) − f·sign ẋ con hol
 mismo código del firmware compilado en la PC): con c = 0,15 a 0,57, τ = 0,40 a 0,44 s y hasta 1° de
 desnivel real en cada eje, |x| máximo de 55 a 64 mm y ninguna pausa. En simulación el error
 final de los escalones queda entre 5 y 16 mm, por la holgura y el rozamiento.
+
+## Versión de trabajo: `bop_controlador_estable.ino` (2026-11-13)
+
+Es el firmware de los logs con mejor desempeño con la bola de ping pong: el círculo `105517`
+(centro en (6, −4) mm, radio medio de 45 mm, sin tocar el borde) y el ensayo `105834`. Se tomó
+del commit `8d0f938` de `bop_prueba_circulo_lazo.ino`:
+- controlador original de la Etapa C (Kp 0,0341 °/mm, Kd 0,0259 °/(mm/s), Ki 0,0227 °/(mm·s));
+- zona de tolerancia de 5 mm en modo centro;
+- integrador que se descarga lejos de la referencia;
+- sin compensación de zona muerta ni despegue.
+
+Único cambio: `TH_TRIM` = {−1,25; −0,25}°, por el corrimiento de neutro tras lubricar (log
+`151156`). BOOT recorre: desarmado → centro → círculo → ensayo automático de 70 s (escalones de
+4 s) → desarmado.
+
+Aviso: en simulación (holgura de 1°, retardo de 0,44 s, poco rozamiento), este controlador hace
+un ciclo límite de ±35 a 50 mm en Y. En el prototipo (`105834`), Y quedó a una mediana de 6 mm
+del centro. Si en las pruebas aparece una oscilación lenta (~10 s de periodo), es eso.

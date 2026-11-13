@@ -676,3 +676,10 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
 - Pedido del equipo: más pruebas centradas en la tarea de centrar la bola. Se agregó `MODO_BOOT = 5` (~9,5 min): escalones al centro desde 8 direcciones a 60 mm (fase 12), empujones de ±2° y ±3° durante 0,3 s (fase 13), desniveles constantes de ±1° durante 25 s (fase 14) y 60 s quieta. Detalle en `firmware/LEEME_prueba_lazo.md`.
 - Simulado con el mismo código del firmware: |x| ≤ 64 mm, sin pausas de seguridad, para c entre 0,15 y 0,57, τ de 0,40 a 0,44 s y 1° de desnivel real. Es una simulación, no una medición.
 - Observación de diseño: con CONJUNTO = 1, Kp = 0,0073 °/mm. Un desnivel de 1° solo con el proporcional dejaría la bola a ~140 mm. Lo que la sostiene es la compensación de zona muerta y el despegue. Además, el integrador se descarga fuera de E_ZONA = 40 mm. Por eso un trim mal ajustado deja la bola lejos del centro (log 151156). La fase 14 lo mide.
+
+### 2026-11-13 — Versión de trabajo del controlador (`firmware/bop_controlador_estable/`)
+
+- Pedido del equipo: volver a la versión más funcional para seguir probando.
+- Elegida la de los logs `105517` (mejor círculo de todos) y `105834`: controlador original, zona de 5 mm, integrador con descarga (commit `8d0f938`). Solo se cambió `TH_TRIM` a {−1,25; −0,25}°.
+- Comparación real que la respalda (tabla "Prueba del rediseño"): círculo con error mediano de 30 mm, contra 45 a 58 mm del rediseño. En escalones, el rediseño terminó más cerca (1 a 47 mm, contra 9 a 80 mm).
+- En simulación, el original hace un ciclo límite de ±35 a 50 mm en Y con 1° de holgura. No se vio en `105834` (|y| mediano de 6 mm en modo centro). Es para vigilar.
