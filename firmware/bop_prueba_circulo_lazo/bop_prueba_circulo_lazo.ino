@@ -77,7 +77,11 @@ const float R_CIRC  = 60.0f;   // mm, radio (el util del plato es +-127 mm)
 const float T_CIRC  = 4.0f;    // s por vuelta (mas lento = mas facil de seguir)
 const float SENTIDO = 1.0f;    // +1 antihorario, -1 horario (en el marco de la vision)
 const float RAMPA_S = 3.0f;    // s para que el radio llegue a R_CIRC
-const float C_ROD   = 5.0f / 7.0f;    // rodadura nominal (Etapa A; PENDIENTE identificar en B1)
+// (2026-11-13) Solo para la prealimentacion del circulo. En el circulo de
+// sesion_20261113_093155 (R = 60 mm, T = 4 s) la bola giro con radio 94 mm: el balance
+// radial w^2 R_bola = c g sin(th_ff + Kp*(R_bola - R)) da c ~ 0,57 para movimientos
+// lentos y grandes (B3, con perturbacion chica y rapida dentro de la holgura, da ~0,2).
+const float C_ROD   = 0.57f;          // rodadura para la prealimentacion (nominal 5/7)
 const float G_MM    = 9810.0f;        // mm/s^2
 const float TAU_PRED = 0.075f; // s: compensacion del retardo de la camara en modo circulo
                                // (x_pred = x_hat + v_hat * TAU_PRED). 0 = sin compensacion.
@@ -135,7 +139,9 @@ const float TH_TAB[2][NTAB] = {
 // (2026-11-13) CORREGIDO: +2,5 era excesivo (salia de tramos con la bola quieta por
 // rozamiento, no en equilibrio). En el circulo sesion_20261113_090144 la ley tuvo que
 // restar en promedio -2,6 (X) y -1,5 (Y): el nivel real esta en ~0 (X) y ~+1 (Y).
-const float TH_TRIM[2] = {0.0f, 1.0f};   // deg, ejes X e Y
+// (2026-11-13, sesion_20261113_093155) la ley sumo en promedio +0,94 (X) y +0,23 (Y)
+// durante 160 s de circulo: se pasan al trim.
+const float TH_TRIM[2] = {0.9f, 1.2f};   // deg, ejes X e Y
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;
 

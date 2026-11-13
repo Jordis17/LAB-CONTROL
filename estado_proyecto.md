@@ -434,3 +434,16 @@ Modo círculo (R = 60 mm, T = 4 s) durante unos 100 s.
 - **Corregido a `TH_TRIM = {0, +1}`.**
 - El radio mayor que el pedido también es coherente con un c real menor que el 5/7 usado en la
   prealimentación. Pendiente: rediseñar con el modelo identificado.
+
+### Círculo con TH_TRIM = {0, +1} (2026-11-13, `sesion_20261113_093155`)
+
+160 s en modo círculo (R = 60 mm, T = 4 s), **sin caídas**, con la bola detectada el 100 % del
+tiempo.
+- Centro de la órbita: **(30, 31) mm**; antes estaba en (−78, −41).
+- Radio respecto de ese centro: 94 mm (p10 78, p90 110). Atraso angular de ≈ 25 ms.
+- Ley media: +0,94° (X) y +0,23° (Y). Se pasa al trim: **`TH_TRIM = {0,9; 1,2}`**.
+- Balance radial: ω²·R_bola = c·g·sen(θ_ff + Kp·(R_bola − R)), que da **c ≈ 0,57** para
+  movimientos lentos y grandes. B3, con la perturbación chica y rápida, da ≈ 0,2. Esa
+  diferencia apoya la hipótesis de la **holgura**: los movimientos pequeños y rápidos se pierden
+  en el juego mecánico.
+- La prealimentación del círculo pasa a usar c = 0,57.
