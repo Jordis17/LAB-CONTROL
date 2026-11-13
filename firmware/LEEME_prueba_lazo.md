@@ -220,3 +220,22 @@ LED da destellos cortos y la ESP32 hace sola esta secuencia de 70 s:
   de 61 mm del centro y el plato no pasa de 4,2°. No es una medición.
 
 **2026-11-13:** los escalones de la fase 2 duran ahora 8 s (`T_ESC`), y el ensayo completo 90 s. Las fases 3 a 6 empiezan 20 s más tarde.
+
+### Mapeo completo (modo 4, 2026-11-13)
+
+BOOT cuatro veces: centro → círculo → ensayo → **mapeo**. El LED da un doble destello. Dura unos
+**20,5 min** (1231 s, 73 segmentos) y después pasa solo a modo centro.
+
+| Bloque | Contenido | Fase en la telemetría |
+|---|---|---|
+| Cuadrícula | 5 × 5 puntos de −60 a +60 mm cada 30 mm, en zigzag, 20 s por punto, con referencia en rampa (50 mm/s) | 7 |
+| Escalones radiales | Del centro a 60 mm en 8 direcciones y de vuelta, 12 s + 12 s | 7 |
+| Círculos | Radios 20, 35 y 50 mm; periodos 8, 6 y 4 s (sin 50 mm a 4 s); los dos sentidos; 3 vueltas | 8 |
+| Perturbación conocida | ±1,0 y ±1,5° en el centro, y ±1,5° en (±40, 0) y (0, ±40); 20 s cada una | 9 |
+| Figura de ocho | 50 × 35 mm, periodos de 10 s y 7 s, 3 ciclos | 10 |
+| Pausa de seguridad | Si \|x\| o \|y\| > 100 mm: referencia al centro, y sigue cuando la bola está a < 30 mm y casi quieta | 11 |
+
+**Simulación previa** (modelo identificado: retardo 0,44 s, zona muerta de 1°, compensación de
+1°, los dos controladores, c = 0,2 y 0,57): la bola no pasó de **91 a 98 mm** del centro (el
+borde está a ~129 mm). Hubo que achicar la versión inicial: con puntos a 70 mm, perturbación de
+±2,5° y el círculo de 50 mm a 4 s, la bola llegaba al borde. No es una medición.

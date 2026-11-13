@@ -593,3 +593,12 @@ La segunda corrida no tuvo `CONJUNTO = 0`.
 - Los escalones del ensayo automático pasan a **8 s** (`T_ESC`); el ensayo dura 90 s.
 - Pendiente: corrida con `CONJUNTO = 0` (original) con el firmware actual (integrador que se
   descarga y compensación de zona muerta), para comparar en igualdad de condiciones.
+
+### Mapeo completo automático (modo 4, 2026-11-13)
+
+Pedido del equipo: un ensayo exhaustivo sin tocar los bordes. Son 20,5 min con una cuadrícula
+de 25 puntos, escalones radiales en 8 direcciones, círculos (3 radios × 3 velocidades × 2
+sentidos), perturbación conocida en 5 posiciones, figura de ocho y pausa de seguridad a 100 mm.
+Detalle en `firmware/LEEME_prueba_lazo.md`. En simulación, la bola no pasa de 98 mm con ninguno
+de los dos controladores. Sirve para mapear el nivel y el error en todo el plato, comparar los
+controladores y repetir B3 en varias posiciones.

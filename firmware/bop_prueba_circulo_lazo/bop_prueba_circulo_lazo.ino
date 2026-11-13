@@ -18,8 +18,9 @@
 //
 // Boton BOOT (GPIO0), cada pulsacion pasa al modo siguiente:
 //   DESARMADO (LED apagado) -> CENTRO (LED encendido) -> CIRCULO (LED parpadeo lento)
-//   -> ENSAYO AUTOMATICO (LED destellos cortos, 70 s, ver "Ensayo automatico") -> DESARMADO
-//   Al terminar el ensayo pasa solo a CENTRO.
+//   -> ENSAYO AUTOMATICO (LED destellos cortos, 90 s, ver "Ensayo automatico")
+//   -> MAPEO COMPLETO (LED doble destello, ~20,5 min, ver "Mapeo completo") -> DESARMADO
+//   Al terminar el ensayo o el mapeo pasa solo a CENTRO.
 // Al entrar en CIRCULO el radio crece en rampa durante RAMPA_S segundos.
 // Lo demas (watchdog, sin bola, filtro de saltos, limite de velocidad) es igual al v2.
 //
@@ -344,8 +345,8 @@ void enviarTelemetria(float x_rx) {
 }
 
 // Referencia circular de radio R (con rampa de RAMPA_S) y periodo T, en el instante t.
-void refCirculo(float R, float T, float t, float r[2], float vr[2], float ff[2]) {
-  float w = SENTIDO * 2.0f * PI / T;
+void refCirculoS(float R, float T, float sentido, float t, float r[2], float vr[2], float ff[2]) {
+  float w = sentido * 2.0f * PI / T;
   float Rk = R * fminf(1.0f, t / RAMPA_S);
   float ang = w * t;
   r[0] = Rk * cosf(ang);          r[1] = Rk * sinf(ang);
@@ -354,6 +355,10 @@ void refCirculo(float R, float T, float t, float r[2], float vr[2], float ff[2])
     float a_ref = -w * w * r[e];                              // mm/s^2
     ff[e] = -a_ref / (C_ROD * G_MM) * 180.0f / PI;            // deg
   }
+}
+
+void refCirculo(float R, float T, float t, float r[2], float vr[2], float ff[2]) {
+  refCirculoS(R, T, SENTIDO, t, r, vr, ff);
 }
 
 // Bit pseudoaleatorio (LFSR de 16 bits, polinomio x^16+x^14+x^13+x^11+1).
@@ -395,6 +400,130 @@ bool refEnsayo(float t, float r[2], float vr[2], float ff[2], float dth[2], bool
   return false;
 }
 
+
+// ------------------------------------------ Mapeo completo (modo 4) ---
+// (2026-11-13, pedido del equipo) Secuencia automatica de ~20,5 min que recorre el plato
+// sin tocar los bordes. Segmentos (la fase de la telemetria indica el tipo):
+//   fase 7  PUNTO   : referencia a (a, b), con rampa de RAMPA_REF_MM_S
+//   fase 8  CIRCULO : radio a, periodo b, sentido c (+1/-1), centrado en (0, 0)
+//   fase 9  DITHER  : referencia en (a, b) + perturbacion pseudoaleatoria de +-c deg
+//   fase 10 LISSAJOUS (figura de ocho): x = a sin(wt), y = b sin(2wt), periodo c
+//   fase 11 PAUSA DE SEGURIDAD: la bola paso de LIM_SEG_MM (100 mm); se la lleva al centro y el
+//           ensayo sigue cuando esta a menos de 30 mm y casi quieta (el reloj se detiene).
+// Al terminar pasa solo a CENTRO.
+const float LIM_SEG_MM = 100.0f;   // simulacion del mapeo (retardo 0,44 s, zona muerta 1 deg, los
+                                   // dos controladores, c 0,2 y 0,57): |x| max 91 a 98 mm (borde ~129)
+const float RAMPA_REF_MM_S = 50.0f;
+struct Seg { uint8_t tipo; float a, b, c, dur; };
+const int NSEG_MAX = 140;
+Seg segs[NSEG_MAX];
+int nseg = 0;
+float t_seg = 0.0f;      // s dentro del segmento actual
+int iseg = 0;
+bool pausa = false;
+float r_map[2] = {0, 0};  // referencia con rampa (PUNTO y DITHER)
+uint16_t n_pausas = 0;
+
+void agregar(uint8_t tipo, float a, float b, float c, float dur) {
+  if (nseg < NSEG_MAX) { segs[nseg].tipo = tipo; segs[nseg].a = a; segs[nseg].b = b; segs[nseg].c = c; segs[nseg].dur = dur; nseg++; }
+}
+
+void armarMapeo() {
+  nseg = 0;
+  agregar(0, 0, 0, 0, 10);                                   // centro
+  // 1) cuadricula 5 x 5 en zigzag (-60 a 60 mm), 20 s por punto
+  const float G[5] = {-60, -30, 0, 30, 60};
+  for (int iy = 0; iy < 5; iy++)
+    for (int k = 0; k < 5; k++) {
+      int ix = (iy % 2 == 0) ? k : 4 - k;
+      agregar(0, G[ix], G[iy], 0, 20);
+    }
+  agregar(0, 0, 0, 0, 15);
+  // 2) escalones radiales de 60 mm en 8 direcciones (ida 12 s, vuelta 12 s)
+  for (int d = 0; d < 8; d++) {
+    float ang = d * PI / 4.0f;
+    agregar(0, 60.0f * cosf(ang), 60.0f * sinf(ang), 0, 12);
+    agregar(0, 0, 0, 0, 12);
+  }
+  // 3) circulos: radios 20, 35, 50 mm; periodos 8, 6, 4 s; dos sentidos; 3 vueltas cada uno
+  const float RR[3] = {20, 35, 50};
+  const float TT[3] = {8, 6, 4};
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      if (RR[i] > 40.0f && TT[j] < 5.0f) continue;   // 50 mm a 4 s: la bola sale a ~75 mm (simulacion)
+      for (int sgn = 0; sgn < 2; sgn++)
+        agregar(1, RR[i], TT[j], sgn == 0 ? 1.0f : -1.0f, 3.0f * TT[j]);
+    }
+    agregar(0, 0, 0, 0, 5);
+  }
+  // 4) perturbacion conocida: en el centro con tres amplitudes y en cuatro puntos con 1,5 deg
+  agregar(2, 0, 0, 1.0f, 20);
+  agregar(2, 0, 0, 1.5f, 20);
+  agregar(2, 40, 0, 1.5f, 20);    // (2 y 2,5 deg y los puntos a 50 mm acercaban la bola al
+  agregar(2, -40, 0, 1.5f, 20);   //  borde en simulacion)
+  agregar(2, 0, 40, 1.5f, 20);
+  agregar(2, 0, -40, 1.5f, 20);
+  agregar(0, 0, 0, 0, 10);
+  // 5) figura de ocho 50 x 35 mm, periodos 10 y 7 s, 3 ciclos cada una
+  agregar(3, 50, 35, 10, 30);
+  agregar(0, 0, 0, 0, 8);
+  agregar(3, 50, 35, 7, 21);
+  agregar(0, 0, 0, 0, 10);                                   // final en el centro
+}
+
+// Referencia del mapeo en este cuadro. Devuelve false al terminar la secuencia.
+bool refMapeo(float xb, float yb, float vxb, float vyb, float r[2], float vr[2], float ff[2],
+              float dth[2], bool &circulo) {
+  r[0] = r[1] = vr[0] = vr[1] = ff[0] = ff[1] = dth[0] = dth[1] = 0.0f;
+  circulo = false;
+  // pausa de seguridad
+  if (!pausa && (fabsf(xb) > LIM_SEG_MM || fabsf(yb) > LIM_SEG_MM)) { pausa = true; n_pausas++; }
+  if (pausa) {
+    fase = 11;
+    if (hypotf(xb, yb) < 30.0f && hypotf(vxb, vyb) < 20.0f) { pausa = false; r_map[0] = xb; r_map[1] = yb; }
+    return true;                                             // referencia (0, 0); el reloj no avanza
+  }
+  if (iseg >= nseg) { fase = 0; return false; }
+  Seg &S = segs[iseg];
+  float t = t_seg;
+  if (S.tipo == 0 || S.tipo == 2) {                          // PUNTO / DITHER: referencia con rampa
+    fase = (S.tipo == 0) ? 7 : 9;
+    float obj[2] = {S.a, S.b};
+    for (int e = 0; e < 2; e++) {
+      float d = obj[e] - r_map[e], paso = RAMPA_REF_MM_S * TS;
+      if (d > paso) d = paso;
+      if (d < -paso) d = -paso;
+      r_map[e] += d;
+      r[e] = r_map[e];
+    }
+    if (S.tipo == 2) {
+      if (n_dither <= 0) {
+        for (int e = 0; e < 2; e++) dither[e] = bitPRBS(e) ? S.c : -S.c;
+        n_dither = DITHER_CUADROS;
+      }
+      n_dither--;
+      dth[0] = dither[0];  dth[1] = dither[1];
+    }
+  } else if (S.tipo == 1) {                                  // CIRCULO
+    fase = 8;  circulo = true;
+    refCirculoS(S.a, S.b, S.c, t, r, vr, ff);
+    r_map[0] = r[0];  r_map[1] = r[1];
+  } else {                                                   // LISSAJOUS (figura de ocho)
+    fase = 10;  circulo = true;
+    float w = 2.0f * PI / S.c;
+    float k = fminf(1.0f, t / RAMPA_S);
+    float Ax = k * S.a, Ay = k * S.b;
+    r[0] = Ax * sinf(w * t);               r[1] = Ay * sinf(2.0f * w * t);
+    vr[0] = Ax * w * cosf(w * t);          vr[1] = 2.0f * Ay * w * cosf(2.0f * w * t);
+    float a_ref[2] = {-w * w * r[0], -4.0f * w * w * r[1]};
+    for (int e = 0; e < 2; e++) ff[e] = -a_ref[e] / (C_ROD * G_MM) * 180.0f / PI;
+    r_map[0] = r[0];  r_map[1] = r[1];
+  }
+  t_seg += TS;
+  if (t_seg >= S.dur) { t_seg = 0.0f; iseg++; }
+  return true;
+}
+
 // ------------------------------------------------------------ Setup ---
 void setup() {
   Serial.begin(BAUD);
@@ -406,6 +535,7 @@ void setup() {
     servo[e].attach(e == 0 ? PIN_X : PIN_Y, 500, 2500);
   }
   platoHorizontal();
+  armarMapeo();
   t_ultima = millis();
 }
 
@@ -422,10 +552,11 @@ void loop() {
   static uint32_t t_btn = 0;
   bool btn = digitalRead(PIN_BTN);
   if (btn == LOW && btn_prev == HIGH && ahora - t_btn > 300) {
-    modo = (modo + 1) % 4;
+    modo = (modo + 1) % 5;
     armado = (modo > 0);
     t_circ = 0.0f;
     t_ens = 0.0f;  fase = 0;  n_dither = 0;
+    iseg = 0;  t_seg = 0.0f;  pausa = false;  r_map[0] = r_map[1] = 0.0f;
     t_btn = ahora;
     for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; }   // sin integral al cambiar de modo
     hay_prev = false;
@@ -466,6 +597,12 @@ void loop() {
             modo = 1;                      // termino el ensayo: queda en CENTRO
             for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; }
           }
+        } else if (modo == 4) {
+          if (!refMapeo(SIGNO_VIS[0] * v[0], SIGNO_VIS[1] * v[1], SIGNO_VIS[0] * v[2], SIGNO_VIS[1] * v[3],
+                        r, vr, ff, dth, circulo)) {
+            modo = 1;                      // termino el mapeo: queda en CENTRO
+            for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; }
+          }
         } else {
           fase = 0;
         }
@@ -498,5 +635,6 @@ void loop() {
   if (sin_tramas) digitalWrite(PIN_LED, (ahora / 100) % 2);
   else if (modo == 2) digitalWrite(PIN_LED, (ahora / 500) % 2);
   else if (modo == 3) digitalWrite(PIN_LED, ((ahora / 150) % 4) == 0);   // destellos cortos
+  else if (modo == 4) digitalWrite(PIN_LED, (ahora % 1000) < 100 || ((ahora % 1000) >= 200 && (ahora % 1000) < 300)); // doble destello
   else digitalWrite(PIN_LED, armado ? HIGH : LOW);
 }
