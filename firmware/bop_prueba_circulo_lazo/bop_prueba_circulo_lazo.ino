@@ -203,8 +203,19 @@ void haciaHorizontal() {           // con rampa: sin bola, sin tramas, desarmado
 }
 
 // Misma ley que bop_ley_control.m (usar_aw = saturar = true), en grados.
-float leyControl(int e, float xh, float vh, float r, float vref, float th_ff) {
+// Zona de tolerancia (solo en modo CENTRO, 2026-11-13, pedido del equipo): con la bola a
+// menos de ZONA_MM de la referencia en un eje, el proporcional de ese eje vale 0 y el
+// integrador no suma. Fuera de la zona el error se cuenta desde su borde (sin salto).
+// Evita que el integrador acumule de a poco hasta despegar la bola de golpe (rozamiento).
+// OJO: con zona, el error estacionario puede llegar a ZONA_MM (el requisito R3 es 3 mm).
+const float ZONA_MM = 5.0f;
+float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bool zona) {
   float eps = xh - r;
+  bool en_zona = false;
+  if (zona) {
+    if (fabsf(eps) <= ZONA_MM) { eps = 0.0f; en_zona = true; }
+    else eps = (eps > 0) ? eps - ZONA_MM : eps + ZONA_MM;
+  }
   float u = KP * eps + I[e] + KD * (vh - vref) + th_ff;
   float th = u;
   if (th > TH_LIM) th = TH_LIM;
@@ -213,7 +224,7 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff) {
   sat_e[e] = saturado;
   bool congelar = saturado && ((eps > 0) - (eps < 0)) == ((u > 0) - (u < 0));
   if (fabsf(vh) < V_INT) nq[e]++; else nq[e] = 0;
-  if (!congelar && nq[e] >= (NQ > 1 ? NQ : 1) && fabsf(eps) < E_ZONA) {
+  if (!congelar && !en_zona && nq[e] >= (NQ > 1 ? NQ : 1) && fabsf(eps) < E_ZONA) {
     float ec = eps;
     if (ec > E_CLIP) ec = E_CLIP;
     if (ec < -E_CLIP) ec = -E_CLIP;
@@ -436,7 +447,7 @@ void loop() {
           float xh = SIGNO_VIS[e] * v[e];
           float vh = SIGNO_VIS[e] * v[2 + e];
           if (circulo) xh += vh * TAU_PRED;       // donde estara la bola cuando actue el plato
-          float th = leyControl(e, xh, vh, r[e], vr[e], ff[e]);
+          float th = leyControl(e, xh, vh, r[e], vr[e], ff[e], modo == 1);
           th_ley[e] = th;
           r_tel[e] = r[e];
           float th_tot = th + dth[e];             // perturbacion del ensayo (0 fuera de la fase 3)

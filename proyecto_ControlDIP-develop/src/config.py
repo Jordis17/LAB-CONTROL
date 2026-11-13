@@ -37,7 +37,8 @@ WHITE_BALANCE_K = 4600
 # alineacion mide 20 mm y los otros tres 28 mm.
 PLATE_SIZE_MM = 290.0
 
-BALL_DIAMETER_MM = 40.0
+# 2026-11-13: el equipo cambio a una bola de ping pong de 35 mm (antes PLA de 40 mm).
+BALL_DIAMETER_MM = 35.0
 
 # Altura del lente sobre la cara superior del plato. Define la correccion de
 # paralaje: el centro de la bola esta BALL_DIAMETER_MM/2 por encima del plano
@@ -55,7 +56,7 @@ SWAP_XY = False
 INVERT_Y = False
 
 # Radio util del centro de la bola: (294/2) - 20 = 127 mm.
-MAX_RADIUS_MM = 127.0
+MAX_RADIUS_MM = 129.5   # 150 - 3 (borde) - 17,5 (radio de la bola de ping pong)
 
 # ------------------------------------------------------------- Deteccion --
 # Fracciones del area teorica de la bola en pixeles (pi * r_px^2).

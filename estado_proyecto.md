@@ -494,3 +494,21 @@ se caía: en los logs de círculo estuvo cerca del borde (más de 115 mm del cen
 - Con R = 40 mm y T = 6 s el círculo salió deforme y lento según el equipo: la inclinación
   necesaria (< 1°) es del orden del rozamiento y la holgura. Se pasa a **R = 45 mm, T = 4 s**
   (inclinación > 1°; con la amplificación observada, ~70 mm, lejos del borde).
+
+### Cambio a bola de ping pong y zona de tolerancia (2026-11-13)
+
+- El equipo cambia a una **bola de ping pong de 35 mm**, porque la de PLA podría no ser
+  uniforme. Esperado: c ≈ 3/5 = 0,60 (cáscara), mucho menos rozamiento y unos 2,7 g de masa.
+  - `config.py`: `BALL_DIAMETER_MM = 35`, `MAX_RADIUS_MM = 129,5`.
+  - Hay que recalibrar el color.
+  - **Todo lo identificado hasta ahora es de la bola de PLA**: hay que repetir los ensayos
+    automáticos con la bola nueva.
+  - A0 (`r_bola`, `m_bola_g`, `c_rod`) se actualiza al rediseñar, con la masa medida.
+- **Zona de tolerancia en modo centro** (`ZONA_MM = 5`, en `bop_prueba_circulo_lazo`): dentro
+  de ±5 mm por eje, el proporcional vale 0 y el integrador no suma; fuera, el error se cuenta
+  desde el borde de la zona.
+  - Motivo: la bola casi en el centro "saltaba" porque el integrador acumulaba hasta vencer el
+    rozamiento.
+  - Consecuencia: el error estacionario puede llegar a 5 mm, contra R3 de 3 mm. Se revisa en el
+    rediseño.
+  - No se aplica en el círculo ni en el ensayo automático.
