@@ -575,3 +575,21 @@ bajar el retardo: menos holgura en el mecanismo y `loop()` de la ESP32 más ráp
 
 Pendiente para cerrar formalmente: actualizar A0 (bola y retardo identificados), C1 y D1 con
 el rediseño, y después regenerar el código y repetir E a G en MATLAB.
+
+### Prueba del rediseño (2026-11-13, `sesion_20261113_112242` y `sesion_20261113_112627`)
+
+Los dos logs son del **rediseño**: la Kp implícita en la telemetría es 0,0072 °/mm en ambos.
+La segunda corrida no tuvo `CONJUNTO = 0`.
+
+| | Corrida 1 | Corrida 2 | Original, ping pong (`105834`) |
+|---|---|---|---|
+| Escalones de 40 mm: sobrepaso | 0 % | 0 % (salvo el retorno a 0) | 0 % |
+| Error al final del escalón (4 s) | 11 a 47 mm | 1 a 42 mm | 9 a 80 mm |
+| Círculo, R = 45 mm: radio medio | 63 mm | 61 mm | 45 mm (18 a 73) |
+| Círculo: error mediano | 58 mm | 45 mm | 30 mm |
+
+- Ningún controlador se establece en 4 s con esta mecánica: con escalones de 4 s no se puede
+  medir ts.
+- Los escalones del ensayo automático pasan a **8 s** (`T_ESC`); el ensayo dura 90 s.
+- Pendiente: corrida con `CONJUNTO = 0` (original) con el firmware actual (integrador que se
+  descarga y compensación de zona muerta), para comparar en igualdad de condiciones.

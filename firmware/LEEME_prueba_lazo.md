@@ -218,3 +218,5 @@ LED da destellos cortos y la ESP32 hace sola esta secuencia de 70 s:
 - `tel_thx` / `tel_thy` incluyen la perturbación; `tel_leyx` / `tel_leyy` son solo la ley.
 - Simulación previa (modelo lineal, 75 ms de retardo, desnivel de 0,4° / −0,3°): la bola no pasa
   de 61 mm del centro y el plato no pasa de 4,2°. No es una medición.
+
+**2026-11-13:** los escalones de la fase 2 duran ahora 8 s (`T_ESC`), y el ensayo completo 90 s. Las fases 3 a 6 empiezan 20 s más tarde.

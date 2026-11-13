@@ -105,7 +105,8 @@ int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo, 3 ensayo aut
 // ------------------------------------------- Ensayo automatico (modo 3) ---
 // Secuencia fija (s desde que se entra al modo 3), sin intervencion:
 //   fase 1   0- 5  centro
-//   fase 2   5-25  escalones de referencia de ESC_MM: +X, -X, +Y, -Y (4 s c/u) y centro (4 s)
+//   fase 2   5-45  escalones de referencia de ESC_MM: +X, -X, +Y, -Y y centro, T_ESC = 8 s c/u
+//   (las fases siguientes se corren 20 s respecto de la version con escalones de 4 s; total 90 s)
 //   fase 3  25-45  centro + perturbacion pseudoaleatoria de +-DITHER_DEG en cada eje,
 //                  cambia cada DITHER_CUADROS cuadros (para identificar: entrada conocida
 //                  e independiente del ruido)
@@ -114,6 +115,7 @@ int   modo = 0;                // 0 desarmado, 1 centro, 2 circulo, 3 ensayo aut
 //   fase 6  65-70  centro; al terminar pasa solo a modo CENTRO
 // La fase va en los bits 4-7 de las banderas de la telemetria.
 const float ESC_MM = 40.0f;
+const float T_ESC = 8.0f;         // s por escalon (2026-11-13: con 4 s ningun controlador se establecia)
 const float DITHER_DEG = 1.5f;
 const int   DITHER_CUADROS = 9;     // 0,3 s
 float t_ens = 0.0f;
@@ -366,16 +368,17 @@ bool refEnsayo(float t, float r[2], float vr[2], float ff[2], float dth[2], bool
   r[0] = r[1] = vr[0] = vr[1] = ff[0] = ff[1] = dth[0] = dth[1] = 0.0f;
   circulo = false;
   if (t < 5.0f) { fase = 1; return true; }
-  if (t < 25.0f) {
+  if (t < 5.0f + 5.0f * T_ESC) {
     fase = 2;
-    int k = (int)((t - 5.0f) / 4.0f);       // 0..4
+    int k = (int)((t - 5.0f) / T_ESC);       // 0..4
     if (k == 0) r[0] = ESC_MM;
     else if (k == 1) r[0] = -ESC_MM;
     else if (k == 2) r[1] = ESC_MM;
     else if (k == 3) r[1] = -ESC_MM;
     return true;
   }
-  if (t < 45.0f) {
+  float t3 = 5.0f + 5.0f * T_ESC;            // inicio de la fase 3
+  if (t < t3 + 20.0f) {
     fase = 3;
     if (n_dither <= 0) {
       for (int e = 0; e < 2; e++) dither[e] = bitPRBS(e) ? DITHER_DEG : -DITHER_DEG;
@@ -385,9 +388,9 @@ bool refEnsayo(float t, float r[2], float vr[2], float ff[2], float dth[2], bool
     dth[0] = dither[0];  dth[1] = dither[1];
     return true;
   }
-  if (t < 57.0f) { fase = 4; circulo = true; refCirculo(50.0f, 6.0f, t - 45.0f, r, vr, ff); return true; }
-  if (t < 65.0f) { fase = 5; circulo = true; refCirculo(50.0f, 4.0f, t - 57.0f, r, vr, ff); return true; }
-  if (t < 70.0f) { fase = 6; return true; }
+  if (t < t3 + 32.0f) { fase = 4; circulo = true; refCirculo(50.0f, 6.0f, t - (t3 + 20.0f), r, vr, ff); return true; }
+  if (t < t3 + 40.0f) { fase = 5; circulo = true; refCirculo(50.0f, 4.0f, t - (t3 + 32.0f), r, vr, ff); return true; }
+  if (t < t3 + 45.0f) { fase = 6; return true; }
   fase = 0;
   return false;
 }
