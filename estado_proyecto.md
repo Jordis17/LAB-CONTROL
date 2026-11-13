@@ -602,3 +602,21 @@ sentidos), perturbación conocida en 5 posiciones, figura de ocho y pausa de seg
 Detalle en `firmware/LEEME_prueba_lazo.md`. En simulación, la bola no pasa de 98 mm con ninguno
 de los dos controladores. Sirve para mapear el nivel y el error en todo el plato, comparar los
 controladores y repetir B3 en varias posiciones.
+
+### Mapeo largo con la bola de ping pong (2026-11-13, `sesion_20261113_121542`, 55 min, rediseño)
+
+- La cuadrícula llegó al punto 17 de 25 (5,7 min). Después la bola cruzó a (100, 60) mm,
+  entró en la pausa de seguridad y **quedó 49 min quieta en (99, 3) mm** con el plato pedido a
+  +1,7° (X) y +3° (Y). La pausa no terminaba porque, lejos de la referencia, el integrador se
+  descarga y la compensación de 1° no alcanzaba.
+- Durante la cuadrícula, la bola quedó **quieta 80 s con ~2° pedidos** y **100 s con 4,2°
+  pedidos en Y**, sin llegar a los puntos.
+- **La cámara sí veía la bola** en esos tramos: área de 1890 a 1950 px y circularidad de 0,84,
+  igual que con la bola en movimiento.
+- Hipótesis, a verificar en el prototipo:
+  - adherencia de la bola liviana (2,7 g) al acrílico, por estática o por residuos;
+  - el plato no se inclina lo que se pide en esas posiciones (holgura, servo, acrílico combado).
+- **Cambios en el firmware** (`bop_prueba_circulo_lazo` y `bop_mapeo`):
+  - **despegue**: con la bola quieta (|v| < 5 mm/s) a más de 10 mm de la referencia, se suma
+    una inclinación extra que crece 1°/s hasta 5° y se quita al moverse;
+  - la pausa de seguridad dura como máximo 30 s.

@@ -80,6 +80,14 @@ const float KI = KI_SET[CONJUNTO];
 // Compensacion de la zona muerta de la transmision (~1 deg en B3, igual con las dos bolas):
 // si el error supera ZONA_MM, se suma sign(u)*COMP_DB a la inclinacion pedida.
 const float COMP_DB = 1.0f;   // deg (0 = sin compensacion)
+// (2026-11-13) Despegue: en el mapeo sesion_20261113_121542 la bola de ping pong quedo
+// quieta 80 s con el plato pedido a ~2 deg y 100 s con 4,2 deg (la camara si veia la bola:
+// misma area y circularidad). Si la bola esta quieta lejos de la referencia, se suma una
+// inclinacion extra que crece a DESP_RATE hasta DESP_MAX y se quita al moverse.
+const float DESP_RATE = 1.0f;   // deg/s
+const float DESP_MAX  = 5.0f;   // deg
+const float DESP_V    = 5.0f;   // mm/s: por debajo, la bola se considera quieta
+float desp[2] = {0, 0};
 const float TS     = 1.0f / 30.0f;   // s (periodo de diseno)
 const float TH_LIM = 10.0f;          // deg, saturacion de la inclinacion pedida
 const float E_CLIP = 30.0f;          // mm, recorte del error del integrador
@@ -242,6 +250,16 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bo
   float eps_bruto = xh - r;
   if (COMP_DB > 0.0f && fabsf(eps_bruto) > ZONA_MM && fabsf(u) > 0.05f)
     u += (u > 0) ? COMP_DB : -COMP_DB;            // compensacion de zona muerta
+  // despegue: bola quieta lejos de la referencia -> inclinacion extra creciente
+  if (fabsf(vh) < DESP_V && fabsf(eps_bruto) > 2.0f * ZONA_MM) {
+    float sg = (eps_bruto > 0) ? 1.0f : -1.0f;      // el plato sube del lado de la bola
+    desp[e] += sg * DESP_RATE * TS;
+    if (desp[e] > DESP_MAX) desp[e] = DESP_MAX;
+    if (desp[e] < -DESP_MAX) desp[e] = -DESP_MAX;
+  } else {
+    desp[e] *= 0.7f;                               // se quita en ~0,1 s al moverse
+  }
+  u += desp[e];
   float th = u;
   if (th > TH_LIM) th = TH_LIM;
   if (th < -TH_LIM) th = -TH_LIM;
@@ -421,6 +439,8 @@ int nseg = 0;
 float t_seg = 0.0f;      // s dentro del segmento actual
 int iseg = 0;
 bool pausa = false;
+float t_pausa = 0.0f;     // s en la pausa actual (maximo T_PAUSA_MAX)
+const float T_PAUSA_MAX = 30.0f;
 float r_map[2] = {0, 0};  // referencia con rampa (PUNTO y DITHER)
 uint16_t n_pausas = 0;
 
@@ -477,10 +497,13 @@ bool refMapeo(float xb, float yb, float vxb, float vyb, float r[2], float vr[2],
   r[0] = r[1] = vr[0] = vr[1] = ff[0] = ff[1] = dth[0] = dth[1] = 0.0f;
   circulo = false;
   // pausa de seguridad
-  if (!pausa && (fabsf(xb) > LIM_SEG_MM || fabsf(yb) > LIM_SEG_MM)) { pausa = true; n_pausas++; }
+  if (!pausa && (fabsf(xb) > LIM_SEG_MM || fabsf(yb) > LIM_SEG_MM)) { pausa = true; n_pausas++; t_pausa = 0.0f; }
   if (pausa) {
     fase = 11;
-    if (hypotf(xb, yb) < 30.0f && hypotf(vxb, vyb) < 20.0f) { pausa = false; r_map[0] = xb; r_map[1] = yb; }
+    t_pausa += TS;
+    if ((hypotf(xb, yb) < 30.0f && hypotf(vxb, vyb) < 20.0f) || t_pausa > T_PAUSA_MAX) {
+      pausa = false; r_map[0] = xb; r_map[1] = yb;           // sigue (por llegar o por tiempo)
+    }
     return true;                                             // referencia (0, 0); el reloj no avanza
   }
   if (iseg >= nseg) { fase = 0; return false; }
