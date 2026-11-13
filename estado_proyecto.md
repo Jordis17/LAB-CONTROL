@@ -490,3 +490,7 @@ se caía: en los logs de círculo estuvo cerca del borde (más de 115 mm del cen
 - B3 no se ve afectado: descarta los tramos a más de 110 mm del centro y los choques.
 - `R_CIRC` pasa a 40 mm, para evaluar el seguimiento sin tocar el borde.
 - Para el informe: "sin caídas" se debe a los bordes y no solo al controlador.
+
+- Con R = 40 mm y T = 6 s el círculo salió deforme y lento según el equipo: la inclinación
+  necesaria (< 1°) es del orden del rozamiento y la holgura. Se pasa a **R = 45 mm, T = 4 s**
+  (inclinación > 1°; con la amplificación observada, ~70 mm, lejos del borde).

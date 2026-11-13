@@ -73,10 +73,9 @@ const int   NQ     = 4;              // cuadros quieta antes de integrar
 float REF[2] = {0.0f, 0.0f};         // referencia (mm): centro del plato
 
 // ------------------------------------------------ Trayectoria circular ---
-const float R_CIRC  = 40.0f;   // mm, radio. 2026-11-13: con 60 la bola salia a ~90 mm y tocaba
-                               // el borde cada 3 a 10 s (el equipo agrego bordes altos)
-const float T_CIRC  = 6.0f;    // s por vuelta (2026-11-13: con 4 s la bola salia a ~94 mm para 60
-                               // pedidos, efecto del retardo del lazo; mas lento = menos amplificacion)
+const float R_CIRC  = 45.0f;   // mm. 2026-11-13: 60 mm/4 s tocaba el borde; 40 mm/6 s pide menos de
+                               // 1 deg (rozamiento + holgura): avanza a tirones. Punto intermedio.
+const float T_CIRC  = 4.0f;    // s por vuelta
 const float SENTIDO = 1.0f;    // +1 antihorario, -1 horario (en el marco de la vision)
 const float RAMPA_S = 3.0f;    // s para que el radio llegue a R_CIRC
 // (2026-11-13) Solo para la prealimentacion del circulo. En el circulo de
