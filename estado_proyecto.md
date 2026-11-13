@@ -660,3 +660,13 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
   lubricante en las estrías o por un tornillo aflojado. Pendiente: revisión del equipo y repetir
   el ensayo corto.
 - B3 con este log (validando con `112242`): FIT de 71 % y 70 %, contra 66 % y 51 % del nominal.
+
+### 2026-11-13 — Log `sesion_20261113_151156` (después de lubricar) y nuevo trim
+
+- 10 min: ensayo corto (modo 3) y ~8 min en modo centro. Detección 100 %.
+- Escalones: X no llega a ±5 mm (error de 7 a 24 mm al final de cada escalón de 8 s). Y mejora y llega en 4,6–7,6 s en algunos escalones.
+- Modo centro (200–600 s): la bola queda en (−89, −2) mm de media, con una salida media de la ley de θx = −2,05° y θy = −1,44°.
+- B3 (ident 151156, valid 112242): τ común 270 ms (X 340, Y 270). X: c 0,18, b −52,2 mm/s² (desnivel equivalente −1,68°), f 0,86°. Y: c 0,28, b −72,6 mm/s² (−1,50°), f 1,18°.
+- Interpretación: X recuperó su ganancia (c 0,06 en 150437 → 0,18), pero el neutro de X se corrió unos −1,7°. Lo más probable es que el brazo del servo se haya movido o reasentado durante la lubricación. Y también muestra un desnivel de −1,5° (y su ley media coincide, −1,44°, con la bola centrada).
+- Decisión: `TH_TRIM` pasa de {0,45; 1,2} a **{−1,25; −0,25}°** en `bop_mapeo.ino` y `bop_prueba_circulo_lazo.ino`. Para X se usó el desnivel de B3 (−1,68°) y no la ley media (−2,05°), porque la bola estaba pegada por fricción y eso sesga la ley media (el mismo error que con el TRIM +2,5 anterior). Para Y coinciden las dos estimaciones.
+- Pendiente: repetir el ensayo corto con el trim nuevo y confirmar que la bola se centra en X.

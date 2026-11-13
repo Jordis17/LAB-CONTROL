@@ -1,22 +1,22 @@
-ETAPA B - B3_identificar_lazo_cerrado_BoP   (2026-11-13 21:08:36)
+ETAPA B - B3_identificar_lazo_cerrado_BoP   (2026-11-13 21:29:13)
 
 Logs:
-  sesion_20261113_150437.csv       ident  5617 cuadros, 25 ventanas, th: -5.6 a 4.5 deg
+  sesion_20261113_151156.csv       ident 18007 cuadros, 98 ventanas, th: -6.2 a 4.3 deg
     atraso de los datos con que trabajo la ESP32 (eco de x, bola en movimiento): 2 cuadros (100 % de ecos encontrados)
-    cuadros con aceleracion medida > 2500 mm/s^2 (mano, choque o falsa deteccion): 66; sus ventanas se descartan
+    cuadros con aceleracion medida > 2500 mm/s^2 (mano, choque o falsa deteccion): 100; sus ventanas se descartan
   sesion_20261113_112242.csv       valid  6359 cuadros, 114 ventanas, th: -4.3 a 3.8 deg
     atraso de los datos con que trabajo la ESP32 (eco de x, bola en movimiento): 2 cuadros (100 % de ecos encontrados)
     cuadros con aceleracion medida > 2500 mm/s^2 (mano, choque o falsa deteccion): 128; sus ventanas se descartan
 
-Identificacion (775 muestras por eje en ventanas de 1.0 s):
-  tau = 270 ms comun (optimo por eje: X 360 ms, Y 240 ms; grilla -40 a 500 ms)
+Identificacion (3038 muestras por eje en ventanas de 1.0 s):
+  tau = 270 ms comun (optimo por eje: X 340 ms, Y 270 ms; grilla -40 a 500 ms)
   AVISO: los ejes dan retardos distintos en mas de 40 ms: tau es poco preciso con estos datos.
-  eje X: c = 0.0642 (nominal 5/7 = 0.7143), b = -18.6 mm/s^2 -> desnivel equivalente -1.70 deg, f = 27.7 mm/s^2 -> inclinacion minima para rodar 2.52 deg, RMSE de ajuste 1.46 mm
-  eje Y: c = 0.2387 (nominal 5/7 = 0.7143), b = -56.6 mm/s^2 -> desnivel equivalente -1.39 deg, f = 63.3 mm/s^2 -> inclinacion minima para rodar 1.55 deg, RMSE de ajuste 1.87 mm
+  eje X: c = 0.1815 (nominal 5/7 = 0.7143), b = -52.2 mm/s^2 -> desnivel equivalente -1.68 deg, f = 26.8 mm/s^2 -> inclinacion minima para rodar 0.86 deg, RMSE de ajuste 1.21 mm
+  eje Y: c = 0.2818 (nominal 5/7 = 0.7143), b = -72.6 mm/s^2 -> desnivel equivalente -1.50 deg, f = 57.0 mm/s^2 -> inclinacion minima para rodar 1.18 deg, RMSE de ajuste 1.38 mm
 
 Validacion (logs "valid"): x0 y v0 con los primeros 6 cuadros de cada ventana y prediccion del resto (0.80 s) sin reajustar:
-  identificado eje X: RMSE 14.23 mm, MAE 9.85, sesgo +3.37, R2 0.916, FIT 70.9 %, autocorr(1) 0.92, tendencia -0.001 mm/muestra
-  identificado eje Y: RMSE 13.09 mm, MAE 8.81, sesgo +5.20, R2 0.912, FIT 70.4 %, autocorr(1) 0.91, tendencia +0.001 mm/muestra
+  identificado eje X: RMSE 15.04 mm, MAE 9.90, sesgo +8.34, R2 0.906, FIT 69.3 %, autocorr(1) 0.89, tendencia -0.000 mm/muestra
+  identificado eje Y: RMSE 13.67 mm, MAE 9.09, sesgo +6.99, R2 0.904, FIT 69.1 %, autocorr(1) 0.89, tendencia +0.001 mm/muestra
   nominal      eje X: RMSE 16.48 mm, MAE 9.80, sesgo -2.10, R2 0.887, FIT 66.4 %, autocorr(1) 0.91, tendencia +0.003 mm/muestra
   nominal      eje Y: RMSE 21.91 mm, MAE 14.93, sesgo -12.05, R2 0.755, FIT 50.5 %, autocorr(1) 0.88, tendencia -0.000 mm/muestra
 (sin grafica: no hay entorno grafico)

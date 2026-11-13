@@ -190,7 +190,7 @@ const float TH_TAB[2][NTAB] = {
 // (2026-11-13, sesion_20261113_094845) con X = 0,9 el centro de la orbita paso de +30 a
 // -31 mm: el valor justo en X esta en el medio. En Y el centro casi no cambio con el trim
 // (+31 -> +27 mm): ese corrimiento no es de nivel (probable holgura de Y, hasta 2,4 deg).
-const float TH_TRIM[2] = {0.45f, 1.2f};   // deg, ejes X e Y
+const float TH_TRIM[2] = {-1.25f, -0.25f}; // deg, ejes X e Y (re-estimado 2026-11-13, log 151156)
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;
 
