@@ -481,3 +481,12 @@ tiempo.
   2. repetir dos ensayos automáticos y la identificación (B3);
   3. rediseñar el controlador con ese modelo (Etapas C y D) y regenerar el código (E a G).
 - El rediseño va después del ajuste mecánico porque la holgura cambia el modelo.
+
+**Corrección (2026-11-13):** el equipo **agregó bordes más altos** al plato. Por eso la bola no
+se caía: en los logs de círculo estuvo cerca del borde (más de 115 mm del centro) el 27 %, el
+23 % y el 12 % del tiempo, y llegó al borde 52, 48 y 34 veces (cada 3 a 10 s).
+- Los choques con el borde son perturbaciones y explican en parte la órbita irregular y el
+  centro variable. No todo es holgura.
+- B3 no se ve afectado: descarta los tramos a más de 110 mm del centro y los choques.
+- `R_CIRC` pasa a 40 mm, para evaluar el seguimiento sin tocar el borde.
+- Para el informe: "sin caídas" se debe a los bordes y no solo al controlador.
