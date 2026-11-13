@@ -670,3 +670,9 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
 - Interpretación: X recuperó su ganancia (c 0,06 en 150437 → 0,18), pero el neutro de X se corrió unos −1,7°. Lo más probable es que el brazo del servo se haya movido o reasentado durante la lubricación. Y también muestra un desnivel de −1,5° (y su ley media coincide, −1,44°, con la bola centrada).
 - Decisión: `TH_TRIM` pasa de {0,45; 1,2} a **{−1,25; −0,25}°** en `bop_mapeo.ino` y `bop_prueba_circulo_lazo.ino`. Para X se usó el desnivel de B3 (−1,68°) y no la ley media (−2,05°), porque la bola estaba pegada por fricción y eso sesga la ley media (el mismo error que con el TRIM +2,5 anterior). Para Y coinciden las dos estimaciones.
 - Pendiente: repetir el ensayo corto con el trim nuevo y confirmar que la bola se centra en X.
+
+### 2026-11-13 — Ensayo de centrado (modo 5 en `bop_mapeo.ino`)
+
+- Pedido del equipo: más pruebas centradas en la tarea de centrar la bola. Se agregó `MODO_BOOT = 5` (~9,5 min): escalones al centro desde 8 direcciones a 60 mm (fase 12), empujones de ±2° y ±3° durante 0,3 s (fase 13), desniveles constantes de ±1° durante 25 s (fase 14) y 60 s quieta. Detalle en `firmware/LEEME_prueba_lazo.md`.
+- Simulado con el mismo código del firmware: |x| ≤ 64 mm, sin pausas de seguridad, para c entre 0,15 y 0,57, τ de 0,40 a 0,44 s y 1° de desnivel real. Es una simulación, no una medición.
+- Observación de diseño: con CONJUNTO = 1, Kp = 0,0073 °/mm. Un desnivel de 1° solo con el proporcional dejaría la bola a ~140 mm. Lo que la sostiene es la compensación de zona muerta y el despegue. Además, el integrador se descarga fuera de E_ZONA = 40 mm. Por eso un trim mal ajustado deja la bola lejos del centro (log 151156). La fase 14 lo mide.

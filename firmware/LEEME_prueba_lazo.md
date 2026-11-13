@@ -245,3 +245,23 @@ borde está a ~129 mm). Hubo que achicar la versión inicial: con puntos a 70 mm
 Es el mismo firmware que `bop_prueba_circulo_lazo`, pero **una pulsación de BOOT arranca
 directamente el ensayo** y otra desarma. `MODO_BOOT = 4` corre el mapeo completo (por defecto) y
 `MODO_BOOT = 3` el ensayo automático corto. Al terminar queda en modo centro.
+
+## Ensayo de centrado (`bop_mapeo.ino`, `MODO_BOOT = 5`, 2026-11-13)
+
+Una pulsación de BOOT arranca el ensayo (LED con triple destello). Dura unos 9,5 min y al terminar
+queda en CENTRO (LED fijo). Otra pulsación desarma. Usa la zona de tolerancia de CENTRO.
+
+| Parte | Fase (bits 4–7) | Qué hace | Para qué |
+|---|---|---|---|
+| 1 | 7 → 12 | 8 veces: lleva la bola con rampa a 60 mm (0°, 45°, …, 315°, 12 s) y la referencia **salta** al centro (20 s) | tiempo de establecimiento, sobreimpulso y error final al centrar desde 8 direcciones |
+| 2 | 13 | con la referencia en el centro, suma ±2° y ±3° al plato durante 0,3 s (±X y ±Y) | rechazo de un golpe corto |
+| 3 | 14 | suma ±1° constante en un eje durante 25 s (4 casos, con 8 s de centro entre ellos) | si el integrador compensa un desnivel (trim mal ajustado) |
+| 4 | 7 | 60 s quieta en el centro | error estacionario y ciclo límite |
+
+Si la bola pasa de 100 mm se activa la pausa de seguridad (fase 11). Si eso pasa durante un empujón
+o un desnivel, ese segmento no se retoma.
+
+Simulación previa (planta ẍ = −c·g·sin θ(t−τ) − f·sign ẋ con holgura de 1°, ruido de 0,4 mm, el
+mismo código del firmware compilado en la PC): con c = 0,15 a 0,57, τ = 0,40 a 0,44 s y hasta 1° de
+desnivel real en cada eje, |x| máximo de 55 a 64 mm y ninguna pausa. En simulación el error
+final de los escalones queda entre 5 y 16 mm, por la holgura y el rozamiento.

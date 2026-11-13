@@ -5,6 +5,7 @@
 //   DESARMADO (LED apagado)  --BOOT-->  ENSAYO elegido en MODO_BOOT  --BOOT-->  DESARMADO
 // MODO_BOOT = 4: mapeo completo (~20,5 min, LED doble destello)
 // MODO_BOOT = 3: ensayo automatico corto (90 s, LED destellos cortos)
+// MODO_BOOT = 5: ensayo de CENTRADO (~9,5 min, LED triple destello), ver "Ensayo de centrado"
 // Al terminar el ensayo queda en CENTRO (LED fijo); otra pulsacion desarma.
 // El controlador se elige con CONJUNTO (1 rediseno, 0 original), igual que en el original.
 //
@@ -81,7 +82,7 @@ const float SIGNO_VIS[2] = {+1.0f, +1.0f};
 //      [0,15; 0,57]. Mas lento (simulacion: centra desde 80 mm en 7 a 9 s, sin sobrepaso).
 // Retardo total ~0,44 s = camara 0,04 + datos de la ESP32 0,07 + orden->bola 0,33 (B3).
 const int CONJUNTO = 1;
-const int MODO_BOOT = 4;          // 4 = mapeo completo, 3 = ensayo automatico corto
+const int MODO_BOOT = 5;          // 5 = centrado, 4 = mapeo completo, 3 = ensayo automatico corto
 const float KP_SET[2] = {0.034118997f, 0.007274f};   // deg/mm
 const float KD_SET[2] = {0.025875847f, 0.018436f};   // deg/(mm/s)
 const float KI_SET[2] = {0.022745998f, 0.001455f};   // deg/(mm s)  (rediseno: Ti = 5 s)
@@ -512,13 +513,58 @@ void armarMapeo() {
   agregar(0, 0, 0, 0, 10);                                   // final en el centro
 }
 
+// ---------------------------------------- Ensayo de centrado (modo 5) ---
+// (2026-11-13, pedido del equipo) ~9,5 min solo sobre la tarea de CENTRAR la bola. Usa la misma
+// maquina de segmentos y la misma pausa de seguridad que el mapeo. Fases de la telemetria:
+//   fase 7  PUNTO con rampa (llevar la bola al punto de partida)
+//   fase 12 ESCALON AL CENTRO sin rampa: la referencia salta de (a, b) a (0, 0); de aqui salen
+//           tiempo de establecimiento, sobreimpulso y error final (8 direcciones, 60 mm)
+//   fase 13 EMPUJON: con la referencia en el centro se suma (a, b) deg al plato durante
+//           EMPUJON_S; mide el rechazo a una perturbacion corta (como un golpe a la bola)
+//   fase 14 DESNIVEL: se suma (a, b) deg al plato todo el segmento; imita un trim mal
+//           ajustado y mide si el integrador lo compensa (el problema de los logs del 13/11)
+//   fase 7  al final: 60 s quieta en el centro (error estacionario y ciclo limite)
+// La zona de tolerancia de CENTRO (ZONA_MM) tambien se usa aqui, para medir el centrado tal
+// como se usa.
+const float EMPUJON_S = 0.3f;     // s
+void armarCentrado() {
+  nseg = 0;
+  agregar(0, 0, 0, 0, 15);                                   // centro
+  for (int d = 0; d < 8; d++) {                              // 1) escalones al centro
+    float ang = d * PI / 4.0f;
+    agregar(0, 60.0f * cosf(ang), 60.0f * sinf(ang), 0, 12); // ir al punto (con rampa)
+    agregar(0, 0, 0, 1.0f, 20);                              // salto al centro (20 s)
+  }
+  const float A[2] = {2.0f, 3.0f};                           // 2) empujones de 0,3 s
+  for (int k = 0; k < 2; k++) {
+    agregar(4,  A[k], 0, 0, 12);
+    agregar(4, -A[k], 0, 0, 12);
+    agregar(4, 0,  A[k], 0, 12);
+    agregar(4, 0, -A[k], 0, 12);
+  }
+  agregar(5,  1.0f, 0, 0, 25);                               // 3) desnivel de 1 deg, 25 s c/u
+  agregar(0, 0, 0, 0, 8);
+  agregar(5, -1.0f, 0, 0, 25);
+  agregar(0, 0, 0, 0, 8);
+  agregar(5, 0,  1.0f, 0, 25);
+  agregar(0, 0, 0, 0, 8);
+  agregar(5, 0, -1.0f, 0, 25);
+  agregar(0, 0, 0, 0, 8);
+  agregar(0, 0, 0, 0, 60);                                   // 4) quieta en el centro
+}
+
 // Referencia del mapeo en este cuadro. Devuelve false al terminar la secuencia.
 bool refMapeo(float xb, float yb, float vxb, float vyb, float r[2], float vr[2], float ff[2],
               float dth[2], bool &circulo) {
   r[0] = r[1] = vr[0] = vr[1] = ff[0] = ff[1] = dth[0] = dth[1] = 0.0f;
   circulo = false;
   // pausa de seguridad
-  if (!pausa && (fabsf(xb) > LIM_SEG_MM || fabsf(yb) > LIM_SEG_MM)) { pausa = true; n_pausas++; t_pausa = 0.0f; }
+  if (!pausa && (fabsf(xb) > LIM_SEG_MM || fabsf(yb) > LIM_SEG_MM)) {
+    pausa = true; n_pausas++; t_pausa = 0.0f;
+    // EMPUJON / DESNIVEL: no se retoman despues de la pausa (el desnivel volveria a sacar la
+    // bola y el ensayo quedaria repitiendo pausas); se pasa al segmento siguiente.
+    if (iseg < nseg && (segs[iseg].tipo == 4 || segs[iseg].tipo == 5)) { iseg++; t_seg = 0.0f; }
+  }
   if (pausa) {
     fase = 11;
     t_pausa += TS;
@@ -533,10 +579,14 @@ bool refMapeo(float xb, float yb, float vxb, float vyb, float r[2], float vr[2],
   if (S.tipo == 0 || S.tipo == 2) {                          // PUNTO / DITHER: referencia con rampa
     fase = (S.tipo == 0) ? 7 : 9;
     float obj[2] = {S.a, S.b};
+    bool salto = (S.tipo == 0 && S.c > 0.5f);                // PUNTO con c = 1: escalon sin rampa
+    if (salto) fase = 12;
     for (int e = 0; e < 2; e++) {
       float d = obj[e] - r_map[e], paso = RAMPA_REF_MM_S * TS;
-      if (d > paso) d = paso;
-      if (d < -paso) d = -paso;
+      if (!salto) {
+        if (d > paso) d = paso;
+        if (d < -paso) d = -paso;
+      }
       r_map[e] += d;
       r[e] = r_map[e];
     }
@@ -548,6 +598,11 @@ bool refMapeo(float xb, float yb, float vxb, float vyb, float r[2], float vr[2],
       n_dither--;
       dth[0] = dither[0];  dth[1] = dither[1];
     }
+  } else if (S.tipo == 4 || S.tipo == 5) {                   // EMPUJON / DESNIVEL (referencia (0, 0))
+    fase = (S.tipo == 4) ? 13 : 14;
+    r_map[0] = r_map[1] = 0.0f;
+    bool activo = (S.tipo == 5) || (t < EMPUJON_S);
+    if (activo) { dth[0] = S.a;  dth[1] = S.b; }
   } else if (S.tipo == 1) {                                  // CIRCULO
     fase = 8;  circulo = true;
     refCirculoS(S.a, S.b, S.c, t, r, vr, ff);
@@ -579,7 +634,7 @@ void setup() {
     servo[e].attach(e == 0 ? PIN_X : PIN_Y, 500, 2500);
   }
   platoHorizontal();
-  armarMapeo();
+  if (MODO_BOOT == 5) armarCentrado(); else armarMapeo();
   t_ultima = millis();
 }
 
@@ -641,7 +696,7 @@ void loop() {
             modo = 1;                      // termino el ensayo: queda en CENTRO
             for (int e = 0; e < 2; e++) { I[e] = 0; nq[e] = 0; }
           }
-        } else if (modo == 4) {
+        } else if (modo == 4 || modo == 5) {
           if (!refMapeo(SIGNO_VIS[0] * v[0], SIGNO_VIS[1] * v[1], SIGNO_VIS[0] * v[2], SIGNO_VIS[1] * v[3],
                         r, vr, ff, dth, circulo)) {
             modo = 1;                      // termino el mapeo: queda en CENTRO
@@ -654,7 +709,7 @@ void loop() {
           float xh = SIGNO_VIS[e] * v[e];
           float vh = SIGNO_VIS[e] * v[2 + e];
           if (circulo) xh += vh * TAU_PRED;       // donde estara la bola cuando actue el plato
-          float th = leyControl(e, xh, vh, r[e], vr[e], ff[e], modo == 1);
+          float th = leyControl(e, xh, vh, r[e], vr[e], ff[e], modo == 1 || modo == 5);
           th_ley[e] = th;
           r_tel[e] = r[e];
           float th_tot = th + dth[e];             // perturbacion del ensayo (0 fuera de la fase 3)
@@ -680,5 +735,6 @@ void loop() {
   else if (modo == 2) digitalWrite(PIN_LED, (ahora / 500) % 2);
   else if (modo == 3) digitalWrite(PIN_LED, ((ahora / 150) % 4) == 0);   // destellos cortos
   else if (modo == 4) digitalWrite(PIN_LED, (ahora % 1000) < 100 || ((ahora % 1000) >= 200 && (ahora % 1000) < 300)); // doble destello
+  else if (modo == 5) { uint32_t q = ahora % 1200; digitalWrite(PIN_LED, q < 100 || (q >= 200 && q < 300) || (q >= 400 && q < 500)); } // triple destello
   else digitalWrite(PIN_LED, armado ? HIGH : LOW);
 }
