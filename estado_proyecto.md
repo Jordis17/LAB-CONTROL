@@ -422,3 +422,15 @@ modelo nominal.
   La perturbación del ensayo (±1,5°) está dentro de la holgura.
 - **Siguiente paso:** probar el trim; si centra bien, rediseñar el controlador (Etapas C y D)
   con el modelo identificado (c ≈ 0,2, τ ≈ 0,3 s, rozamiento ≈ 1°).
+
+### Prueba de círculo con TH_TRIM = +2,5° (2026-11-13, `sesion_20261113_090144`)
+
+Modo círculo (R = 60 mm, T = 4 s) durante unos 100 s.
+- La bola giró alrededor de un centro desplazado en **(−78, −41) mm**, con un radio medio de
+  105 mm y un error medio de 94 mm, y chocaba con la esquina (−, −) en cada vuelta.
+- El atraso angular medio fue de solo ≈ 6° (≈ 70 ms).
+- En régimen, la ley de control restó en promedio −2,6° (X) y −1,5° (Y): **el trim de +2,5°
+  era excesivo**. Había salido de tramos con la bola quieta por rozamiento, no en equilibrio.
+- **Corregido a `TH_TRIM = {0, +1}`.**
+- El radio mayor que el pedido también es coherente con un c real menor que el 5/7 usado en la
+  prealimentación. Pendiente: rediseñar con el modelo identificado.

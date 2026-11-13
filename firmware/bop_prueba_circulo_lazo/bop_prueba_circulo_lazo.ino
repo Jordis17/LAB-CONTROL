@@ -132,7 +132,10 @@ const float TH_TAB[2][NTAB] = {
 // pedido a +2 a +3 deg en los dos ejes, y B3 da una aceleracion constante de +68 a +100
 // mm/s^2 (equilibrio en ~+2,5 deg pedidos). La tabla de la app tiene un sesgo de ese orden.
 // Se suma a la inclinacion pedida antes de la tabla (la telemetria th_out NO la incluye).
-const float TH_TRIM[2] = {2.5f, 2.5f};   // deg, ejes X e Y
+// (2026-11-13) CORREGIDO: +2,5 era excesivo (salia de tramos con la bola quieta por
+// rozamiento, no en equilibrio). En el circulo sesion_20261113_090144 la ley tuvo que
+// restar en promedio -2,6 (X) y -1,5 (Y): el nivel real esta en ~0 (X) y ~+1 (Y).
+const float TH_TRIM[2] = {0.0f, 1.0f};   // deg, ejes X e Y
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;
 
