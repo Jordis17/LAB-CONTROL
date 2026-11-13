@@ -620,3 +620,19 @@ controladores y repetir B3 en varias posiciones.
   - **despegue**: con la bola quieta (|v| < 5 mm/s) a más de 10 mm de la referencia, se suma
     una inclinación extra que crece 1°/s hasta 5° y se quita al moverse;
   - la pausa de seguridad dura como máximo 30 s.
+
+### Segundo mapeo (2026-11-13, `sesion_20261113_132508`, 33,5 min, rediseño con despegue)
+
+- 18 pausas de seguridad, varias de ellas cortadas por el máximo de 30 s.
+- El despegue evita que la bola quede pegada mucho tiempo, pero **la bola vuelve sola a las
+  mismas zonas**. Ejemplo a los 50 s: en y ≈ −77 mm, con el plato pedido hasta −5° en Y, la
+  bola subió a −54 mm y regresó a −80 mm.
+- **Zonas donde la bola se traba, repetidas en varios logs:**
+  - (−65, −64) mm, hasta 35 s con 4,7° pedidos;
+  - (99, 3) mm;
+  - (12, −36 a −43) mm.
+- Hipótesis física, a verificar: **el plato no es plano** (pozos en esas zonas, acrílico
+  combado), o algo **limita mecánicamente** la inclinación en esa dirección (por ejemplo, los
+  bordes nuevos rozando).
+- La compensación de zona muerta con signo hacía **vibrar el plato ±1° cuadro a cuadro**. Se
+  cambió a una compensación suave: COMP_DB·sat(u/0,3°).

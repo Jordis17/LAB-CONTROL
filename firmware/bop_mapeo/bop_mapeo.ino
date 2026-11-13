@@ -259,8 +259,14 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bo
   }
   float u = KP * eps + I[e] + KD * (vh - vref) + th_ff;
   float eps_bruto = xh - r;
-  if (COMP_DB > 0.0f && fabsf(eps_bruto) > ZONA_MM && fabsf(u) > 0.05f)
-    u += (u > 0) ? COMP_DB : -COMP_DB;            // compensacion de zona muerta
+  // compensacion de zona muerta SUAVE (2026-11-13): la version con signo saltaba de +1 a
+  // -1 deg cuando u cruzaba 0 y el plato vibraba +-1 deg cuadro a cuadro (log 132508).
+  if (COMP_DB > 0.0f && fabsf(eps_bruto) > ZONA_MM) {
+    float k = u / 0.3f;                            // llega a la compensacion completa con |u| = 0,3 deg
+    if (k > 1.0f) k = 1.0f;
+    if (k < -1.0f) k = -1.0f;
+    u += COMP_DB * k;
+  }
   // despegue: bola quieta lejos de la referencia -> inclinacion extra creciente
   if (fabsf(vh) < DESP_V && fabsf(eps_bruto) > 2.0f * ZONA_MM) {
     float sg = (eps_bruto > 0) ? 1.0f : -1.0f;      // el plato sube del lado de la bola
