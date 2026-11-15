@@ -1,0 +1,44 @@
+\section{Discusión}
+
+\pendiente{Esta sección se termina con los datos de la Etapa~H. Lo que sigue es el esqueleto
+con las diferencias ya medidas entre el modelo y la planta. Ordenarlas por peso cuando se tengan
+los resultados finales y no corregirlas artificialmente.}
+
+La diferencia principal entre el modelo y el prototipo está en la transmisión entre la orden de
+inclinación y la bola. El modelo de diseño suponía $c = 5/7$ y un retardo de
+\SI{75}{\milli\second}. La identificación dio una ganancia efectiva cercana a \num{0.2} para
+movimientos pequeños y un retardo de \SIrange{0.27}{0.41}{\second}, con una zona muerta de
+alrededor de \SI{1}{\degree}. Como el resultado fue el mismo con dos bolas muy distintas, el
+origen está en el mecanismo: holgura de las rótulas y varillas, medida hasta \SI{2.4}{\degree}
+en el eje Y, y respuesta del servo a cambios pequeños. El eje Y, cuyo servo es más duro, tiene
+más holgura y más retardo, y es donde aparecieron casi todas las zonas en las que la bola se
+quedaba trabada. La asimetría entre los ejes viene, entonces, del actuador.
+
+Estas diferencias explican el comportamiento observado. Una ganancia de planta cuatro veces
+menor queda cerca del margen de ganancia inferior de \SI{-12.6}{\deci\bel} del lazo
+condicionalmente estable (Tabla~\ref{tab:controlador}), y un retardo cuatro veces mayor deja muy
+poco margen de fase. Con un retardo total estimado de \SI{0.44}{\second} (cámara, datos de la
+ESP32 y transmisión), el cálculo de márgenes del controlador original da un margen de fase de
+unos \SI{12}{\degree} para $c_{\mathrm{ef}} = 0{,}2$, y un rediseño preliminar con ese modelo
+($\Kp = \SI{0.00727}{\degree\per\milli\metre}$, $\Kd = \SI{0.0184}{\degree\per(\milli\metre\per\second)}$,
+$\Ti = \SI{5}{\second}$) sube el margen a \SI{43}{\degree}. Con ese retardo, el requisito R1 de
+\SI{3}{\second} no se puede cumplir con un controlador robusto: o se acepta un requisito menos
+exigente o se reduce el retardo, con menos holgura mecánica y un \texttt{loop()} más rápido en la
+ESP32.
+
+\pendiente{Los márgenes del rediseño se calcularon fuera de MATLAB (Python, sesión del
+2026-11-13). Antes de citarlos, repetir C1 y D1 en MATLAB con el modelo nominal identificado y
+regenerar el código (E a G). Comparar en el prototipo el original y el rediseño con el mismo
+ensayo: en las pruebas del 2026-11-13 el rediseño terminó más cerca en los escalones (error final
+de \SIrange{1}{47}{\milli\metre}, contra \SIrange{9}{80}{\milli\metre}), pero siguió peor el
+círculo (error mediano de \SIrange{45}{58}{\milli\metre}, contra \SI{30}{\milli\metre}).}
+
+Otras diferencias identificadas: la latencia medida de la visión fue menor que la supuesta, el
+ruido de posición fue unas diez veces menor que el \SI{1}{\milli\metre} del diseño (aunque, en
+simulación, bajar el parámetro del Kalman a ese valor hacía oscilar el lazo, por lo que se
+mantuvo en \SI{1}{\milli\metre}), la relación servo--plato fue asimétrica y más empinada que la calculada, y
+el término centrífugo limita la validez del modelo lineal cuando el plato se mueve rápido.
+
+\pendiente{Diferencias de la implementación física (cuantización, efecto del \texttt{loop()} de
+\SI{40}{\milli\second}, la zona de tolerancia de \SI{5}{\milli\metre} y su efecto sobre R3,
+perturbaciones por choques con el borde) cuando se tengan los datos de H.}

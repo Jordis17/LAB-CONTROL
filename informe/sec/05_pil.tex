@@ -1,0 +1,84 @@
+\section{Verificación Processor-in-the-Loop}
+
+En PIL, el código del controlador se compila para el procesador objetivo y se ejecuta en él,
+mientras la planta sigue simulada en la PC \cite{mw_pil}. El procesador es una ESP32 (ESP32-D0WD-V3,
+placa de desarrollo de 38 pines), la misma que ejecuta el controlador en el prototipo.
+
+El \emph{Simulink Support Package for Arduino Hardware} de R2026a programa la ESP32, pero no
+habilita PIL para ella \cite{mw_arduino}: la clase de la placa declara
+\texttt{IsPilSupported = 0}, y al registrar a mano una conexión PIL, la clase interna del paquete
+falla porque espera datos que solo existen para las placas soportadas. Por eso se usó una
+\textbf{alternativa de ingeniería}: un PIL propio con la misma arquitectura que el de Simulink
+\cite{mw_pil_target}. En la ESP32 corre exactamente el código C de la Etapa~E, el mismo
+verificado en SIL (se comprueba que la copia sea idéntica byte a byte), compilado con la
+cadena Xtensa del paquete, con dos instancias, una por eje. Un sketch hace solo de puente serie:
+recibe $r$, $\xh$, $\vh$ y \texttt{habilitado} como \texttt{double} de \SI{8}{bytes}, llama a
+\texttt{Controller\_BoP\_step}, y devuelve $\thc$, $I$, \texttt{saturado} y los ciclos de CPU de
+la llamada. En la PC siguen la planta del banco SIL, la referencia, la rama Normal y la
+comparación.
+
+\pendiente{Agregar un diagrama de bloques pequeño de la arquitectura PIL (PC: planta, referencia,
+rama Normal y comparación; serie a \SI{921600}{baudios}; ESP32: puente y
+\texttt{Controller\_BoP\_step}). Confirmar la velocidad del puerto usada en
+\texttt{etapaG/pil\_esp32/}.}
+
+Se hicieron dos pruebas. En G4 se ejecutó el controlador solo, con las entradas del MIL de los
+casos D1 y D2; el segundo tiene nueve cuadros saturados, así que ejercita la saturación y el
+\emph{clamping} que el ensayo SIL no alcanzaba. En los dos casos $\thc$ e $I$ fueron idénticos y
+ninguna bandera de saturación difirió. En G5 se repitió el banco de lazo cerrado de la
+Sección~IV-C con la rama PIL. La Fig.~\ref{fig:pil} muestra las diferencias y la
+Tabla~\ref{tab:silpil} resume las dos verificaciones.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[estilo, height=3.2cm, xmin=0, xmax=9, ymin=-1, ymax=1,
+             xlabel={Tiempo (\si{\second})}, ylabel={Diferencia}, legend pos=north east,
+             legend columns=2]
+  \addplot[cRojo] table[col sep=comma, x=t_s, y=dif_thx] {\G/G5_comparacion.csv};
+  \addplot[cVerde, dashed] table[col sep=comma, x=t_s, y=dif_x] {\G/G5_comparacion.csv};
+  \legend{$\Delta\theta_x$ (\si{\radian}), $\Delta x$ (\si{\milli\metre})}
+\end{axis}
+\end{tikzpicture}
+\caption{Diferencias PIL $-$ Normal en el banco de lazo cerrado (G5).}
+\label{fig:pil}
+\end{figure}
+
+\begin{table}[!t]
+\caption{Resultados de las verificaciones SIL y PIL. LC: banco de lazo cerrado; G4: controlador
+solo con las entradas del MIL ($\thc$, $I$ y \texttt{saturado}). Fuente:
+\texttt{etapaF/resultados/F1\_metricas.csv}, \texttt{etapaG/resultados/G4\_resultados.csv} y
+\texttt{G5\_metricas.csv}.}
+\label{tab:silpil}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{SIL (F1)} & \textbf{PIL (G4)} & \textbf{PIL (G5)} \\
+\midrule
+Ensayo & LC, 2 ejes & D1 y D2 & LC, 2 ejes \\
+Muestras & 271 & 194 y 179 & 271 \\
+Señales & 10 & 3 & 10 \\
+$\max|\Delta|$ & 0 & 0 & 0 \\
+RMSE & 0 & 0 & 0 \\
+Igualdad exacta & 271/271 & Sí & 271/271 \\
+Cuadros saturados & 0 & 9 (en D2) & 0 \\
+\midrule
+Resultado & PASS & PASS & PASS \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La igualdad exacta indica que el compilador Xtensa y la aritmética \texttt{double} de la ESP32,
+que no tiene unidad de punto flotante de doble precisión y la emula por software, dan los mismos
+resultados bit a bit que la PC para esta secuencia de operaciones. El tiempo de
+\texttt{Controller\_BoP\_step} en la ESP32 fue de \SI{7.5}{\micro\second} de mediana y
+\SI{31.3}{\micro\second} como máximo, el \SI{0.094}{\percent} de $\Ts$, así que el cálculo no
+limita el periodo de muestreo.
+
+PIL aporta, sobre SIL, la evidencia de que el código corre en el procesador objetivo, con su
+compilador, y conserva el comportamiento. Aun así, un PASS en PIL no valida el controlador sobre
+la planta real: la planta sigue siendo un modelo, no hay cámara ni servos, el intercambio por el
+puerto serie no corre a \SI{30}{fps} en tiempo real, y el modelo usado para diseñar resultó, como
+se vio en la Sección~II, bastante distinto del prototipo.

@@ -1,0 +1,262 @@
+\section{Modelado e identificación del sistema}
+
+\subsection{Modelo físico}
+
+El modelo se planteó desde primeros principios, con las ecuaciones de Lagrange para la bola
+sobre el plato. Las hipótesis fueron: la bola rueda sin deslizar y no gira alrededor de la normal
+del plato; es rígida, con momento de inercia $J = k\,m\,r_b^2$; el plato y el mecanismo son
+rígidos y sin holgura; no hay fricción de rodadura; la entrada del modelo es la inclinación del
+plato, con el actuador modelado aparte; y la cámara está fija sobre el eje de la junta. Se define
+el coeficiente de rodadura $c = 1/(1+k)$, que vale $5/7$ para una esfera maciza. La masa de la
+bola se cancela.
+
+Para un eje, con el otro horizontal, la ecuación queda
+
+\begin{equation}
+\ddot x = c\left[-g\sin\theta + x\,\dot\theta^{2} + \hef\,\ddot\theta\right],
+\qquad \hef = h + k\,r_b,
+\label{eq:nolineal}
+\end{equation}
+
+donde $h$ es la altura del centro de la bola sobre el centro de la junta. El modelo completo de
+dos ejes agrega términos de Coriolis y de acople que solo aparecen cuando los dos ejes se mueven
+a la vez. Las no linealidades son el seno, el término centrífugo $x\,\dot\theta^{2}$, la
+proyección que hace la cámara cuando el plato está inclinado, el mecanismo de cuatro barras
+entre servo y plato, y la saturación y la velocidad máxima del servo.
+
+La cámara no mide la posición sobre el plato. Como la homografía se calibró con el plato
+horizontal, con el plato inclinado mide la proyección del centro de la bola, que linealizada da
+$\Xm = x - h\,\theta$. Linealizando \eqref{eq:nolineal} alrededor de $x = \dot x = 0$,
+$\theta = \dot\theta = 0$, se obtienen dos funciones de transferencia por eje,
+
+\begin{align}
+\frac{X(s)}{\Theta(s)} &= \frac{c\,\hef\,s^{2} - c\,g}{s^{2}},
+\label{eq:lineal}\\
+\frac{\Xm(s)}{\Theta(s)} &= \frac{-(1-c)\,\hsup\,s^{2} - c\,g}{s^{2}},
+\label{eq:linealm}
+\end{align}
+
+donde $\hsup$ es la altura de la cara del plato sobre la junta. El jacobiano del modelo de dos
+ejes en el punto de operación no tiene términos cruzados (diferencia relativa con el analítico de
+\num{1.7e-13}), así que a primer orden los ejes quedan desacoplados y se tratan como dos lazos
+SISO iguales. La Tabla~\ref{tab:fisico} resume los valores con la geometría del diseño.
+
+\begin{table}[!t]
+\caption{Modelo lineal por eje con los parámetros del diseño ($c = 5/7$,
+$\hsup = \SI{49}{\milli\metre}$, $h = \SI{69}{\milli\metre}$, $r_b = \SI{20}{\milli\metre}$).
+Fuente: \texttt{etapaA/resultados/A2\_consola.txt}.}
+\label{tab:fisico}
+\centering
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Magnitud} & \textbf{Valor} \\
+\midrule
+$c\,g$ & \SI{7007}{\milli\metre\per\second\squared\per\radian} \\
+$c\,\hef$ & \SI{55.0}{\milli\metre\per\radian} \\
+$-(1-c)\,\hsup$ & \SI{-14.0}{\milli\metre\per\radian} \\
+Polos & $s = 0$ (doble) \\
+Ceros de $X/\Theta$ & $s = \pm\SI{11.29}{\radian\per\second}$ \\
+Ceros de $\Xm/\Theta$ & $s = \pm j\,\SI{22.37}{\radian\per\second}$ \\
+Pendiente servo $\rightarrow$ plato (diseño) & \SI{0.343}{\degree\per\degree} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El doble polo en el origen tiene tres consecuencias que salen del modelo. Primero, la planta no
+es estable en lazo abierto: con \SI{2}{\degree} de inclinación la bola llega a la pared en
+aproximadamente \SI{1.0}{\second}, de modo que un ensayo escalón en lazo abierto no es posible.
+Segundo, el método SIMC usado en el Proyecto~1 no aplica, porque supone una planta estable de
+primer orden con tiempo muerto \cite{skogestad2003}. Tercero, un PI no puede estabilizar un doble
+integrador: hace falta acción derivativa o realimentación de velocidad.
+
+Para cuantificar el error de la aproximación lineal no se pueden usar escalones, porque la planta
+no tiene equilibrio estable. Se aplicó un triplete de inclinación ($+A$, $-A$, $+A$) que, en el
+modelo lineal, deja la bola en reposo en el punto de partida, con transiciones rápidas (el plato
+a la velocidad máxima del servo, unos \SI{206}{\degree\per\second}) y lentas. La
+Fig.~\ref{fig:barrido} muestra el error de trayectoria en función de la amplitud. Con el criterio
+fijado por el equipo, un error menor al \SI{5}{\percent} de $\max|x|$, el modelo lineal vale
+hasta $A = \SI{3}{\degree}$ con transiciones lentas, pero solo hasta \SI{0.5}{\degree} con
+transiciones rápidas. El término dominante no es el seno, que a \SI{13}{\degree} equivale a solo
+\SI{0.11}{\degree} de error de inclinación, sino el centrífugo $x\,\dot\theta^{2}$, que crece con
+el cuadrado de la velocidad del plato. Por eso conviene que el controlador no pida cambios
+bruscos de inclinación.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[estilo, height=3.8cm, xlabel={Amplitud del triplete $A$ (\si{\degree})},
+             ylabel={Error de trayectoria (\si{\percent})}, ymin=0, ymax=100, xmin=0, xmax=13.5,
+             legend pos=north west]
+  \addplot[cRojo, mark=*, mark size=1pt]
+    table[col sep=comma, x=A_deg, y=err_rel_x_pct,
+          restrict expr to domain={\thisrow{modo_1rapida_2lenta}}{1:1}] {\G/A2_barrido_amplitud.csv};
+  \addplot[cAzul, mark=square*, mark size=1pt]
+    table[col sep=comma, x=A_deg, y=err_rel_x_pct,
+          restrict expr to domain={\thisrow{modo_1rapida_2lenta}}{2:2}] {\G/A2_barrido_amplitud.csv};
+  \addplot[cGris, dashed, domain=0:13.5, samples=2] {5};
+  \legend{Transición rápida, Transición lenta, Umbral \SI{5}{\percent}}
+\end{axis}
+\end{tikzpicture}
+\caption{Error del modelo lineal frente al no lineal, en porcentaje de $\max|x|$, para el
+triplete de inclinación con transiciones rápidas y lentas.}
+\label{fig:barrido}
+\end{figure}
+
+\subsection{Caracterización del sensor y del actuador}
+
+Antes de identificar la dinámica de la bola se midieron, sobre el prototipo, los elementos de la
+cadena que el modelo trataba como ideales. La Tabla~\ref{tab:caracterizacion} resume las
+mediciones.
+
+\begin{table}[!t]
+\caption{Mediciones de la cadena de medición y del actuador sobre el prototipo. Fuente:
+\texttt{datos\_prototipo/camara/} y \texttt{datos\_prototipo/mecanica/}.}
+\label{tab:caracterizacion}
+\centering
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Magnitud} & \textbf{Valor medido} \\
+\midrule
+Periodo entre cuadros (YUYV, 2 búferes) & \SI{33.25}{\milli\second}, desv. \SI{1.9}{\milli\second} \\
+Cuadros dentro de $\pm\SI{5}{\milli\second}$ / perdidos & \SI{100}{\percent} / \SI{0}{\percent} \\
+Latencia de la visión (mediana, 2 corridas) & \SI{57.8}{} y \SI{60.3}{\milli\second} \\
+Ruido de posición, bola quieta (centro / esquina) & \SI{0.12}{} / \SI{0.09}{\milli\metre} \\
+Pendiente servo $\rightarrow$ plato cerca del neutro (v3) & \SI{0.47}{\degree\per\degree} \\
+Holgura del mecanismo (eje X / eje Y) & hasta \SI{0.8}{} / \SI{2.4}{\degree} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El periodo de muestreo quedó en $\Ts = \SI{33.3}{\milli\second}$ con el formato YUYV y dos
+búferes; el MJPG se descartó porque perdía el \SI{46}{\percent} de los cuadros. La latencia
+medida, de unos \SI{60}{\milli\second}, quedó por debajo de los \SI{75}{\milli\second} que se
+habían estimado para el diseño. La relación entre el ángulo del servo y el del plato resultó
+asimétrica y con una pendiente cerca de 1,4 veces la del diseño, así que el firmware convierte
+la inclinación pedida en comando del servo con la tabla medida y no con la cinemática del diseño.
+Con esa tabla, el peor eje alcanza unos $\pm\SI{11.3}{\degree}$, y la saturación del controlador
+se fijó en $\thlim = \SI{10}{\degree}$.
+
+\pendiente{Confirmar con el equipo qué tabla servo--plato queda como definitiva (v3 del
+2026-11-09, o una v4 si se cambia el servo Y) y el rango simétrico que da. Agregar el modelo del
+servo confirmado en la etiqueta.}
+
+\subsection{Identificación experimental}
+
+Como la planta no es estable en lazo abierto, la identificación se hizo en lazo cerrado. El
+firmware de prueba de la ESP32 ejecuta un ensayo automático con escalones de referencia, una
+perturbación pseudoaleatoria de $\pm\SI{1.5}{\degree}$ sumada a la inclinación y trayectorias
+circulares, y devuelve en cada cuadro la inclinación que aplicó. Con esa telemetría y la posición
+medida se ajustó, por mínimos cuadrados y en ventanas de \SI{1}{\second}, el modelo por eje
+
+\begin{equation}
+\ddot x = -c_{\mathrm{ef}}\,g\,\sin\theta(t-\tau) + b - f\,\operatorname{sign}(\dot x),
+\label{eq:b3}
+\end{equation}
+
+donde $c_{\mathrm{ef}}$ es una ganancia de rodadura efectiva, que incluye también la ganancia
+real de la transmisión servo--plato, $b$ representa un desnivel constante, $f$ un rozamiento o
+zona muerta, y $\tau$ el retardo entre la orden de inclinación y la respuesta de la bola. El
+retardo se buscó en una grilla, minimizando el error de ajuste
+(Fig.~\ref{fig:tau}).
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[estilo, height=3.6cm, xlabel={Retardo supuesto $\tau$ (\si{\second})},
+             ylabel={SSE (\si{\milli\metre\squared})}, legend pos=north east,
+             scaled y ticks=base 10:-3, ytick scale label code/.code={}, ylabel={SSE ($\times 10^{3}$ \si{\milli\metre\squared})}]
+  \addplot[cAzul]  table[col sep=comma, x=tau_s, y=sse_x] {\G/B3_tau.csv};
+  \addplot[cNaranja, dashed] table[col sep=comma, x=tau_s, y=sse_y] {\G/B3_tau.csv};
+  \legend{Eje X, Eje Y}
+\end{axis}
+\end{tikzpicture}
+\caption{Error de ajuste del modelo \eqref{eq:b3} en función del retardo supuesto, ensayo
+\texttt{sesion\_20261113\_151156}.}
+\label{fig:tau}
+\end{figure}
+
+La Tabla~\ref{tab:b3} reúne las identificaciones hechas a medida que cambiaba el prototipo. En
+todas, $c_{\mathrm{ef}}$ salió entre \num{0.12} y \num{0.28}, de tres a seis veces menos que el
+\num{0.714} del modelo, y el retardo entre \SI{0.27}{} y \SI{0.41}{\second}, cuatro a cinco
+veces el estimado. Al cambiar la bola de PLA por una pelota de ping pong, que es lisa y liviana,
+se obtuvieron el mismo $c_{\mathrm{ef}}$ y la misma zona muerta de alrededor de \SI{1}{\degree}.
+Eso indica que el efecto no viene de la bola sino del mecanismo: holgura de rótulas y varillas, y
+respuesta del servo a cambios pequeños, que quedan dentro de la perturbación de
+$\pm\SI{1.5}{\degree}$ del ensayo.
+
+\begin{table}[!t]
+\caption{Parámetros identificados en lazo cerrado (B3) por ensayo, en el formato eje X / eje
+Y. ZM: zona muerta equivalente, en grados pedidos. Fuente:
+\texttt{estado\_proyecto.md} y \texttt{etapaB/resultados/}.}
+\label{tab:b3}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+\textbf{Ensayo} & \textbf{Condición} & $c_{\mathrm{ef}}$ & $\tau$ (\si{\milli\second}) & ZM (\si{\degree}) \\
+\midrule
+\texttt{143311} & PLA, tabla v2      & 0,19 / 0,22 & 340 / 370 & 1,2 / 1,0 \\
+\texttt{164915} & PLA, tabla v3      & 0,16 / 0,24 & 340 / 310 & 1,0 / 1,0 \\
+\texttt{165209} & PLA, tabla v3      & 0,12 / 0,21 & 270 / 370 & 1,9 / 1,5 \\
+\texttt{105834} & Ping pong          & 0,19 / 0,22 & 270 / 410 & 1,2 / 1,0 \\
+\texttt{150437} & Tras lubricar      & 0,06 / 0,24 & --- & 2,5 / --- \\
+\texttt{151156} & Tras lubricar      & 0,18 / 0,28 & 340 / 270 & 0,86 / 1,18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\pendiente{Repetir dos ensayos automáticos con la mecánica definitiva (servo Y cambiado o
+ajustado, holgura reducida) y la bola definitiva, y completar con ellos la última fila de la
+Tabla~\ref{tab:b3}. Medir la masa de la pelota de ping pong (se usó un valor típico de
+\SI{2.7}{\gram}, que no afecta la dinámica de rodadura). El \texttt{150437} no tiene retardo por
+eje registrado: confirmarlo en su consola o quitar la fila.}
+
+\subsection{Validación y selección del modelo}
+
+Cada modelo identificado se validó con un ensayo distinto del usado para ajustarlo: desde la
+posición y la velocidad de los primeros seis cuadros de cada ventana se predijeron los
+\SI{0.8}{\second} siguientes sin reajustar parámetros. La Tabla~\ref{tab:validacion} compara el
+modelo identificado con el nominal de la Etapa~A para el ensayo más reciente.
+
+\begin{table}[!t]
+\caption{Validación del modelo identificado con \texttt{151156} sobre los datos de
+\texttt{112242}, frente al modelo nominal ($c = 5/7$, $b = 0$, $f = 0$,
+$\tau = \SI{75}{\milli\second}$). Predicción de
+\SI{0.8}{\second} por ventana. Fuente: \texttt{etapaB/resultados/B3\_consola.txt}.}
+\label{tab:validacion}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llS[table-format=2.1]S[table-format=2.1]S[table-format=+2.1]S[table-format=1.3]S[table-format=2.1]S[table-format=1.2]@{}}
+\toprule
+\textbf{Modelo} & \textbf{Eje} & {RMSE} & {MAE} & {Sesgo} & {$R^2$} & {FIT} & {$\rho_1$} \\
+ & & {(\si{\milli\metre})} & {(\si{\milli\metre})} & {(\si{\milli\metre})} & & {(\si{\percent})} & \\
+\midrule
+Identificado & X & 15.0 & 9.9  & +8.3  & 0.906 & 69.3 & 0.89 \\
+Identificado & Y & 13.7 & 9.1  & +7.0  & 0.904 & 69.1 & 0.89 \\
+Nominal      & X & 16.5 & 9.8  & -2.1  & 0.887 & 66.4 & 0.91 \\
+Nominal      & Y & 21.9 & 14.9 & -12.1 & 0.755 & 50.5 & 0.88 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El modelo identificado predice mejor en los dos ejes, sobre todo en Y, donde el FIT sube de
+\SI{50.5}{} a \SI{69.1}{\percent}. Sin embargo, el residuo tiene una autocorrelación a un paso
+$\rho_1$ de \num{0.89}: no es ruido blanco, sino un error con estructura, de modo que al modelo
+\eqref{eq:b3} todavía le falta una parte de la dinámica. Lo más probable es que sea la holgura
+del mecanismo y la dinámica real del servo, que el modelo reduce a una ganancia, un retardo y
+una zona muerta. Además, el $c_{\mathrm{ef}}$ de unos \num{0.2} se obtiene con perturbaciones
+pequeñas y rápidas; el balance de fuerzas en las trayectorias circulares, que son movimientos
+lentos y grandes, dio alrededor de \num{0.57}. Esa diferencia es coherente con una transmisión que
+pierde los movimientos pequeños dentro del juego mecánico.
+
+\pendiente{Seleccionar el modelo nominal con los ensayos de la mecánica definitiva y escribirlo
+explícitamente, por ejemplo
+$G_{p,\mathrm{nom}}(s) = -c_{\mathrm{nom}}\,g\,e^{-\tau_{\mathrm{nom}} s}/s^{2}$ por eje, con
+$c_{\mathrm{nom}}$, $\tau_{\mathrm{nom}}$ y la zona muerta con unidades, y justificar por qué ese
+y no otro (no promediar parámetros de modelos distintos). Agregar una figura de validación
+(medición, predicción y residuo de algunas ventanas) a partir de
+\texttt{etapaB/resultados/B3\_validacion.csv}.}

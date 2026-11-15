@@ -1,0 +1,199 @@
+\section{Diseño del controlador y evaluación MIL}
+
+\pendiente{Toda esta sección usa el modelo del diseño ($c = 5/7$, retardo de
+\SI{75}{\milli\second}), porque el diseño se hizo antes de identificar la planta. Cuando se
+cierre el rediseño con el modelo nominal de la Sección~II-D, decidir si esta sección presenta
+los dos diseños (original y rediseño) bajo las mismas condiciones o solo el definitivo.}
+
+\subsection{Estructura y sintonización}
+
+Cada eje es un doble integrador con retardo, así que la estructura se eligió a partir de esa
+dinámica y no del Proyecto~1. La acción derivativa es obligatoria para tener margen de fase. En
+vez de derivar la posición medida, el controlador usa la velocidad $\vh$ que ya estima el filtro
+de Kalman de la PC, con lo que no se agrega otro filtro ni más atraso. La acción integral hace
+falta para corregir sesgos como el desnivel del plato o el neutro de los servos: sin ella, cada
+grado de desnivel deja un error de unos \SI{29}{\milli\metre}. Pero un PID clásico no sirve en
+esta planta, porque al arrancar con la bola lejos de la referencia el integrador se carga durante
+todo el recorrido. Por eso se usó \emph{integración condicional}: el integrador solo acumula
+después de cuatro cuadros seguidos con la bola casi quieta, $|\vh| < \SI{25}{\milli\metre\per\second}$,
+que es cuando el error que queda es un sesgo y no un transitorio. La Tabla~\ref{tab:estructuras}
+compara las tres estructuras con las mismas $\Kp$ y $\Kd$ en el simulador no lineal.
+
+\begin{table}[!t]
+\caption{Comparación de estructuras en el simulador no lineal, con las mismas $\Kp$ y $\Kd$.
+Regulación desde \SI{100}{\milli\metre} y desnivel de \SI{1}{\degree}. Fuente:
+\texttt{etapaC/resultados/C1\_consola.txt}.}
+\label{tab:estructuras}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lS[table-format=1.2]S[table-format=2.1]S[table-format=1.2]S[table-format=2.2]@{}}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Regulación \SI{100}{\milli\metre}}} & {\textbf{Desnivel}} \\
+\cmidrule(lr){2-4}\cmidrule(l){5-5}
+\textbf{Estructura} & {$t_s$ (\si{\second})} & {$M_p$ (\si{\percent})} & {$e_{ss}$ (\si{\milli\metre})} & {$e_{ss}$ (\si{\milli\metre})} \\
+\midrule
+PD                       & 1.40 & 2.3  & 0.28 & 30.52 \\
+PID clásico              & 3.93 & 38.8 & 2.07 & 0.14 \\
+PID integr. condicional  & 1.30 & 4.4  & 0.18 & 0.27 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+$\Kp$ y $\Kd$ se calcularon por asignación de polos. El retardo del lazo se representó como un
+atraso equivalente $t_e = t_d + \Ts/2 + 2/\omega_{n,\mathrm{srv}}$, con $t_d = \SI{75}{\milli\second}$
+y $\omega_{n,\mathrm{srv}} = \SI{50}{\radian\per\second}$ supuesto para el servo, lo que da
+$t_e = \SI{0.132}{\second}$. Con el modelo de diseño $-c\,g/(s^{2}(t_e s + 1))$, el polinomio
+característico $t_e s^{3} + s^{2} + c\,g\,\Kd\,s + c\,g\,\Kp$ se igualó a
+$t_e(s + a\omega)(s^{2} + 2\zeta\omega s + \omega^{2})$ con $\zeta = 0{,}7$ y $a = 1$. El
+coeficiente de $s^{2}$ fija $\omega = 1/(t_e(a + 2\zeta))$: es el retardo el que limita la
+velocidad del lazo. La integral se ajustó con $\Ti = \SI{1.5}{\second}$, con el error que entra
+al integrador recortado a $\pm\SI{30}{\milli\metre}$. Los parámetros resultantes y los márgenes
+del lazo discreto, con la planta ZOH, el retardo, el Kalman y el controlador lineal, se
+resumen en la Tabla~\ref{tab:controlador}. En la parte lineal, con $C(s)$ en \si{\radian\per\milli\metre}, el controlador es
+
+\begin{equation}
+C(s) = \frac{4{,}52\times10^{-4}\,s^{2} + 5{,}95\times10^{-4}\,s + 3{,}97\times10^{-4}}{s}
+.
+\label{eq:cs}
+\end{equation}
+
+\begin{table}[!t]
+\caption{Parámetros del controlador y márgenes del lazo discreto nominal. Fuente:
+\texttt{etapaC/resultados/C1\_consola.txt} (MATLAB R2026a).}
+\label{tab:controlador}
+\centering
+\footnotesize
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Magnitud} & \textbf{Valor} \\
+\midrule
+$\Kp$ & \SI{0.03412}{\degree\per\milli\metre} \\
+$\Kd$ & \SI{0.02588}{\degree\per(\milli\metre\per\second)} \\
+$\Ki$ (continua) & \SI{0.02275}{\degree\per(\milli\metre\second)} \\
+$\Ki\Ts$ (incremento por muestra) & \SI{7.58e-4}{\degree\per\milli\metre} \\
+Saturación $\thlim$ & \SI{10}{\degree} \\
+Kalman ($\sigma_a = \SI{500}{\milli\metre\per\second\squared}$, $\sigma_m = \SI{1}{\milli\metre}$) & $K = [\num{0.647};\ \SI{9.90}{\per\second}]$ \\
+\midrule
+Frecuencia de cruce $\omega_c$ & \SI{3.30}{\radian\per\second} \\
+Margen de fase & \SI{40.9}{\degree} \\
+Margen de ganancia superior / inferior & \SI{+11.8}{} / \SI{-12.6}{\deci\bel} \\
+Margen de retardo & \SI{216}{\milli\second} \\
+PM con retardo de 90 / \SI{120}{\milli\second} & \SI{38.0}{} / \SI{32.3}{\degree} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El margen de ganancia inferior aparece porque el lazo es condicionalmente estable: si la ganancia
+de la planta baja más de \SI{12.6}{\deci\bel}, el doble integrador se desestabiliza. Este dato
+importa en la Sección~VII, porque la identificación dio una ganancia efectiva bastante menor que
+la nominal.
+
+La ley discreta que se ejecuta en cada cuadro, por eje, es
+
+\begin{equation}
+\begin{aligned}
+\varepsilon_k &= \xh_k - r_k, \qquad u_k = \Kp\,\varepsilon_k + I_k + \Kd\,\vh_k,\\
+\theta_{\mathrm{cmd},k} &= \operatorname{sat}(u_k, \pm\thlim),\\
+n_k &= \begin{cases} n_{k-1} + 1 & |\vh_k| < \SI{25}{\milli\metre\per\second}\\ 0 & \text{en otro caso}\end{cases}\\
+I_{k+1} &= I_k + \Ki\Ts\,\operatorname{sat}(\varepsilon_k, \pm\SI{30}{\milli\metre}),\\
+&\quad\text{solo si } n_k \ge 4 \text{ y no hay \emph{clamping}},
+\end{aligned}
+\label{eq:ley}
+\end{equation}
+
+donde el \emph{clamping} congela el integrador cuando la salida está saturada y el error tiene el
+mismo signo que $u_k$ \cite{mw_antiwindup}.
+
+\pendiente{Si el enunciado pide un diseño alternativo por otro método, presentarlo aquí. El
+rediseño de la Sección~VII es la misma estructura con otra sintonía, no una estrategia distinta.
+Candidatos reales: realimentación de estados con observador (LQR/LQG) o un compensador de
+adelanto--atraso por respuesta en frecuencia.}
+
+\subsection{Evaluación Model-in-the-Loop}
+
+El MIL simula la cadena completa con el modelo no lineal de dos ejes: la cámara toma muestras
+cada $\Ts$ con ruido de \SI{1}{\milli\metre}, el dato llega a la ESP32 con el retardo, pasa por el
+Kalman y el controlador, la inclinación se convierte en comando con la tabla servo--plato medida,
+y el servo, de segundo orden con $\omega_n = \SI{50}{\radian\per\second}$, velocidad de
+\SI{600}{\degree\per\second} y carrera de $\pm\SI{45}{\degree}$, mueve el plato. Todos los casos
+comparten planta, $\Ts$, retardo, ruido (con la misma semilla), integrador numérico y duración,
+salvo lo que cada caso cambia a propósito. La Fig.~\ref{fig:mil} muestra el ensayo de requisitos
+y el de saturación, y la Tabla~\ref{tab:mil} las métricas.
+
+\begin{figure*}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 2, horizontal sep=1.3cm, vertical sep=0.9cm},
+                  estilo, ancho, xmin=0, xmax=6]
+\nextgroupplot[ylabel={Posición (\si{\milli\metre})}, xticklabels={},
+               title={\scriptsize D1: regulación desde \SI{100}{\milli\metre}}, title style={yshift=-2pt},
+               legend pos=north east]
+  \addplot[cAzul] table[col sep=comma, x=t_cap_s, y=xh_x_mm] {\G/D_caso_D1_requisitos.csv};
+  \addplot[cVerde, dashed] table[col sep=comma, x=t_cap_s, y=x_plato_mm] {\G/D_caso_D1_requisitos.csv};
+  \addplot[cGris, densely dotted] table[col sep=comma, x=t_cap_s, y=r_x_mm] {\G/D_caso_D1_requisitos.csv};
+  \legend{$\xh$, $x$ (plato), $r$}
+\nextgroupplot[ylabel={Posición (\si{\milli\metre})}, xticklabels={},
+               title={\scriptsize D2: empujón con saturación y anti-windup}, title style={yshift=-2pt},
+               legend pos=north east]
+  \addplot[cAzul] table[col sep=comma, x=t_cap_s, y=xh_x_mm] {\G/D_caso_D2_sat_con_AW.csv};
+  \addplot[cVerde, dashed] table[col sep=comma, x=t_cap_s, y=x_plato_mm] {\G/D_caso_D2_sat_con_AW.csv};
+  \addplot[cRojo, densely dotted, domain=0:6, samples=2] {127};
+  \legend{$\xh$, $x$ (plato), Borde}
+\nextgroupplot[ylabel={$\thc$ (\si{\degree})}, xlabel={Tiempo (\si{\second})}]
+  \addplot[cNaranja] table[col sep=comma, x=t_cap_s, y=thcmd_x_deg] {\G/D_caso_D1_requisitos.csv};
+\nextgroupplot[ylabel={$\thc$ (\si{\degree})}, xlabel={Tiempo (\si{\second})}]
+  \addplot[cNaranja] table[col sep=comma, x=t_cap_s, y=thcmd_x_deg] {\G/D_caso_D2_sat_con_AW.csv};
+  \addplot[cRojo, densely dotted, domain=0:6, samples=2] {10};
+\end{groupplot}
+\end{tikzpicture}
+\caption{Evaluación MIL con el actuador medido. Izquierda: ensayo de requisitos. Derecha:
+empujón de \SI{420}{\milli\metre\per\second} con \SI{1}{\degree} de desnivel, con saturación a
+$\thlim = \SI{10}{\degree}$ y anti-windup.}
+\label{fig:mil}
+\end{figure*}
+
+\begin{table}[!t]
+\caption{Métricas MIL (eje X). Fuente: \texttt{etapaD/resultados/D1\_metricas.csv}
+(MATLAB R2026a).}
+\label{tab:mil}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Caso} & $t_s$ (\si{\second}) & $M_p$ (\si{\percent}) & $e_{ss}$ (\si{\milli\metre}) & $\max|x|$ (\si{\milli\metre}) & $t_{\mathrm{sat}}$ (\si{\second}) \\
+\midrule
+D1 requisitos                 & 1,30 & 4,4  & 0,18 & 102,7 & 0 \\
+D2 sin saturación             & ---  & ---  & 1,48 & 127,1 & 0 \\
+D2 con sat., sin AW           & ---  & ---  & 4,49 & 133,0 & 0,30 \\
+D2 con sat., con AW           & ---  & ---  & 4,49 & 133,0 & 0,30 \\
+D2b PID clásico, sin AW       & ---  & ---  & 2,97 & 133,0 & 0,33 \\
+D2b PID clásico, con AW       & ---  & ---  & 2,40 & 133,0 & 0,30 \\
+D3 desnivel de \SI{1}{\degree} & ---  & ---  & 0,27 & 28,8  & 0 \\
+\midrule
+D5 retardo de \SI{120}{\milli\second} & 3,03 & 5,0  & 0,14 & 102,6 & 0 \\
+D5 ruido de \SI{2}{\milli\metre}      & 4,90 & 6,5  & 0,96 & 102,9 & 0 \\
+D5 firmware sin tabla                 & 4,73 & 23,8 & 0,78 & 80,2  & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+En el ensayo de requisitos el controlador cumple R1 a R4: $t_s = \SI{1.30}{\second}$,
+$M_p = \SI{4.4}{\percent}$ y $e_{ss} = \SI{0.18}{\milli\metre}$, con un pico de
+\SI{3.8}{\degree} de inclinación, lejos de la saturación. La saturación solo aparece con
+perturbaciones que llevan la bola casi al borde. Con el empujón de D2, el plato satura
+\SI{0.30}{\second} y la bola llega a \SI{133}{\milli\metre}, más allá del borde: con
+$\thlim = \SI{10}{\degree}$, el actuador real no alcanza a frenar esa perturbación, y eso es una
+limitación del mecanismo y no de la sintonía. Con integración condicional, las versiones con y sin
+anti-windup dan exactamente lo mismo, porque durante la saturación la bola se mueve rápido y el
+integrador ya está detenido por la condición de velocidad. Con un PID clásico, en cambio, el
+anti-windup sí actúa y baja el error final de \SI{2.97}{} a \SI{2.40}{\milli\metre}.
+
+Los casos de robustez muestran dónde está el riesgo: con \SI{120}{\milli\second} de retardo o con
+\SI{2}{\milli\metre} de ruido, $t_s$ pasa de \SI{3}{\second}, y si el firmware convirtiera la
+inclinación en comando con la pendiente del diseño en vez de la tabla medida, el sobreimpulso
+subiría a \SI{23.8}{\percent}. Por eso el firmware usa la tabla.
+
+\pendiente{Verificar R4 en D2 de forma explícita en el texto final (no se cumple con ese
+empujón). Agregar el caso D4 (dos ejes) si cabe en la extensión.}

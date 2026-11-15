@@ -1,0 +1,60 @@
+\section{Introducción}
+
+La planta \emph{Ball on Plate} es una bola que rueda sobre un plato cuadrado de acrílico de
+\SI{300}{\milli\metre} $\times$ \SI{300}{\milli\metre}. El plato se apoya en una junta universal central y se inclina en
+dos ejes, $\theta_x$ y $\theta_y$, con dos servos Tower Pro MG90D que lo empujan mediante
+varillas. Una cámara web cenital, a \SI{450}{\milli\metre} sobre el plato, mide la posición de
+la bola. La visión corre en una PC con Linux: segmenta la bola por color, convierte píxeles a
+milímetros con una homografía y estima la posición y la velocidad con un filtro de Kalman. El
+controlador corre en una ESP32, que recibe el estado por el puerto serie y genera el PWM de los
+servos. La variable controlada es la posición $(x, y)$ del centro de la bola, en milímetros, y
+la variable manipulada es la inclinación del plato, en grados.
+
+El problema de control consiste en llevar la bola a una posición de referencia y mantenerla ahí
+sin que salga del área útil del plato, $|x|, |y| \le \SI{127}{\milli\metre}$, con una inclinación
+limitada por el recorrido de los servos. A diferencia de una planta térmica, esta no tiene un
+equilibrio estable: sin control, cualquier inclinación lleva la bola al borde en alrededor de un
+segundo. Además, el periodo de muestreo no es libre, porque lo fija la cámara a
+\SI{30}{fps}, y la cadena de medición agrega un retardo que es tiempo muerto dentro del lazo.
+
+\pendiente{El enunciado oficial del proyecto final no se ha entregado (\texttt{Intrucciones.txt}
+está vacío). Los requisitos de la Tabla~\ref{tab:requisitos} los fijó el equipo como decisión de
+ingeniería. Si el enunciado trae otros, reemplazarlos aquí y repetir la verificación.}
+
+\begin{table}[!t]
+\caption{Requisitos de desempeño fijados por el equipo. Ensayo: bola quieta a
+\SI{100}{\milli\metre} del centro en un eje y referencia en 0.}
+\label{tab:requisitos}
+\centering
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Id} & \textbf{Requisito} & \textbf{Criterio} \\
+\midrule
+R1 & Tiempo de establecimiento & $t_s \le \SI{3}{\second}$ (banda del \SI{5}{\percent}) \\
+R2 & Sobreimpulso & $M_p \le \SI{20}{\percent}$ \\
+R3 & Error estacionario & $e_{ss} \le \SI{3}{\milli\metre}$ \\
+R4 & Seguridad & $|x|, |y| \le \SI{127}{\milli\metre}$ en todo momento \\
+Diseño & Márgenes del lazo lineal & $\mathrm{PM} \ge \SI{40}{\degree}$, $\mathrm{GM} \ge \SI{6}{\deci\bel}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las métricas se calculan siempre sobre la posición filtrada $\xh$ en los instantes de cuadro,
+que es lo que registra la PC, para que la misma definición sirva en simulación y en el
+experimento: $t_s$ es el último instante con $|\xh - r|$ mayor que el \SI{5}{\percent} del
+cambio, $M_p$ el máximo sobrepaso en porcentaje del cambio y $e_{ss}$ el valor absoluto de la
+media del error en el último segundo.
+
+Como en el Proyecto~1, el objetivo no es solo que el controlador funcione en simulación, sino
+recorrer el flujo completo de diseño basado en modelos \cite{mw_hil}:
+
+\begin{center}
+modelado $\rightarrow$ identificación $\rightarrow$ diseño $\rightarrow$ MIL $\rightarrow$
+código $\rightarrow$ SIL $\rightarrow$ PIL $\rightarrow$ implementación física.
+\end{center}
+
+\pendiente{Explicar en una o dos frases el orden real del trabajo: por decisión del equipo, el
+diseño, el MIL, el código, el SIL y el PIL se hicieron primero con el modelo del diseño, y la
+identificación con el prototipo vino después. Por eso el rediseño de la Sección~VII cierra el
+ciclo.}

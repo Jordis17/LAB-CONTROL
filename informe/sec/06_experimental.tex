@@ -1,0 +1,88 @@
+\section{Implementación experimental}
+
+\pendiente{La Etapa~H formal no se ha hecho: todavía no corre en la ESP32 el código generado de
+\texttt{Controller\_BoP}. Los resultados de esta sección son de las pruebas funcionales con el
+firmware de prueba escrito a mano (\texttt{firmware/bop\_controlador\_estable/}), que usa la
+misma ley \eqref{eq:ley} más protecciones agregadas durante las pruebas. Cuando se haga H:
+integrar \texttt{etapaE/codigo\_generado} en el firmware (copia del controlador para
+implementación, el original sin cambios), repetir los ensayos y reemplazar esta sección.}
+
+\subsection{Arquitectura del lazo físico}
+
+La cadena completa es: captura de la cámara a \SI{30}{fps} en la PC con Linux $\rightarrow$
+homografía de píxeles a milímetros sobre el cuadrado de \SI{290}{\milli\metre} de las marcas del
+plato $\rightarrow$ segmentación HSV de la bola con filtro de área y circularidad $\rightarrow$
+corrección de paralaje $\rightarrow$ filtro de Kalman de velocidad constante $\rightarrow$ trama
+binaria de \SI{20}{bytes} por el puerto serie a \SI{921600}{baudios} $\rightarrow$ controlador
+en la ESP32 $\rightarrow$ saturación $\rightarrow$ conversión de inclinación a comando del servo
+con la tabla medida $\rightarrow$ PWM de \SI{50}{\hertz} $\rightarrow$ servos. \textbf{El
+algoritmo de control se ejecuta en la ESP32}; la PC solo mide y filtra. La ESP32 lleva el plato a
+horizontal si la visión indica que no hay bola o si deja de recibir tramas durante
+\SI{200}{\milli\second}, y en cada cuadro devuelve por el mismo puerto la inclinación aplicada,
+que la PC guarda junto con la medición.
+
+Las pruebas encontraron problemas de implementación que no estaban en el modelo y que se
+corrigieron antes de medir: la ESP32 leía la trama byte a byte y trabajaba con datos unos
+\SI{0.6}{\second} atrasados, los ejes de la cámara quedaron cruzados por el orden de los clics de
+la calibración, y la primera tabla servo--plato tenía un desnivel en el neutro. Además, el
+\texttt{loop()} de la ESP32 corre cada \SI{40}{\milli\second}, por lo que el controlador procesa
+\num{25} de las \num{30} tramas por segundo.
+
+\pendiente{Lista de comprobación de seguridad antes de energizar (fuente de los servos con
+interruptor, orden de encendido, armado con el botón BOOT, watchdog, bordes del plato) y
+fotografía del prototipo. Ver \texttt{INSTRUCTIVO\_PRUEBAS.md} y
+\texttt{firmware/LEEME\_prueba\_lazo.md}.}
+
+\subsection{Resultados experimentales}
+
+La Fig.~\ref{fig:exp} muestra escalones de referencia de \SI{40}{\milli\metre} en cada eje y una
+trayectoria circular de \SI{45}{\milli\metre} de radio y periodo de \SI{4}{\second}, con la pelota
+de ping pong y el controlador original.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.2cm,
+                  xmin=0, xmax=30]
+\nextgroupplot[ylabel={$x$ (\si{\milli\metre})}, xticklabels={}, legend pos=north east,
+               legend columns=2]
+  \addplot[cAzul] table[col sep=comma, x=t_s, y=x_mm] {\G/exp_20261113_105834.csv};
+  \addplot[cGris, densely dashed] table[col sep=comma, x=t_s, y=rx_mm] {\G/exp_20261113_105834.csv};
+  \legend{Medida, Referencia}
+\nextgroupplot[ylabel={$y$ (\si{\milli\metre})}, xlabel={Tiempo (\si{\second})}]
+  \addplot[cNaranja] table[col sep=comma, x=t_s, y=y_mm] {\G/exp_20261113_105834.csv};
+  \addplot[cGris, densely dashed] table[col sep=comma, x=t_s, y=ry_mm] {\G/exp_20261113_105834.csv};
+\end{groupplot}
+\end{tikzpicture}
+
+\vspace{2mm}
+\begin{tikzpicture}
+\begin{axis}[estilo, width=0.62\columnwidth, height=0.62\columnwidth, axis equal image,
+             xmin=-127, xmax=127, ymin=-127, ymax=127,
+             xlabel={$x$ (\si{\milli\metre})}, ylabel={$y$ (\si{\milli\metre})}]
+  \addplot[cAzul, line width=0.3pt, aligera=2,
+           restrict expr to domain={\thisrow{modo}}{2:2}] table[col sep=comma, x=x_mm, y=y_mm] {\G/exp_20261113_105517.csv};
+  \addplot[cRojo, dashed, domain=0:360, samples=73, line width=0.8pt] ({45*cos(x)}, {45*sin(x)});
+\end{axis}
+\end{tikzpicture}
+\caption{Prueba funcional en el prototipo con el firmware de prueba. Arriba: escalones de
+\SI{40}{\milli\metre} (\texttt{sesion\_20261113\_105834}). Abajo: trayectoria circular de
+\SI{45}{\milli\metre} y \SI{4}{\second} durante \SI{152}{\second}, con el círculo pedido en rojo
+(\texttt{sesion\_20261113\_105517}).}
+\label{fig:exp}
+\end{figure}
+
+En los escalones, la bola no tiene sobreimpulso, pero queda a entre \SI{9}{} y
+\SI{80}{\milli\metre} de la referencia al final de cada tramo de \SI{4}{\second}, así que no se
+puede medir $t_s$ con esa duración. En el círculo, la órbita quedó centrada en
+$(6, -4)\,\si{\milli\metre}$, con un radio medio de \SI{45}{\milli\metre} (percentiles 10 y 90 de
+\SI{18}{} y \SI{73}{\milli\metre}) y un error mediano de \SI{30}{\milli\metre}, sin tocar el borde
+y con la bola detectada el \SI{100}{\percent} del tiempo. Durante las pruebas se
+agregaron al plato bordes más altos que impiden que la bola caiga, así que la ausencia de caídas
+no se debe solo al controlador.
+
+\pendiente{Tabla de desempeño experimental frente a MIL con las mismas definiciones de la
+Sección~I: repetir el ensayo de requisitos (bola quieta a \SI{100}{\milli\metre}, referencia 0,
+al menos \SI{8}{\second}) en cada eje con el firmware de la Etapa~H, y calcular $t_s$, $M_p$,
+$e_{ss}$, $\max|x|$, mínimo y máximo de $\thc$ y tiempo en saturación desde el CSV, con el mismo
+script del MIL. El ensayo de centrado (modo~5 de \texttt{bop\_mapeo}) sirve para esto.}

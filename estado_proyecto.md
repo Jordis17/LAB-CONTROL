@@ -131,6 +131,7 @@ Ningún valor de esta tabla viene de una identificación. Las columnas de estado
 | `etapaG/pil_esp32/bop_pil_esp32/` | Sketch puente serie y copia del código de la Etapa E que corre en la ESP32 |
 | `etapaG/G3_…`, `G4_…`, `G5_…`, `etapaG/funciones/g_pil_*.m` | Preparación y carga, PIL del controlador solo, banco en lazo cerrado y comunicador serie |
 | `etapaG/resultados/` | Consolas G0 a G5, CSV de G4 y G5, `G5_resultados.mat`, `G5_diferencias.png` |
+| `informe/` | Plantilla del informe en LaTeX (IEEEtran, mismo formato que el Proyecto 1), con lo que hay hasta el 2026-11-13 y recuadros `\pendiente{}` para lo que falta. Ver `informe/LEEME.md` (2026-11-15) |
 
 El contenido del zip `Proyecto_FINAL_LAB_Control_para_ClaudeCode.zip` se copió a la raíz del repo sin cambios (sesión 1).
 

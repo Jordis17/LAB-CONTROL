@@ -1,0 +1,10 @@
+# Temporales de LaTeX (el PDF compilado si se sube como referencia)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+build.log
