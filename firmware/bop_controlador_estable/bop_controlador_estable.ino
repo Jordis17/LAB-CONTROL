@@ -8,7 +8,8 @@
 //   - la zona de tolerancia de 5 mm en modo centro y el integrador que se descarga lejos de la
 //     referencia (la correccion del defecto de x = -57 mm de ese mismo log);
 //   - SIN compensacion de zona muerta ni despegue (se agregaron despues y no mejoraron).
-// UNICO cambio respecto de ese commit: TH_TRIM (nivel del plato visto por la bola). Paso de
+// Cambios respecto de ese commit: (1) el integrador suma con la bola quieta en cualquier posicion
+// (2026-11-18, ver leyControl); (2) TH_TRIM (nivel del plato visto por la bola). Paso de
 // {0,45; 1,2} a {-1,25; -0,25} deg el 2026-11-13 (log 151156) y a {1,5; 0,4} el 2026-11-18
 // (log 092357, ver la constante).
 // Si el equipo reajusta los brazos, hay que volver a estimar el trim.
@@ -131,7 +132,7 @@ float t_circ = 0.0f;           // s desde que se entro al modo circulo (cuenta p
 // --- v2: protecciones de la prueba funcional
 const float SLEW_DEG = 6.0f;         // deg por cuadro (= 180 deg/s a 30 fps). v2 usa 3; con 6 la bola
                                      // empujada a 500 mm/s se frena a 125 mm en vez de 138 (simulacion 2026-11-09)
-const float E_ZONA   = 40.0f;        // mm: solo se integra con |error| menor que esto
+const float E_ZONA   = 40.0f;        // mm: lejos de esto, el integrador se descarga con la bola en movimiento (2026-11-18)
 const float I_MAX    = 3.0f;         // deg: tope del integrador
 // (2026-11-13) Fuera de E_ZONA el integrador ya no queda congelado: se descarga con esta
 // constante de tiempo. En sesion_20261113_105834 la bola quedo 20 s quieta a x = -57 mm
@@ -252,8 +253,16 @@ float leyControl(int e, float xh, float vh, float r, float vref, float th_ff, bo
   sat_e[e] = saturado;
   bool congelar = saturado && ((eps > 0) - (eps < 0)) == ((u > 0) - (u < 0));
   if (fabsf(vh) < V_INT) nq[e]++; else nq[e] = 0;
-  if (fabsf(eps) >= E_ZONA) I[e] *= (1.0f - TS / TAU_DESCARGA);   // descarga lejos de la referencia
-  if (!congelar && !en_zona && nq[e] >= (NQ > 1 ? NQ : 1) && fabsf(eps) < E_ZONA) {
+  bool quieta = nq[e] >= (NQ > 1 ? NQ : 1);
+  // (2026-11-18) INTEGRADOR CON LA BOLA QUIETA EN CUALQUIER POSICION, como en la ley de la Etapa C
+  // (bop_ley_control.m): si la bola esta quieta, el error que queda es un sesgo (nivel, neutro) y
+  // el integrador lo corrige, este cerca o lejos de la referencia. Antes solo integraba con
+  // |error| < E_ZONA y se descargaba fuera, y en sesion_20261118_092357 la bola quedo 55 s quieta
+  // en (110, 58) mm con el integrador en 0. Ahora la descarga solo actua con la bola EN MOVIMIENTO
+  // lejos de la referencia (lo que se cargo mientras estaba sostenida o trabada no frena el regreso).
+  // Con la bola quieta lejos, sube a KI*E_CLIP = 0,68 deg/s hasta despegarla (tope I_MAX).
+  if (fabsf(eps) >= E_ZONA && !quieta) I[e] *= (1.0f - TS / TAU_DESCARGA);
+  if (!congelar && !en_zona && quieta) {
     float ec = eps;
     if (ec > E_CLIP) ec = E_CLIP;
     if (ec < -E_CLIP) ec = -E_CLIP;

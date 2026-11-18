@@ -708,3 +708,25 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
     mandar el CSV. Con la bola quieta cerca del centro se afina el trim: trim + ley media.
   - Decidir si el integrador debe seguir sumando con la bola quieta lejos de la referencia, como
     en el diseño de la Etapa C. Así corrige solo el nivel, en vez de reajustar el trim cada vez.
+
+### 2026-11-18 — Integrador con la bola quieta en cualquier posición (`bop_controlador_estable`)
+
+- **Pedido del equipo.** El integrador vuelve a la regla de la Etapa C: suma siempre que la bola
+  esté quieta (4 cuadros con |v̂| < 25 mm/s), cerca o lejos de la referencia, con el error
+  recortado a ±30 mm y el tope `I_MAX` de 3°.
+- **Descarga.** La descarga (τ = 1,5 s) solo actúa con la bola **en movimiento** a más de
+  `E_ZONA` (40 mm). La zona de 5 mm y el clamping no cambian.
+- **Por qué.** En el log 092357 la bola quedó quieta a 110 mm con el integrador en 0. Con la
+  bola quieta lejos, ahora el integrador sube 0,68°/s hasta despegarla. Así corrige solo el
+  error que deje el trim.
+- **Simulación de un eje** (`firmware/simulaciones/sim_integrador_2026-11-18.py` y su salida;
+  modelo simplificado, no es el MIL):
+  - Casos: c de 0,2 a 0,57, τ de 0,27 y 0,4 s, rozamiento de 1 a 1,5° y error de nivel de 0 a
+    ±1,5°.
+  - Ley anterior: en 3 de los 30 casos la bola queda quieta a 51–57 mm del centro.
+  - Ley nueva: \|x\| ≤ 13 mm en los últimos 20 s de todos los casos. Lo que queda (≈ 1 a 10 mm)
+    viene de la zona de 5 mm más el rozamiento.
+- **Riesgo conocido.** Si se sostiene la bola con la mano lejos del centro, el integrador se
+  carga hasta 3°. Al soltarla se descarga mientras la bola se mueve lejos de la referencia.
+- **Pendiente:** probarlo en el prototipo (modo centro, bola soltada quieta en 3 o 4 puntos) y
+  mandar el CSV.
