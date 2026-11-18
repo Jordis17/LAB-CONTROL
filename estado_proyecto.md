@@ -684,3 +684,27 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
 - Elegida la de los logs `105517` (mejor círculo de todos) y `105834`: controlador original, zona de 5 mm, integrador con descarga (commit `8d0f938`). Solo se cambió `TH_TRIM` a {−1,25; −0,25}°.
 - Comparación real que la respalda (tabla "Prueba del rediseño"): círculo con error mediano de 30 mm, contra 45 a 58 mm del rediseño. En escalones, el rediseño terminó más cerca (1 a 47 mm, contra 9 a 80 mm).
 - En simulación, el original hace un ciclo límite de ±35 a 50 mm en Y con 1° de holgura. No se vio en `105834` (|y| mediano de 6 mm en modo centro). Es para vigilar.
+
+### 2026-11-18 — Nivel corrido otra vez (`sesion_20261118_092357`, modo centro, 70 s)
+
+- Firmware `bop_controlador_estable` con `TH_TRIM = {−1,25; −0,25}`. Bola detectada el 100 %.
+- A los 2,5 s la bola salió de (−5, −11) mm hacia la esquina (+x, +y), chocó con el borde en
+  x ≈ 127 mm y quedó **55 s quieta en (110,4; 57,6) mm**.
+  - La aceleración de salida, de unos 1000 mm/s², es demasiado grande para un error de nivel de
+    1 a 2°. Lo más probable es que la bola se haya soltado o empujado con la mano. Ese tramo no se
+    usa para estimar el nivel.
+- **Con la bola quieta, la ley pedía +3,60° (X) y +1,80° (Y), y el integrador estaba en 0.**
+  - Fuera de `E_ZONA` (40 mm) el integrador se descarga, así que nada corrige el nivel: es el
+    mismo defecto que se anotó con el log 151156.
+  - Con el trim, el plato recibía +2,35° (X) y +1,55° (Y), y aun así la bola no volvía.
+- **Estimación del nivel.** La bola llegó a ese punto rodando hacia el centro (−x, −y), así que
+  quedó en el borde de la zona muerta. Entonces, nivel = aplicado − zona muerta. Con la zona
+  muerta de B3 del log 151156 (X 0,86°, Y 1,18°) da **+1,5° (X) y +0,4° (Y)**.
+  - Incertidumbre de ~1°: la zona muerta varió entre 0,9 y 1,9° de un ensayo a otro.
+  - No se usa la ley media sin restar la zona muerta: ese fue el error del trim +2,5 del 2026-11-09.
+- **Cambio:** `TH_TRIM = {1,5; 0,4}` en `bop_controlador_estable.ino`. Es el único cambio.
+- **Pendiente:**
+  - Probar 60 s en modo centro, soltando la bola quieta, sin empujarla, en 3 o 4 puntos, y
+    mandar el CSV. Con la bola quieta cerca del centro se afina el trim: trim + ley media.
+  - Decidir si el integrador debe seguir sumando con la bola quieta lejos de la referencia, como
+    en el diseño de la Etapa C. Así corrige solo el nivel, en vez de reajustar el trim cada vez.

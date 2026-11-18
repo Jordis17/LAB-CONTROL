@@ -8,8 +8,9 @@
 //   - la zona de tolerancia de 5 mm en modo centro y el integrador que se descarga lejos de la
 //     referencia (la correccion del defecto de x = -57 mm de ese mismo log);
 //   - SIN compensacion de zona muerta ni despegue (se agregaron despues y no mejoraron).
-// UNICO cambio respecto de ese commit: TH_TRIM pasa de {0,45; 1,2} a {-1,25; -0,25} deg,
-// porque el neutro de los servos se corrio al lubricar (log sesion_20261113_151156).
+// UNICO cambio respecto de ese commit: TH_TRIM (nivel del plato visto por la bola). Paso de
+// {0,45; 1,2} a {-1,25; -0,25} deg el 2026-11-13 (log 151156) y a {1,5; 0,4} el 2026-11-18
+// (log 092357, ver la constante).
 // Si el equipo reajusta los brazos, hay que volver a estimar el trim.
 // BOOT: DESARMADO -> CENTRO -> CIRCULO -> ENSAYO AUTOMATICO (90 s) -> DESARMADO.
 //
@@ -165,7 +166,14 @@ const float TH_TAB[2][NTAB] = {
 // (2026-11-13, sesion_20261113_094845) con X = 0,9 el centro de la orbita paso de +30 a
 // -31 mm: el valor justo en X esta en el medio. En Y el centro casi no cambio con el trim
 // (+31 -> +27 mm): ese corrimiento no es de nivel (probable holgura de Y, hasta 2,4 deg).
-const float TH_TRIM[2] = {-1.25f, -0.25f}; // deg, ejes X e Y (re-estimado 2026-11-13, log 151156; antes {0,45; 1,2})
+// (2026-11-18, sesion_20261118_092357, modo centro 70 s) con {-1,25; -0,25} la bola se fue a la
+// esquina (+x, +y) y quedo 55 s quieta en (110,4; 57,6) mm. Ahi la ley pedia +3,60 (X) y +1,80 (Y)
+// (integrador en 0, porque fuera de E_ZONA se descarga), o sea +2,35 y +1,55 aplicados con el trim.
+// La bola llego a ese punto rodando hacia el centro, asi que quedo en el BORDE de la zona muerta:
+// nivel = aplicado - zona muerta (B3, log 151156: X 0,86, Y 1,18 deg) = +1,5 (X) y +0,4 (Y).
+// Incertidumbre de ~1 deg (la zona muerta vario de 0,9 a 1,9 deg entre ensayos). NO se uso la ley
+// media sin restar la zona muerta: ese fue el error del trim +2,5 del 2026-11-09.
+const float TH_TRIM[2] = {1.5f, 0.4f};     // deg, ejes X e Y (2026-11-18; antes {-1,25; -0,25})
 const float US_NEUTRO = 1500.0f;
 const float US_POR_GRADO = 1000.0f / 90.0f;
 
