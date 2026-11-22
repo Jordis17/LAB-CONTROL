@@ -1,44 +1,55 @@
 \section{Discusión}
 
-\pendiente{Esta sección se termina con los datos de la Etapa~H. Lo que sigue es el esqueleto
-con las diferencias ya medidas entre el modelo y la planta. Ordenarlas por peso cuando se tengan
-los resultados finales y no corregirlas artificialmente.}
+La diferencia principal entre el modelo de diseño y el prototipo está en la transmisión entre la
+orden de inclinación y la bola. El diseño suponía $c = 5/7$ y un retardo de
+\SI{75}{\milli\second}; la identificación dio una ganancia efectiva de \numrange{0.12}{0.28} para
+movimientos pequeños (\num{0.18} y \num{0.28} en el modelo nominal), un retardo de \SIrange{0.27}{0.41}{\second} y una zona muerta de alrededor
+de \SI{1}{\degree}. Como el resultado fue el mismo con dos bolas muy distintas, el origen está en
+el mecanismo: la holgura de rótulas y varillas, medida hasta en \SI{2.4}{\degree} en el eje Y, y
+la respuesta del servo a cambios pequeños. El servo Y, que el equipo nota más duro desde su
+compra, es el de más holgura y más retardo, y del lado $-y$ aparecieron casi todas las zonas
+donde la bola quedaba trabada. La asimetría entre los ejes viene del actuador, no del
+controlador.
 
-La diferencia principal entre el modelo y el prototipo está en la transmisión entre la orden de
-inclinación y la bola. El modelo de diseño suponía $c = 5/7$ y un retardo de
-\SI{75}{\milli\second}. La identificación dio una ganancia efectiva cercana a \num{0.2} para
-movimientos pequeños y un retardo de \SIrange{0.27}{0.41}{\second}, con una zona muerta de
-alrededor de \SI{1}{\degree}. Como el resultado fue el mismo con dos bolas muy distintas, el
-origen está en el mecanismo: holgura de las rótulas y varillas, medida hasta \SI{2.4}{\degree}
-en el eje Y, y respuesta del servo a cambios pequeños. El eje Y, cuyo servo es más duro, tiene
-más holgura y más retardo, y es donde aparecieron casi todas las zonas en las que la bola se
-quedaba trabada. La asimetría entre los ejes viene, entonces, del actuador.
+Estas diferencias explican el desempeño de la Sección~VI. Con una ganancia de planta cuatro veces
+menor, el lazo queda cerca del margen de ganancia inferior de \SI{-12.6}{\deci\bel}
+(Tabla~\ref{tab:controlador}). Con el modelo nominal y un retardo total estimado de
+\SI{0.44}{\second} (unos \SI{0.04}{\second} de la cámara, \SI{0.07}{\second} por el
+\texttt{loop()} de la ESP32 y \SI{0.33}{\second} de la orden a la bola), el controlador original
+tiene un margen de fase de solo \SI{12}{\degree} para $c_{\mathrm{ef}} = 0{,}2$ si se considera
+solo la parte PD, y negativo, \SI{-15}{\degree}, si la integral se trata como un término lineal
+siempre activo\footnote{Cálculo con \texttt{informe/scripts/margenes\_retardo.py}, sobre
+$L(s) = c_{\mathrm{ef}}\,g\,C(s)\,e^{-0{,}44 s}/s^{2}$ sin el Kalman.}. En la práctica la
+integral solo actúa con la bola quieta, lo que explica que el lazo no se volviera inestable, pero
+también que fuera lento y que la bola se detuviera lejos de la referencia: con
+$\Kp = \SI{0.034}{\degree\per\milli\metre}$, un error de \SI{30}{\milli\metre} pide alrededor de
+\SI{1}{\degree}, que es del orden de la zona muerta.
 
-Estas diferencias explican el comportamiento observado. Una ganancia de planta cuatro veces
-menor queda cerca del margen de ganancia inferior de \SI{-12.6}{\deci\bel} del lazo
-condicionalmente estable (Tabla~\ref{tab:controlador}), y un retardo cuatro veces mayor deja muy
-poco margen de fase. Con un retardo total estimado de \SI{0.44}{\second} (cámara, datos de la
-ESP32 y transmisión), el cálculo de márgenes del controlador original da un margen de fase de
-unos \SI{12}{\degree} para $c_{\mathrm{ef}} = 0{,}2$, y un rediseño preliminar con ese modelo
-($\Kp = \SI{0.00727}{\degree\per\milli\metre}$, $\Kd = \SI{0.0184}{\degree\per(\milli\metre\per\second)}$,
-$\Ti = \SI{5}{\second}$) sube el margen a \SI{43}{\degree}. Con ese retardo, el requisito R1 de
-\SI{3}{\second} no se puede cumplir con un controlador robusto: o se acepta un requisito menos
-exigente o se reduce el retardo, con menos holgura mecánica y un \texttt{loop()} más rápido en la
-ESP32.
+Con ese mismo modelo se probó un rediseño preliminar de la misma estructura
+($\Kp = \SI{0.0073}{\degree\per\milli\metre}$, $\Kd = \SI{0.0184}{\degree\per(\milli\metre\per\second)}$,
+$\Ti = \SI{5}{\second}$), que sube el margen de fase a \SI{43}{\degree} con la parte PD y a
+\SI{36}{\degree} con la integral lineal, para $c_{\mathrm{ef}} = 0{,}2$. En el prototipo terminó
+más cerca de la referencia en los escalones (error final de \SIrange{1}{47}{\milli\metre}, contra
+\SIrange{9}{80}{\milli\metre}), pero siguió peor el círculo, con un error mediano de
+\SIrange{45}{58}{\milli\metre} contra \SI{30}{\milli\metre}. Por eso el equipo se quedó con el
+controlador original para las pruebas finales. El rediseño no pasó por MIL, SIL ni PIL. Además,
+con un retardo de \SI{0.44}{\second} el requisito R1 de \SI{3}{\second} no se puede cumplir con márgenes
+de estabilidad aceptables: hay que aceptar un requisito menos exigente o reducir el retardo, con menos
+holgura mecánica y un \texttt{loop()} más rápido en la ESP32.
 
-\pendiente{Los márgenes del rediseño se calcularon fuera de MATLAB (Python, sesión del
-2026-11-13). Antes de citarlos, repetir C1 y D1 en MATLAB con el modelo nominal identificado y
-regenerar el código (E a G). Comparar en el prototipo el original y el rediseño con el mismo
-ensayo: en las pruebas del 2026-11-13 el rediseño terminó más cerca en los escalones (error final
-de \SIrange{1}{47}{\milli\metre}, contra \SIrange{9}{80}{\milli\metre}), pero siguió peor el
-círculo (error mediano de \SIrange{45}{58}{\milli\metre}, contra \SI{30}{\milli\metre}).}
+La implementación agregó otras diferencias que el MIL no tenía. El \texttt{loop()} de la ESP32
+tarda \SI{40}{\milli\second}, así que procesa unas \num{25} de las \num{30} tramas por segundo y
+trabaja con datos de unos dos cuadros de atraso. La zona de tolerancia de \SI{5}{\milli\metre}
+evita que el integrador acumule hasta despegar la bola de golpe, pero permite un error
+estacionario mayor que los \SI{3}{\milli\metre} de R3. El nivel del plato, visto por la bola,
+cambió varias veces con los ajustes del mecanismo, y el \emph{trim} se estimó a partir de tramos
+con la bola quieta, donde el rozamiento sesga la estimación. Los choques con el borde también
+actuaron como perturbaciones durante los círculos.
 
-Otras diferencias identificadas: la latencia medida de la visión fue menor que la supuesta, el
-ruido de posición fue unas diez veces menor que el \SI{1}{\milli\metre} del diseño (aunque, en
-simulación, bajar el parámetro del Kalman a ese valor hacía oscilar el lazo, por lo que se
-mantuvo en \SI{1}{\milli\metre}), la relación servo--plato fue asimétrica y más empinada que la calculada, y
-el término centrífugo limita la validez del modelo lineal cuando el plato se mueve rápido.
-
-\pendiente{Diferencias de la implementación física (cuantización, efecto del \texttt{loop()} de
-\SI{40}{\milli\second}, la zona de tolerancia de \SI{5}{\milli\metre} y su efecto sobre R3,
-perturbaciones por choques con el borde) cuando se tengan los datos de H.}
+Otras diferencias fueron favorables o de menor peso. La latencia medida de la visión fue menor
+que la supuesta, y el ruido de posición fue unas diez veces menor que el \SI{1}{\milli\metre} del
+diseño. Aun así, el parámetro del Kalman se mantuvo en \SI{1}{\milli\metre}, porque en
+simulación bajarlo a \SI{0.11}{\milli\metre} hacía oscilar el lazo. La relación servo--plato fue
+asimétrica y más empinada que la calculada, lo que se compensó con la tabla medida. El término
+centrífugo limita la validez del modelo lineal cuando el plato se mueve rápido; en los datos del
+prototipo su efecto no se pudo separar del de la holgura.

@@ -8,8 +8,7 @@ El \emph{Simulink Support Package for Arduino Hardware} de R2026a programa la ES
 habilita PIL para ella \cite{mw_arduino}: la clase de la placa declara
 \texttt{IsPilSupported = 0}, y al registrar a mano una conexión PIL, la clase interna del paquete
 falla porque espera datos que solo existen para las placas soportadas. Por eso se usó una
-\textbf{alternativa de ingeniería}: un PIL propio con la misma arquitectura que el de Simulink
-\cite{mw_pil_target}. En la ESP32 corre exactamente el código C de la Etapa~E, el mismo
+alternativa de ingeniería: un PIL propio con la misma arquitectura que el de Simulink. En la ESP32 corre exactamente el código C de la Etapa~E, el mismo
 verificado en SIL (se comprueba que la copia sea idéntica byte a byte), compilado con la
 cadena Xtensa del paquete, con dos instancias, una por eje. Un sketch hace solo de puente serie:
 recibe $r$, $\xh$, $\vh$ y \texttt{habilitado} como \texttt{double} de \SI{8}{bytes}, llama a
@@ -17,10 +16,33 @@ recibe $r$, $\xh$, $\vh$ y \texttt{habilitado} como \texttt{double} de \SI{8}{by
 la llamada. En la PC siguen la planta del banco SIL, la referencia, la rama Normal y la
 comparación.
 
-\pendiente{Agregar un diagrama de bloques pequeño de la arquitectura PIL (PC: planta, referencia,
-rama Normal y comparación; serie a \SI{921600}{baudios}; ESP32: puente y
-\texttt{Controller\_BoP\_step}). Confirmar la velocidad del puerto usada en
-\texttt{etapaG/pil\_esp32/}.}
+La Fig.~\ref{fig:pilarq} resume la arquitectura. El intercambio es por el puerto USB a
+\SI{115200}{baudios}, un paso por mensaje, sin restricción de tiempo real.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[font=\scriptsize, >=stealth,
+  caja/.style={draw, rounded corners=1pt, align=center, minimum height=0.75cm, inner sep=2pt},
+  grupo/.style={draw, dashed, rounded corners=2pt, inner sep=5pt}]
+  \node[caja] (ref) {Referencia\\y habilitación};
+  \node[caja, below=0.45cm of ref] (planta) {Planta de la rama PIL\\(2 ejes, Kalman)};
+  \node[caja, below=0.45cm of planta] (normal) {Rama Normal\\(modelo y su planta)};
+  \node[caja, right=0.4cm of normal] (cmp) {Comparación\\muestra a muestra};
+  \node[grupo, fit=(ref)(planta)(normal)(cmp), label={[font=\scriptsize]above:PC (MATLAB)}] (pc) {};
+  \node[caja, right=2.7cm of planta, minimum width=2.1cm] (step)
+       {Puente serie\\$\downarrow$\\\texttt{Controller\_BoP\_step}\\(2 instancias)};
+  \node[grupo, fit=(step), label={[font=\scriptsize]above:ESP32}] (esp) {};
+  \draw[->] ([yshift=4pt]planta.east) -- node[above, font=\tiny, yshift=1pt]{$r, \xh, \vh$, hab.} ([yshift=4pt]step.west);
+  \draw[<-] ([yshift=-4pt]planta.east) -- node[below, font=\tiny, yshift=-1pt]{$\thc, I$, sat.} ([yshift=-4pt]step.west);
+  \draw[->] (ref) -- (planta);
+  \draw[->] (normal) -- (cmp);
+  \draw[->] (planta.south east) -- (cmp.north);
+  \draw[->] (ref.west) -- ([xshift=-3mm]ref.west -| planta.west) |- (normal.west);
+\end{tikzpicture}
+\caption{Arquitectura del PIL propio. En la ESP32 corre solo el código generado; la planta, la
+referencia, la rama Normal y la comparación siguen en la PC.}
+\label{fig:pilarq}
+\end{figure}
 
 Se hicieron dos pruebas. En G4 se ejecutó el controlador solo, con las entradas del MIL de los
 casos D1 y D2; el segundo tiene nueve cuadros saturados, así que ejercita la saturación y el

@@ -1,17 +1,5 @@
-% ============================================================
-%  Informe tecnico — EL-5409 Laboratorio de Control Automatico
-%  Proyecto final: Model-Based Design para la planta Ball on Plate
-%  Formato IEEE, dos columnas. Compilar con pdfLaTeX + BibTeX
-%  (latexmk -pdf informe.tex).
-%
-%  PLANTILLA: los recuadros rojos (\pendiente y \figpendiente)
-%  marcan lo que falta. Antes de entregar, cambiar a
-%  \mostrarpendientesfalse en preambulo.tex y revisar que no
-%  quede ninguno.
-%
-%  Todos los numeros salen de archivos del repo (ver LEEME.md de
-%  esta carpeta). No se escriben valores que no tengan respaldo.
-% ============================================================
+% Informe final EL-5409 (Ball on Plate). IEEEtran, compilar con: latexmk -pdf informe.tex
+% Antes de entregar: \mostrarpendientesfalse en preambulo.tex.
 \documentclass[conference,a4paper,10pt]{IEEEtran}
 
 \input{preambulo}
@@ -23,7 +11,8 @@ para una planta \emph{Ball on Plate} de dos grados de libertad}
 
 \author{%
 \IEEEauthorblockN{Abner López Méndez, 2022273075 \qquad Jordi Segura Chinchilla, 2022240646\\
-Anthony Villalta, \textit{carné} \qquad Yonaikel Tencio, \textit{carné}}
+Anthony Villalta, \textit{carné} \qquad Yonaikel Tencio, \textit{carné}}%
+% PENDIENTE: nombres completos y carnés de Anthony y Yonaikel
 \IEEEauthorblockA{Escuela de Ingeniería Electrónica, Tecnológico de Costa Rica\\
 EL-5409 --- Laboratorio de Control Automático, II Semestre 2026\\
 Profesor: Ing. Juan Luis Guerrero Fernández, PhD}}
@@ -31,21 +20,21 @@ Profesor: Ing. Juan Luis Guerrero Fernández, PhD}}
 \maketitle
 
 \begin{abstract}
-\pendiente{Escribir el resumen al final, cuando estén cerradas la identificación (Etapa B), el
-rediseño y la implementación física (Etapa H). Debe incluir resultados cuantitativos de cada
-etapa. Nombres completos y carnés de Anthony y Yonaikel en el encabezado.}
-Se documenta el desarrollo de un controlador de posición para una planta \emph{Ball on Plate}
-de dos grados de libertad, en la que una bola rueda sobre un plato que inclinan dos servos y una
-cámara cenital mide su posición. Siguiendo un flujo de diseño basado en modelos, se obtuvo un
-modelo no lineal por el método de Lagrange y su linealización, un doble integrador por eje,
-que no es estable en lazo abierto. Se diseñó un controlador PD por asignación de polos con
-integración condicional, que en simulación \emph{Model-in-the-Loop} cumple los requisitos con un
-tiempo de establecimiento de \SI{1.30}{\second} y un sobreimpulso de \SI{4.4}{\percent}. El
-código generado con Embedded Coder reprodujo exactamente el modelo en
-\emph{Software-in-the-Loop} y en \emph{Processor-in-the-Loop} sobre una ESP32, con igualdad en
-\num{271} de \num{271} muestras. La identificación en lazo cerrado sobre el prototipo dio una
-ganancia efectiva de rodadura cercana a \num{0.2}, frente a \num{0.714} del modelo, y un retardo
-de unos \SI{0.3}{\second}.
+Se documenta el desarrollo de un controlador de posición para una planta \emph{Ball on Plate} de
+dos grados de libertad, en la que dos servos inclinan el plato y una cámara cenital mide la
+posición de la bola. Siguiendo un flujo de diseño basado en modelos, se obtuvo un modelo no
+lineal por el método de Lagrange cuya linealización es, por eje, un doble integrador que no es
+estable en lazo abierto. Se diseñó un controlador PD por asignación de polos con integración
+condicional, que en simulación \emph{Model-in-the-Loop} alcanzó un tiempo de establecimiento de
+\SI{1.30}{\second}, un sobreimpulso de \SI{4.4}{\percent} y un error estacionario de
+\SI{0.18}{\milli\metre}. El código generado con Embedded Coder reprodujo exactamente el modelo en
+\emph{Software-in-the-Loop} y en \emph{Processor-in-the-Loop} sobre una ESP32, con igualdad en las
+\num{271} muestras comparadas. La identificación en lazo cerrado sobre el prototipo dio una
+ganancia efectiva de rodadura de \numrange{0.12}{0.28}, frente a \num{0.714} del modelo, un
+retardo de unos \SI{0.3}{\second} y una zona muerta cercana a \SI{1}{\degree}, atribuidos a la
+holgura del mecanismo. En la planta real la bola siguió un círculo de \SI{45}{\milli\metre} con un
+error mediano de \SI{30}{\milli\metre}, pero los escalones no se establecieron y terminaron a
+entre \SI{9}{} y \SI{80}{\milli\metre} de la referencia.
 \end{abstract}
 
 \begin{IEEEkeywords}

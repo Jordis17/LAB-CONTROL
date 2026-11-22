@@ -1,18 +1,15 @@
 \section{Implementación experimental}
 
-\pendiente{La Etapa~H formal no se ha hecho: todavía no corre en la ESP32 el código generado de
-\texttt{Controller\_BoP}. Los resultados de esta sección son de las pruebas funcionales con el
-firmware de prueba escrito a mano (\texttt{firmware/bop\_controlador\_estable/}), que usa la
-misma ley \eqref{eq:ley} más protecciones agregadas durante las pruebas. Cuando se haga H:
-integrar \texttt{etapaE/codigo\_generado} en el firmware (copia del controlador para
-implementación, el original sin cambios), repetir los ensayos y reemplazar esta sección.}
-
-\pendiente{Los logs de la Fig.~\ref{fig:exp} son del 2026-11-13. Después, el 2026-11-18, el
-firmware de trabajo cambió en dos cosas: el trim pasó a $\{1{,}5;\ 0{,}4\}\,\si{\degree}$
-(log \texttt{sesion\_20261118\_092357}, bola quieta en (110, 58)~mm con el integrador en 0) y el
-integrador volvió a la regla de la Etapa~C, es decir, suma con la bola quieta en cualquier
-posición. Repetir los ensayos con esa versión antes de cerrar esta sección, o aclarar con qué
-versión se hizo cada figura.}
+La implementación física no usó el código generado de \texttt{Controller\_BoP}. Por tiempo, el
+equipo decidió probar el lazo con un firmware escrito a mano
+(\texttt{firmware/bop\_controlador\_estable/}) que implementa la misma ley \eqref{eq:ley} con
+las mismas ganancias. La función de la ley del primer firmware de prueba se comprobó,
+compilada en la PC, contra la del MIL, con una diferencia máxima de \SI{6e-7}{\degree}, que
+corresponde a la precisión simple del firmware. Sobre esa función se agregaron protecciones durante las pruebas: zona de tolerancia de
+\SI{5}{\milli\metre}, tope del integrador en \SI{3}{\degree}, descarga del integrador lejos de la
+referencia, límite de velocidad de \SI{6}{\degree} por cuadro, filtro de saltos de posición y un
+\emph{trim} de nivel. Por eso los resultados de esta sección no son una validación del código
+verificado en SIL y PIL, sino de la misma ley con esas protecciones.
 
 \subsection{Arquitectura del lazo físico}
 
@@ -22,8 +19,8 @@ plato $\rightarrow$ segmentación HSV de la bola con filtro de área y circulari
 corrección de paralaje $\rightarrow$ filtro de Kalman de velocidad constante $\rightarrow$ trama
 binaria de \SI{20}{bytes} por el puerto serie a \SI{921600}{baudios} $\rightarrow$ controlador
 en la ESP32 $\rightarrow$ saturación $\rightarrow$ conversión de inclinación a comando del servo
-con la tabla medida $\rightarrow$ PWM de \SI{50}{\hertz} $\rightarrow$ servos. \textbf{El
-algoritmo de control se ejecuta en la ESP32}; la PC solo mide y filtra. La ESP32 lleva el plato a
+con la tabla medida $\rightarrow$ PWM de \SI{50}{\hertz} $\rightarrow$ servos. El
+algoritmo de control se ejecuta en la ESP32; la PC solo mide y filtra. La ESP32 lleva el plato a
 horizontal si la visión indica que no hay bola o si deja de recibir tramas durante
 \SI{200}{\milli\second}, y en cada cuadro devuelve por el mismo puerto la inclinación aplicada,
 que la PC guarda junto con la medición.
@@ -35,16 +32,21 @@ la calibración, y la primera tabla servo--plato tenía un desnivel en el neutro
 \texttt{loop()} de la ESP32 corre cada \SI{40}{\milli\second}, por lo que el controlador procesa
 \num{25} de las \num{30} tramas por segundo.
 
-\pendiente{Lista de comprobación de seguridad antes de energizar (fuente de los servos con
-interruptor, orden de encendido, armado con el botón BOOT, watchdog, bordes del plato) y
-fotografía del prototipo. Ver \texttt{INSTRUCTIVO\_PRUEBAS.md} y
-\texttt{firmware/LEEME\_prueba\_lazo.md}.}
+Antes de energizar se comprobó: fuente de los servos separada de la ESP32, con interruptor a
+mano y tierra común; primero se conecta la ESP32 y después la fuente; el firmware arranca
+desarmado, con el plato horizontal, y solo actúa al presionar el botón BOOT; el comando del servo
+se limita a $\pm\SI{40}{\degree}$; y el watchdog lleva el plato a horizontal si se pierden las
+tramas. Durante las pruebas se agregaron al plato bordes más altos que impiden que la bola caiga.
 
 \subsection{Resultados experimentales}
 
-La Fig.~\ref{fig:exp} muestra escalones de referencia de \SI{40}{\milli\metre} en cada eje y una
-trayectoria circular de \SI{45}{\milli\metre} de radio y periodo de \SI{4}{\second}, con la pelota
-de ping pong y el controlador original.
+La Fig.~\ref{fig:exp} muestra los escalones de referencia de \SI{40}{\milli\metre} del ensayo
+automático y una trayectoria circular de \SI{45}{\milli\metre} de radio y periodo de
+\SI{4}{\second}, las dos con la pelota de ping pong y el controlador de la Sección~III. La
+Tabla~\ref{tab:exp} resume las métricas de los escalones, calculadas desde el CSV con las
+definiciones de la Sección~I, junto con las del MIL para escalones de \SI{50}{\milli\metre} (caso
+D4). No es el mismo ensayo, porque en el prototipo no se corrió el ensayo de requisitos de
+\SI{100}{\milli\metre}, pero sirve para comparar el orden de magnitud.
 
 \begin{figure}[!t]
 \centering
@@ -74,22 +76,65 @@ de ping pong y el controlador original.
 \end{tikzpicture}
 \caption{Prueba funcional en el prototipo con el firmware de prueba. Arriba: escalones de
 \SI{40}{\milli\metre} (\texttt{sesion\_20261113\_105834}). Abajo: trayectoria circular de
-\SI{45}{\milli\metre} y \SI{4}{\second} durante \SI{152}{\second}, con el círculo pedido en rojo
+\SI{45}{\milli\metre} y \SI{4}{\second} durante \SI{157}{\second}, con el círculo pedido en rojo
 (\texttt{sesion\_20261113\_105517}).}
 \label{fig:exp}
 \end{figure}
 
-En los escalones, la bola no tiene sobreimpulso, pero queda a entre \SI{9}{} y
-\SI{80}{\milli\metre} de la referencia al final de cada tramo de \SI{4}{\second}, así que no se
-puede medir $t_s$ con esa duración. En el círculo, la órbita quedó centrada en
-$(6, -4)\,\si{\milli\metre}$, con un radio medio de \SI{45}{\milli\metre} (percentiles 10 y 90 de
-\SI{18}{} y \SI{73}{\milli\metre}) y un error mediano de \SI{30}{\milli\metre}, sin tocar el borde
-y con la bola detectada el \SI{100}{\percent} del tiempo. Durante las pruebas se
-agregaron al plato bordes más altos que impiden que la bola caiga, así que la ausencia de caídas
-no se debe solo al controlador.
+\begin{table}[!t]
+\caption{Escalones en el prototipo (\texttt{sesion\_20261113\_105834}, tramos de
+\SI{4.8}{\second}) y en MIL (D4). $\Delta$: cambio pedido desde la posición inicial; $e_f$: error
+medio en el último segundo del tramo. Fuente: \texttt{informe/scripts/preparar\_datos.py} y
+\texttt{etapaD/resultados/D1\_metricas.csv}.}
+\label{tab:exp}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llrcrrr@{}}
+\toprule
+\textbf{Ensayo} & \textbf{Referencia} & $\Delta$ & $t_s$ & $M_p$ & $e_f$ & $\max|\thc|$ \\
+ & (\si{\milli\metre}) & (\si{\milli\metre}) & (\si{\second}) & (\si{\percent}) & (\si{\milli\metre}) & (\si{\degree}) \\
+\midrule
+Prototipo, X & $0 \rightarrow 40$     & 40,7  & $> 4{,}7$ & 0 & 23,2 & 2,9 \\
+Prototipo, X & $40 \rightarrow -40$   & -57,1 & $> 4{,}8$ & 0 & 27,8 & 1,9 \\
+Prototipo, X & $-40 \rightarrow 0$    & 12,4  & $> 4{,}8$ & 0 & 9,3  & 1,3 \\
+Prototipo, Y & $0 \rightarrow 40$     & 83,5  & $> 4{,}8$ & 0 & 80,5 & 2,0 \\
+Prototipo, Y & $40 \rightarrow -40$   & 0,5   & $> 4{,}8$ & 0 & 38,6 & 1,6 \\
+Prototipo, Y & $-40 \rightarrow 0$    & 76,7  & $> 4{,}8$ & 0 & 31,8 & 2,0 \\
+\midrule
+MIL D4, X & $0 \rightarrow 50$        & 51,3  & 4,00 & 14,1 & 1,5 & 2,1 \\
+MIL D4, Y & $0 \rightarrow 50$        & 48,5  & 4,20 & 16,7 & 3,0 & 1,9 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\pendiente{Tabla de desempeño experimental frente a MIL con las mismas definiciones de la
-Sección~I: repetir el ensayo de requisitos (bola quieta a \SI{100}{\milli\metre}, referencia 0,
-al menos \SI{8}{\second}) en cada eje con el firmware de la Etapa~H, y calcular $t_s$, $M_p$,
-$e_{ss}$, $\max|x|$, mínimo y máximo de $\thc$ y tiempo en saturación desde el CSV, con el mismo
-script del MIL. El ensayo de centrado (modo~5 de \texttt{bop\_mapeo}) sirve para esto.}
+En el prototipo, ningún escalón se estableció dentro del tramo, así que $t_s$ solo tiene una
+cota inferior, y el error al final fue de \SIrange{9}{80}{\milli\metre}, contra
+\SIrange{1.5}{3.0}{\milli\metre} en el MIL. No hubo sobreimpulso: la bola se acerca lentamente y
+se detiene antes de llegar. El eje Y fue el peor. En el escalón de 0 a \SI{40}{\milli\metre} la
+bola estaba en \SI{-43}{\milli\metre} y prácticamente no se movió, aunque el plato llegó a pedir
+\SI{2}{\degree}. Es el comportamiento que se espera de la zona muerta y la baja ganancia efectiva
+identificadas en la Sección~II: con $\Kp = \SI{0.034}{\degree\per\milli\metre}$, un error de
+\SI{30}{\milli\metre} pide apenas \SI{1}{\degree}, del orden de la zona muerta.
+
+En el círculo, la órbita quedó centrada en $(6, -4)\,\si{\milli\metre}$, con un radio medio de
+\SI{45}{\milli\metre} (percentiles 10 y 90 de \SI{16}{} y \SI{73}{\milli\metre}) y un error
+mediano respecto de la referencia de \SI{30}{\milli\metre}. La bola estuvo a más de
+\SI{115}{\milli\metre} del centro solo el \SI{0.2}{\percent} del tiempo, y se detectó en todos
+los cuadros.
+
+El 2026-11-18 se repitió el modo de centrado y apareció el mismo problema de forma más clara
+(\texttt{sesion\_20261118\_092357}): la bola quedó \SI{55}{\second} quieta en
+$(110, 58)\,\si{\milli\metre}$ con el plato pidiendo \SI{3.6}{\degree} y \SI{1.8}{\degree}, y el
+integrador en cero, porque el firmware lo descargaba con la bola lejos de la referencia. Con eso
+se corrigieron dos cosas: el \emph{trim} pasó a $\{1{,}5;\ 0{,}4\}\,\si{\degree}$, estimado como
+la inclinación aplicada menos la zona muerta, y el integrador volvió a la regla de
+\eqref{eq:ley}, que suma con la bola quieta en cualquier posición. En una simulación de un eje
+con zona muerta, ese cambio dejó la bola a menos de \SI{13}{\milli\metre} del centro en los 30
+casos probados, contra \SIrange{51}{57}{\milli\metre} en 3 casos con la regla anterior. Esta
+última versión no se alcanzó a probar en el prototipo.
+
+Con estos resultados, los requisitos R1 y R3 no se cumplen en la planta real. R4 tampoco se
+cumplió siempre: en el log del 2026-11-18 la bola llegó al borde en $x \approx \SI{127}{\milli\metre}$,
+y en las pruebas con la bola de PLA llegó a él decenas de veces. Fueron los bordes del plato los
+que evitaron que cayera.

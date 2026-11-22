@@ -17,9 +17,8 @@ equilibrio estable: sin control, cualquier inclinación lleva la bola al borde e
 segundo. Además, el periodo de muestreo no es libre, porque lo fija la cámara a
 \SI{30}{fps}, y la cadena de medición agrega un retardo que es tiempo muerto dentro del lazo.
 
-\pendiente{El enunciado oficial del proyecto final no se ha entregado (\texttt{Intrucciones.txt}
-está vacío). Los requisitos de la Tabla~\ref{tab:requisitos} los fijó el equipo como decisión de
-ingeniería. Si el enunciado trae otros, reemplazarlos aquí y repetir la verificación.}
+No se contó con requisitos dados por el curso para esta planta, así que los de la
+Tabla~\ref{tab:requisitos} los fijó el equipo como una decisión de ingeniería.
 
 \begin{table}[!t]
 \caption{Requisitos de desempeño fijados por el equipo. Ensayo: bola quieta a
@@ -27,6 +26,7 @@ ingeniería. Si el enunciado trae otros, reemplazarlos aquí y repetir la verifi
 \label{tab:requisitos}
 \centering
 \footnotesize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Id} & \textbf{Requisito} & \textbf{Criterio} \\
@@ -34,7 +34,7 @@ ingeniería. Si el enunciado trae otros, reemplazarlos aquí y repetir la verifi
 R1 & Tiempo de establecimiento & $t_s \le \SI{3}{\second}$ (banda del \SI{5}{\percent}) \\
 R2 & Sobreimpulso & $M_p \le \SI{20}{\percent}$ \\
 R3 & Error estacionario & $e_{ss} \le \SI{3}{\milli\metre}$ \\
-R4 & Seguridad & $|x|, |y| \le \SI{127}{\milli\metre}$ en todo momento \\
+R4 & Seguridad & $|x|, |y| \le \SI{127}{\milli\metre}$ siempre \\
 Diseño & Márgenes del lazo lineal & $\mathrm{PM} \ge \SI{40}{\degree}$, $\mathrm{GM} \ge \SI{6}{\deci\bel}$ \\
 \bottomrule
 \end{tabular}
@@ -54,7 +54,8 @@ modelado $\rightarrow$ identificación $\rightarrow$ diseño $\rightarrow$ MIL $
 código $\rightarrow$ SIL $\rightarrow$ PIL $\rightarrow$ implementación física.
 \end{center}
 
-\pendiente{Explicar en una o dos frases el orden real del trabajo: por decisión del equipo, el
-diseño, el MIL, el código, el SIL y el PIL se hicieron primero con el modelo del diseño, y la
-identificación con el prototipo vino después. Por eso el rediseño de la Sección~VII cierra el
-ciclo.}
+El orden real del trabajo no fue estrictamente ese. Para avanzar mientras se terminaba el
+prototipo, el diseño, el MIL, la generación de código, el SIL y el PIL se hicieron primero con el
+modelo físico, y la identificación con el prototipo se hizo después. Por eso la
+Sección~II presenta el modelo identificado, pero el controlador de las Secciones~III a V es el
+diseñado con el modelo físico; la Sección~VII analiza esa diferencia.

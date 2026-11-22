@@ -12,15 +12,15 @@ bandera \texttt{saturado}. Con \texttt{habilitado} en falso, que corresponde al 
 pérdida de la bola o al disparo del watchdog, la salida es cero y el integrador se reinicia. El
 modelo corre a $\Ts = \SI{33.3}{\milli\second}\ (\SI{30}{\hertz})$ y la ley \eqref{eq:ley} se escribió en una sola función
 de MATLAB que usan tanto el MIL como el bloque del modelo, de modo que hay una sola fuente del
-algoritmo. La Fig.~\ref{fig:controller} muestra el modelo.
+algoritmo. En la Fig.~\ref{fig:controller} se ven las cuatro entradas de la interfaz, los ocho
+parámetros como bloques \texttt{Constant} y un solo bloque con la ley; la planta no está.
 
 \begin{figure}[!t]
 \centering
-\figpendiente[4.0cm]{Captura legible de \texttt{etapaE/Controller\_BoP.slx} (nivel superior:
-entradas, bloque de la ley, saturación y salidas). Exportar desde Simulink con
-\texttt{print('-sController\_BoP','-dpdf')} y guardar en \texttt{informe/figuras/}.}
-\caption{Modelo \texttt{Controller\_BoP.slx}: ley de control por eje con saturación, integración
-condicional y \emph{clamping}.}
+\includegraphics[width=0.85\columnwidth]{figuras/Controller_BoP_slx.png}
+\caption{Modelo \texttt{Controller\_BoP.slx} (vista generada por Simulink): las cuatro entradas
+de la interfaz, los ocho parámetros calibrables como bloques \texttt{Constant} y el bloque
+\texttt{ley\_control}, que implementa \eqref{eq:ley}.}
 \label{fig:controller}
 \end{figure}
 
@@ -35,8 +35,14 @@ permitió compilar el mismo código en la PC (SIL) y en la ESP32 (PIL). El Code 
 dio \num{0} resultados Fail, \num{5} advertencias y \num{26} verificaciones aprobadas; las
 advertencias se revisaron y justificaron una por una, sin usar correcciones automáticas.
 
-\pendiente{Resumir en una línea las cinco advertencias del Advisor y su justificación (ver
-\texttt{etapaE/LEEME\_etapaE.md} y \texttt{etapaE/resultados/advisor/}).}
+Las cinco advertencias fueron: los objetivos de generación del Advisor no coincidían con los
+fijados en el modelo (eficiencia y trazabilidad), lo que es informativo; el diagnóstico de nombres
+duplicados de \emph{Data Store} no está en error, y el modelo no usa \emph{Data Stores}; el orden
+de bytes y el redondeo de la división entera no estaban definidos, lo que se corrigió con la
+configuración de hardware descrita arriba; el código admite números no finitos, que hacen falta
+porque la función \texttt{sign} de MATLAB maneja \texttt{NaN}; y hay comparaciones de igualdad
+entre valores en punto flotante, que son intencionales, porque \texttt{saturado} se define
+como $\thc \ne u$.
 
 \subsection{Inspección del código generado}
 

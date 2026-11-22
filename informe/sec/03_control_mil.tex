@@ -1,9 +1,9 @@
 \section{Diseño del controlador y evaluación MIL}
 
-\pendiente{Toda esta sección usa el modelo del diseño ($c = 5/7$, retardo de
-\SI{75}{\milli\second}), porque el diseño se hizo antes de identificar la planta. Cuando se
-cierre el rediseño con el modelo nominal de la Sección~II-D, decidir si esta sección presenta
-los dos diseños (original y rediseño) bajo las mismas condiciones o solo el definitivo.}
+El diseño y la evaluación MIL se hicieron con el modelo de la Etapa~A ($c = 5/7$ y un retardo
+estimado de \SI{75}{\milli\second}), antes de contar con la identificación del prototipo. Este es
+el controlador que se generó, verificó en SIL y PIL, y se probó en la planta. El efecto de la
+diferencia entre ese modelo y el nominal de la Sección~II-D se analiza en la Sección~VII.
 
 \subsection{Estructura y sintonización}
 
@@ -105,10 +105,6 @@ I_{k+1} &= I_k + \Ki\Ts\,\operatorname{sat}(\varepsilon_k, \pm\SI{30}{\milli\met
 donde el \emph{clamping} congela el integrador cuando la salida está saturada y el error tiene el
 mismo signo que $u_k$ \cite{mw_antiwindup}.
 
-\pendiente{Si el enunciado pide un diseño alternativo por otro método, presentarlo aquí. El
-rediseño de la Sección~VII es la misma estructura con otra sintonía, no una estrategia distinta.
-Candidatos reales: realimentación de estados con observador (LQR/LQG) o un compensador de
-adelanto--atraso por respuesta en frecuencia.}
 
 \subsection{Evaluación Model-in-the-Loop}
 
@@ -159,7 +155,7 @@ $\thlim = \SI{10}{\degree}$ y anti-windup.}
 \label{tab:mil}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{2.5pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
 \textbf{Caso} & $t_s$ (\si{\second}) & $M_p$ (\si{\percent}) & $e_{ss}$ (\si{\milli\metre}) & $\max|x|$ (\si{\milli\metre}) & $t_{\mathrm{sat}}$ (\si{\second}) \\
@@ -168,8 +164,8 @@ D1 requisitos                 & 1,30 & 4,4  & 0,18 & 102,7 & 0 \\
 D2 sin saturación             & ---  & ---  & 1,48 & 127,1 & 0 \\
 D2 con sat., sin AW           & ---  & ---  & 4,49 & 133,0 & 0,30 \\
 D2 con sat., con AW           & ---  & ---  & 4,49 & 133,0 & 0,30 \\
-D2b PID clásico, sin AW       & ---  & ---  & 2,97 & 133,0 & 0,33 \\
-D2b PID clásico, con AW       & ---  & ---  & 2,40 & 133,0 & 0,30 \\
+D2b PID clás., sin AW       & ---  & ---  & 2,97 & 133,0 & 0,33 \\
+D2b PID clás., con AW       & ---  & ---  & 2,40 & 133,0 & 0,30 \\
 D3 desnivel de \SI{1}{\degree} & ---  & ---  & 0,27 & 28,8  & 0 \\
 \midrule
 D5 retardo de \SI{120}{\milli\second} & 3,03 & 5,0  & 0,14 & 102,6 & 0 \\
@@ -183,7 +179,8 @@ En el ensayo de requisitos el controlador cumple R1 a R4: $t_s = \SI{1.30}{\seco
 $M_p = \SI{4.4}{\percent}$ y $e_{ss} = \SI{0.18}{\milli\metre}$, con un pico de
 \SI{3.8}{\degree} de inclinación, lejos de la saturación. La saturación solo aparece con
 perturbaciones que llevan la bola casi al borde. Con el empujón de D2, el plato satura
-\SI{0.30}{\second} y la bola llega a \SI{133}{\milli\metre}, más allá del borde: con
+\SI{0.30}{\second} y la bola llega a \SI{133}{\milli\metre}, más allá del borde, así que R4 no se
+cumple en ese caso: con
 $\thlim = \SI{10}{\degree}$, el actuador real no alcanza a frenar esa perturbación, y eso es una
 limitación del mecanismo y no de la sintonía. Con integración condicional, las versiones con y sin
 anti-windup dan exactamente lo mismo, porque durante la saturación la bola se mueve rápido y el
@@ -194,6 +191,3 @@ Los casos de robustez muestran dónde está el riesgo: con \SI{120}{\milli\secon
 \SI{2}{\milli\metre} de ruido, $t_s$ pasa de \SI{3}{\second}, y si el firmware convirtiera la
 inclinación en comando con la pendiente del diseño en vez de la tabla medida, el sobreimpulso
 subiría a \SI{23.8}{\percent}. Por eso el firmware usa la tabla.
-
-\pendiente{Verificar R4 en D2 de forma explícita en el texto final (no se cumple con ese
-empujón). Agregar el caso D4 (dos ejes) si cabe en la extensión.}

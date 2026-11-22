@@ -17,19 +17,20 @@ En Overleaf: subir la carpeta `informe/` completa (incluida `datos_graficas/`) y
 Antes de entregar: en `preambulo.tex` cambiar `\mostrarpendientestrue` por
 `\mostrarpendientesfalse`, y revisar que no quede ningún recuadro rojo ni `\figpendiente`.
 
-## Estructura
+## Estado
 
-| Archivo | Sección | Estado |
-|---|---|---|
-| `informe.tex` | Título, autores, resumen, palabras clave | Resumen provisional; faltan carnés de Anthony y Yonaikel |
-| `sec/01_introduccion.tex` | I. Introducción y requisitos R1–R4 | Completa; falta el enunciado oficial |
-| `sec/02_modelado.tex` | II. Modelo físico (A), caracterización de sensor y actuador, identificación (B3), validación | Falta el modelo nominal y la figura de validación |
-| `sec/03_control_mil.tex` | III. Estructura, sintonía, márgenes, ley discreta, MIL | Con el diseño original; falta decidir cómo entra el rediseño |
-| `sec/04_codigo_sil.tex` | IV. Controller_BoP, inspección del código, SIL | Falta la captura de `Controller_BoP.slx` y el resumen del Advisor |
-| `sec/05_pil.tex` | V. PIL propio en la ESP32 | Falta el diagrama de la arquitectura PIL |
-| `sec/06_experimental.tex` | VI. Arquitectura y pruebas en el prototipo | Pruebas con el firmware de prueba; falta la Etapa H |
-| `sec/07_discusion.tex` | VII. Diferencias modelo–planta | Esqueleto con las diferencias medidas |
-| `sec/08_conclusiones.tex` | VIII. Conclusiones | Puntos con evidencia; falta redactar |
+Completo (2026-11-22): 10 páginas, sin recuadros pendientes. Solo faltan los nombres completos y
+los carnés de Anthony y Yonaikel en `informe.tex`.
+
+Archivos agregados en esta versión:
+- `figuras/Controller_BoP_slx.png`: vista del modelo generada por Simulink. Es la miniatura que
+  guarda el `.slx`, en `metadata/thumbnail.png`.
+- `scripts/preparar_datos.py`: genera `B3_validacion_ventanas.csv` y
+  `metricas_escalones_20261113_105834.csv`, e imprime las métricas del círculo.
+- `scripts/margenes_retardo.py`: márgenes de fase del original y del rediseño con el modelo
+  nominal y 0,44 s de retardo. Sale con y sin la integral.
+  - Ojo: los valores anotados el 2026-11-13 en `estado_proyecto.md` (original 12°, rediseño 43°)
+    eran **sin** la integral.
 
 ## De dónde sale cada número
 

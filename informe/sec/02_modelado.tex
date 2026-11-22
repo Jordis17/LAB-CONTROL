@@ -136,11 +136,8 @@ habían estimado para el diseño. La relación entre el ángulo del servo y el d
 asimétrica y con una pendiente cerca de 1,4 veces la del diseño, así que el firmware convierte
 la inclinación pedida en comando del servo con la tabla medida y no con la cinemática del diseño.
 Con esa tabla, el peor eje alcanza unos $\pm\SI{11.3}{\degree}$, y la saturación del controlador
-se fijó en $\thlim = \SI{10}{\degree}$.
-
-\pendiente{Confirmar con el equipo qué tabla servo--plato queda como definitiva (v3 del
-2026-11-09, o una v4 si se cambia el servo Y) y el rango simétrico que da. Agregar el modelo del
-servo confirmado en la etiqueta.}
+se fijó en $\thlim = \SI{10}{\degree}$. La tabla vigente es la v3, medida el 2026-11-09 después
+de reajustar los brazos de los servos.
 
 \subsection{Identificación experimental}
 
@@ -158,8 +155,10 @@ medida se ajustó, por mínimos cuadrados y en ventanas de \SI{1}{\second}, el m
 donde $c_{\mathrm{ef}}$ es una ganancia de rodadura efectiva, que incluye también la ganancia
 real de la transmisión servo--plato, $b$ representa un desnivel constante, $f$ un rozamiento o
 zona muerta, y $\tau$ el retardo entre la orden de inclinación y la respuesta de la bola. El
-retardo se buscó en una grilla, minimizando el error de ajuste
-(Fig.~\ref{fig:tau}).
+retardo se buscó en una grilla, minimizando el error de ajuste. En la Fig.~\ref{fig:tau}, el
+mínimo está en \SI{340}{\milli\second} para X y en \SI{270}{\milli\second} para Y, y la suma de
+los dos ejes es mínima en \SI{270}{\milli\second}, que se tomó como retardo común. Las curvas son
+bastante planas alrededor del mínimo, así que el retardo queda determinado con poca precisión.
 
 \begin{figure}[!t]
 \centering
@@ -177,8 +176,9 @@ retardo se buscó en una grilla, minimizando el error de ajuste
 \label{fig:tau}
 \end{figure}
 
-La Tabla~\ref{tab:b3} reúne las identificaciones hechas a medida que cambiaba el prototipo. En
-todas, $c_{\mathrm{ef}}$ salió entre \num{0.12} y \num{0.28}, de tres a seis veces menos que el
+La Tabla~\ref{tab:b3} reúne las identificaciones hechas a medida que cambiaba el prototipo.
+Salvo en el ensayo inmediatamente posterior a la lubricación, $c_{\mathrm{ef}}$ salió entre
+\num{0.12} y \num{0.28}, de tres a seis veces menos que el
 \num{0.714} del modelo, y el retardo entre \SI{0.27}{} y \SI{0.41}{\second}, cuatro a cinco
 veces el estimado. Al cambiar la bola de PLA por una pelota de ping pong, que es lisa y liviana,
 se obtuvieron el mismo $c_{\mathrm{ef}}$ y la misma zona muerta de alrededor de \SI{1}{\degree}.
@@ -188,7 +188,8 @@ $\pm\SI{1.5}{\degree}$ del ensayo.
 
 \begin{table}[!t]
 \caption{Parámetros identificados en lazo cerrado (B3) por ensayo, en el formato eje X / eje
-Y. ZM: zona muerta equivalente, en grados pedidos. Fuente:
+Y. $\tau$ es el óptimo de cada eje. ZM: zona muerta equivalente, en grados pedidos. ---: no
+registrado. Fuente:
 \texttt{estado\_proyecto.md} y \texttt{etapaB/resultados/}.}
 \label{tab:b3}
 \centering
@@ -208,11 +209,9 @@ Y. ZM: zona muerta equivalente, en grados pedidos. Fuente:
 \end{tabular}
 \end{table}
 
-\pendiente{Repetir dos ensayos automáticos con la mecánica definitiva (servo Y cambiado o
-ajustado, holgura reducida) y la bola definitiva, y completar con ellos la última fila de la
-Tabla~\ref{tab:b3}. Medir la masa de la pelota de ping pong (se usó un valor típico de
-\SI{2.7}{\gram}, que no afecta la dinámica de rodadura). El \texttt{150437} no tiene retardo por
-eje registrado: confirmarlo en su consola o quitar la fila.}
+El ensayo \texttt{150437} muestra además que el mecanismo no es estable en el tiempo: después
+de lubricar el servo X, la ganancia efectiva de ese eje cayó a \num{0.06}, y en el ensayo
+siguiente se recuperó, pero con el neutro corrido unos \SI{-1.7}{\degree}.
 
 \subsection{Validación y selección del modelo}
 
@@ -253,10 +252,48 @@ pequeñas y rápidas; el balance de fuerzas en las trayectorias circulares, que 
 lentos y grandes, dio alrededor de \num{0.57}. Esa diferencia es coherente con una transmisión que
 pierde los movimientos pequeños dentro del juego mecánico.
 
-\pendiente{Seleccionar el modelo nominal con los ensayos de la mecánica definitiva y escribirlo
-explícitamente, por ejemplo
-$G_{p,\mathrm{nom}}(s) = -c_{\mathrm{nom}}\,g\,e^{-\tau_{\mathrm{nom}} s}/s^{2}$ por eje, con
-$c_{\mathrm{nom}}$, $\tau_{\mathrm{nom}}$ y la zona muerta con unidades, y justificar por qué ese
-y no otro (no promediar parámetros de modelos distintos). Agregar una figura de validación
-(medición, predicción y residuo de algunas ventanas) a partir de
-\texttt{etapaB/resultados/B3\_validacion.csv}.}
+Se seleccionó como modelo nominal el identificado con el ensayo \texttt{151156}, por tres
+razones. Corresponde al estado del prototipo con el que se hicieron las últimas pruebas, con la
+pelota de ping pong y los servos después de la lubricación. Fue validado con un ensayo
+independiente, donde predijo mejor que el modelo de la Etapa~A en los dos ejes. Y sus parámetros
+salen de una sola identificación, sin promediar modelos de ensayos distintos. Con el retardo
+común de \SI{270}{\milli\second} que eligió la grilla, el modelo nominal por eje es
+
+\begin{equation}
+G_{p,\mathrm{nom}}(s) = \frac{X(s)}{\Theta(s)} = -\frac{c_{\mathrm{ef}}\,g\;e^{-\tau_{\mathrm{nom}}s}}{s^{2}},
+\label{eq:gpnom}
+\end{equation}
+
+con $c_{\mathrm{ef}}\,g = \SI{1780}{\milli\metre\per\second\squared\per\radian}$ en X
+($c_{\mathrm{ef}} = \num{0.18}$), \SI{2765}{\milli\metre\per\second\squared\per\radian} en Y
+($c_{\mathrm{ef}} = \num{0.28}$) y $\tau_{\mathrm{nom}} = \SI{0.27}{\second}$, más una zona
+muerta de \SI{0.86}{\degree} en X y \SI{1.18}{\degree} en Y. El desnivel identificado se corrige
+en el firmware con un ajuste fijo de la inclinación (\emph{trim}) y no forma parte del modelo.
+La Fig.~\ref{fig:validacion} muestra algunas ventanas de la validación. El modelo nominal sigue
+la tendencia de la bola, pero en varias ventanas se separa de la medición de forma sostenida,
+que es lo que indica la autocorrelación del residuo.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.6cm}, estilo, height=3.3cm,
+                  xmin=0, xmax=155, xticklabels={}, unbounded coords=jump]
+\nextgroupplot[ylabel={$x$ (\si{\milli\metre})}, legend pos=north east, legend columns=3]
+  \addplot[cAzul, line width=0.9pt, restrict expr to domain={\thisrow{eje}}{1:1}]
+    table[col sep=comma, x=k, y=x_med_mm] {\G/B3_validacion_ventanas.csv};
+  \addplot[cVerde, dashed, restrict expr to domain={\thisrow{eje}}{1:1}]
+    table[col sep=comma, x=k, y=x_ident_mm] {\G/B3_validacion_ventanas.csv};
+  \addplot[cRojo, densely dotted, restrict expr to domain={\thisrow{eje}}{1:1}]
+    table[col sep=comma, x=k, y=x_nom_mm] {\G/B3_validacion_ventanas.csv};
+  \legend{Medida, Identificado, Etapa~A}
+\nextgroupplot[ylabel={Residuo (\si{\milli\metre})}, xlabel={Muestra (6 ventanas de \SI{0.8}{\second})}]
+  \addplot[cVerde, restrict expr to domain={\thisrow{eje}}{1:1}]
+    table[col sep=comma, x=k, y=res_ident_mm] {\G/B3_validacion_ventanas.csv};
+  \addplot[cGris, dashed, domain=0:155, samples=2] {0};
+\end{groupplot}
+\end{tikzpicture}
+\caption{Validación del modelo nominal en el eje X: primeras seis ventanas del ensayo
+\texttt{112242}, que no se usó para identificar. Arriba, medición y predicciones; abajo, residuo
+del modelo identificado.}
+\label{fig:validacion}
+\end{figure}

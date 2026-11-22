@@ -33,7 +33,7 @@
 \usepackage{pgfplotstable}
 \pgfplotsset{compat=1.18}
 \usepgfplotslibrary{groupplots}
-\usetikzlibrary{matrix}
+\usetikzlibrary{matrix,positioning,fit}
 
 % Ruta a la carpeta de datos
 \newcommand{\G}{datos_graficas}
@@ -47,7 +47,7 @@
 % Estilo base: pensado para una columna IEEE
 \pgfplotsset{
   estilo/.style={
-    width            = \columnwidth,
+    width            = 0.97\columnwidth,
     height           = 4.1cm,
     scale only axis  = false,
     grid             = major,

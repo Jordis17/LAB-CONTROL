@@ -37,35 +37,29 @@ En Overleaf: subir la carpeta `informe/` completa y compilar `informe.tex` con p
 tiene 8 páginas. Antes de entregar, en `preambulo.tex` cambiar `\mostrarpendientestrue` por
 `\mostrarpendientesfalse` y revisar que no quede ningún recuadro.
 
-## 3. Qué falta para terminar el informe (en orden)
+## 3. Estado del informe (2026-11-22)
 
-1. **Enunciado y formato.** Confirmar con el profesor la extensión, las secciones y si se
-   permiten anexos. El del Proyecto 1 pedía de 8 a 10 páginas, sin anexos. Si el enunciado
-   final trae requisitos, reemplazar R1–R4 (sección I).
-2. **Prueba con el firmware vigente** (`bop_controlador_estable`, trim e integrador nuevos), en
-   modo centro: soltar la bola quieta en 3 o 4 puntos, 15 s en cada uno. Con ese log:
-   - confirmar o afinar el trim;
-   - completar la tabla de desempeño experimental de la sección VI, con las mismas definiciones
-     de ts, Mp y ess.
-3. **Decidir qué se reporta como Etapa H.** Hay dos opciones:
-   - integrar `etapaE/codigo_generado` en el firmware y repetir los ensayos;
-   - si no da el tiempo, declarar en el informe que la implementación física usó el firmware
-     escrito a mano con la misma ley (es lo que dice hoy la sección VI) y explicar la diferencia.
-4. **Modelo nominal (sección II-D):** escribirlo explícitamente con los parámetros de B3 y
-   agregar la figura de validación desde `etapaB/resultados/B3_validacion.csv`.
-5. **Figuras que faltan:**
-   - captura de `etapaE/Controller_BoP.slx`, exportada desde MATLAB con
-     `print('-sController_BoP','-dpdf')` y guardada en `informe/figuras/`;
-   - diagrama de la arquitectura PIL;
-   - foto del prototipo.
-6. **Datos que faltan:**
-   - carnés y nombres completos de Anthony y Yonaikel;
-   - resumen de las 5 advertencias del Advisor;
-   - URL de la referencia de PIL de MathWorks en `referencias.bib`.
-7. **Resumen, discusión y conclusiones finales** con lo que salga de los puntos 2 y 3.
+El informe quedó completo: 10 páginas, sin recuadros `PENDIENTE` y con todos los números
+respaldados por un archivo del repo.
 
-Cada número nuevo que entre al informe tiene que salir de un archivo del repo (log, CSV o
-consola). No pegar valores a mano sin su fuente (CLAUDE.md, secciones 3.1 y 9).
+**Decisiones del equipo:**
+- La sección VI reporta el firmware escrito a mano, con la misma ley, porque no se usó el código
+  generado en la planta.
+- No hay logs posteriores al 2026-11-18.
+- Se usa el formato del Proyecto 1: IEEE a dos columnas, de 8 a 10 páginas, sin anexos.
+
+**Lo único que falta:**
+1. Nombres completos y carnés de Anthony y Yonaikel (`informe/informe.tex`, línea del
+   `\author`).
+2. Opcional: foto del prototipo, si cabe en la página 10.
+3. Opcional: si se prueba el firmware vigente (trim e integrador del 2026-11-18), la sección VI
+   dice que no se probó. Habría que actualizarla con ese log.
+
+**Scripts nuevos del informe:**
+- `informe/scripts/preparar_datos.py`: métricas de los escalones y del círculo desde los logs, y
+  datos de la figura de validación.
+- `informe/scripts/margenes_retardo.py`: márgenes con el modelo identificado. Su salida queda en
+  `margenes_retardo_salida.txt`.
 
 ## 4. Telemetría en consola (commit `946641a` de Anthony, corregida el 2026-11-22)
 
