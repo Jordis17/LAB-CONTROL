@@ -65,6 +65,7 @@ def main():
     t_prev = time.perf_counter()
     perdidos = 0
     n = 0
+    tel_ultima = None   # ultima telemetria valida, para la consola
 
     try:
         while True:
@@ -108,6 +109,8 @@ def main():
                     estado = 1
 
             tel = tx.leer_telemetria() if tx else None
+            if tel is not None:
+                tel_ultima = tel
             enviado = tx.send(estado, x, y, vx, vy) if tx else False
 
             if log is not None:
@@ -142,20 +145,22 @@ def main():
                       + ("" if medida is not None
                          else f" | {detector.last_reject or ''}"))
 
-            # --- NUEVA SALIDA DE DEPURACIÓN DEL CONTROLADOR ---
-            # Asumiendo que la variable 'tel' existe en el bucle según el documento
-            if 'tel' in locals() and tel is not None:
-                # Calcular errores (Posición filtrada - Referencia de ESP32)
-                err_x = x - tel.get('rx', 0.0)
-                err_y = y - tel.get('ry', 0.0)
-                
-                print(f"  └ ESP32 | ErrX:{err_x:5.1f}  ErrY:{err_y:5.1f} mm")
-                print(f"          | PID X: {tel.get('leyx',0):6.2f}° (I: {tel.get('Ix',0):5.2f}°) -> Motor X: {tel.get('thx',0):6.2f}°")
-                print(f"          | PID Y: {tel.get('leyy',0):6.2f}° (I: {tel.get('Iy',0):5.2f}°) -> Motor Y: {tel.get('thy',0):6.2f}°")
-            elif enviado:
-                print("  └ ESP32 | Esperando telemetría...")
+                # Telemetria del controlador (Anthony, commit 946641a). Va DENTRO de este
+                # bloque para imprimir una vez por segundo y no bajar los fps del lazo
+                # (antes salia en cada cuadro). Usa la ultima telemetria valida, porque la
+                # ESP32 responde ~25 de las 30 tramas y el cuadro 30 puede no traerla.
+                # La telemetria llega con ~2 cuadros de atraso respecto de x, y.
+                if tel_ultima is not None:
+                    err_x = x - tel_ultima.get('rx', 0.0)
+                    err_y = y - tel_ultima.get('ry', 0.0)
+                    print(f"  └ ESP32 | ErrX:{err_x:5.1f}  ErrY:{err_y:5.1f} mm")
+                    print(f"          | PID X: {tel_ultima.get('leyx', 0):6.2f}° "
+                          f"(I: {tel_ultima.get('Ix', 0):5.2f}°) -> Motor X: {tel_ultima.get('thx', 0):6.2f}°")
+                    print(f"          | PID Y: {tel_ultima.get('leyy', 0):6.2f}° "
+                          f"(I: {tel_ultima.get('Iy', 0):5.2f}°) -> Motor Y: {tel_ultima.get('thy', 0):6.2f}°")
+                elif enviado:
+                    print("  └ ESP32 | Esperando telemetría...")
 
-                
             if not args.no_display:
                 if medida is not None:
                     cv2.putText(frame, f"X:{x:.1f} Y:{y:.1f} mm", (10, 30),

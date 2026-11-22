@@ -67,10 +67,18 @@ tiene 8 páginas. Antes de entregar, en `preambulo.tex` cambiar `\mostrarpendien
 Cada número nuevo que entre al informe tiene que salir de un archivo del repo (log, CSV o
 consola). No pegar valores a mano sin su fuente (CLAUDE.md, secciones 3.1 y 9).
 
-## 4. Nota sobre la telemetría en consola (commit `946641a`)
+## 4. Telemetría en consola (commit `946641a` de Anthony, corregida el 2026-11-22)
 
-Las tres líneas nuevas de `main_vision.py`, con el error, el PID y la salida al motor, quedaron
-**fuera** del bloque `if n % 30 == 0`. Se imprimen en cada cuadro que trae telemetría (≈ 25 veces
-por segundo), y "Esperando telemetría..." en los demás. Imprimir tanto puede bajar los fps del
-lazo. Si la intención era verlas una vez por segundo como el resto, hay que indentarlas dentro
-de ese bloque. No se cambió, porque es código del equipo.
+Las tres líneas de telemetría de `main_vision.py` (error, PID e integrador, salida al motor)
+quedaron fuera del bloque `if n % 30 == 0`. Se imprimían en cada cuadro con telemetría,
+unas 25 veces por segundo, y eso podía bajar los fps del lazo.
+
+- **Corrección:** se movieron dentro de ese bloque, así que salen una vez por segundo junto con
+  la línea de posición.
+- **Telemetría guardada:** usan la última telemetría válida (`tel_ultima`). Antes, si el cuadro
+  30 no traía respuesta de la ESP32, se mostraba "Esperando telemetría" aunque sí estuviera
+  llegando.
+- **Respaldo:** la versión original de Anthony quedó en
+  `proyecto_ControlDIP-develop/scripts/respaldo/main_vision_anthony_946641a.py`. También se puede
+  recuperar con `git show 946641a:proyecto_ControlDIP-develop/scripts/main_vision.py`.
+- El CSV no cambió.
