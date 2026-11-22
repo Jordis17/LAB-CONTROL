@@ -142,6 +142,20 @@ def main():
                       + ("" if medida is not None
                          else f" | {detector.last_reject or ''}"))
 
+            # --- NUEVA SALIDA DE DEPURACIÓN DEL CONTROLADOR ---
+            # Asumiendo que la variable 'tel' existe en el bucle según el documento
+            if 'tel' in locals() and tel is not None:
+                # Calcular errores (Posición filtrada - Referencia de ESP32)
+                err_x = x - tel.get('rx', 0.0)
+                err_y = y - tel.get('ry', 0.0)
+                
+                print(f"  └ ESP32 | ErrX:{err_x:5.1f}  ErrY:{err_y:5.1f} mm")
+                print(f"          | PID X: {tel.get('leyx',0):6.2f}° (I: {tel.get('Ix',0):5.2f}°) -> Motor X: {tel.get('thx',0):6.2f}°")
+                print(f"          | PID Y: {tel.get('leyy',0):6.2f}° (I: {tel.get('Iy',0):5.2f}°) -> Motor Y: {tel.get('thy',0):6.2f}°")
+            elif enviado:
+                print("  └ ESP32 | Esperando telemetría...")
+
+                
             if not args.no_display:
                 if medida is not None:
                     cv2.putText(frame, f"X:{x:.1f} Y:{y:.1f} mm", (10, 30),

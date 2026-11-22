@@ -122,3 +122,37 @@ python -m unittest discover -s tests -t .    # o: python -m pytest tests/
   orientacion sin ambiguedad.
 - Watchdog en el firmware de la ESP32.
 - Controlador PD y cinematica inversa (viven en la ESP32).
+
+## Comandos paso a paso:
+
+# Paso 1: Latencia y Ajuste Visual
+```bash
+sudo -E QT_LOGGING_RULES="*.debug=false;qt.qpa.*=false" chrt -r 50 ./venv/bin/python scripts/run_benchmark.py
+```
+(Confirma que no hay estela borrosa. Presiona 'q').
+
+# Paso 2: Calibración Geométrica
+```bash
+sudo -E QT_LOGGING_RULES="*.debug=false;qt.qpa.*=false" chrt -r 50 ./venv/bin/python scripts/calibrate_camera.py
+```
+(Haz clic en las 4 esquinas EXTERIORES. Presiona 'c'. Ojo: El archivo ahora se guardará como calibration.npz).
+
+# Paso 3: Sintonización de la Matriz R del Filtro (NUEVO)
+
+```bash
+sudo -E QT_LOGGING_RULES="*.debug=false;qt.qpa.*=false" chrt -r 50 ./venv/bin/python scripts/medir_ruido.py -n 500
+```
+(Pon la bola en el medio y suéltala. Tras las 500 muestras, toma el número que te da y escríbelo en config.py en la variable MEAS_NOISE_STD_MM).
+
+# Paso 4: Calibración HSV
+
+```bash
+sudo -E QT_LOGGING_RULES="*.debug=false;qt.qpa.*=false" chrt -r 50 ./venv/bin/python scripts/calibrate_color.py
+```
+(Solo debe verse la bola blanca. Presiona 'g').
+
+# Paso 5: Lazo Cerrado a la ESP32
+
+```bash
+sudo -E QT_LOGGING_RULES="*.debug=false;qt.qpa.*=false" chrt -r 50 ./venv/bin/python scripts/main_vision.py
+```
