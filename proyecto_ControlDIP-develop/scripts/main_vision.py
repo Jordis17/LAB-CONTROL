@@ -154,7 +154,12 @@ def main():
                 if tel_ultima is not None:
                     err_x = x - tel_ultima.get('rx', 0.0)
                     err_y = y - tel_ultima.get('ry', 0.0)
-                    print(f"  └ ESP32 | ErrX:{err_x:5.1f}  ErrY:{err_y:5.1f} mm")
+                    # bit 3 de las banderas: controlador activo (firmware bop_controlador_pid_lqr
+                    # y bop_controlador_lqr); los firmwares anteriores lo dejan en 0 (PID)
+                    ctrl = "LQR" if int(tel_ultima.get('banderas', 0)) & 8 else "PID"
+                    modos = {0: "desarmado", 1: "centro", 2: "circulo", 3: "ensayo"}
+                    modo = modos.get(int(tel_ultima.get('modo', 0)), "?")
+                    print(f"  └ ESP32 {ctrl} ({modo}) | ErrX:{err_x:5.1f}  ErrY:{err_y:5.1f} mm")
                     print(f"          | Ley X: {tel_ultima.get('leyx', 0):6.2f}° "
                           f"(I: {tel_ultima.get('Ix', 0):5.2f}°) -> Motor X: {tel_ultima.get('thx', 0):6.2f}°")
                     print(f"          | Ley Y: {tel_ultima.get('leyy', 0):6.2f}° "

@@ -364,7 +364,7 @@ void enviarTelemetria(float x_rx) {
   uint8_t b[57];
   b[0] = 0xBC;                     // formato 2 (57 bytes); 0xBB era el de 49 bytes
   b[1] = (uint8_t)modo;
-  b[2] = (sat_e[0] ? 1 : 0) | (sat_e[1] ? 2 : 0) | (ignorado ? 4 : 0) | ((fase & 0x0F) << 4);
+  b[2] = (sat_e[0] ? 1 : 0) | (sat_e[1] ? 2 : 0) | (ignorado ? 4 : 0) | 8 | ((fase & 0x0F) << 4);   // bit 3 = 1: LQR
   uint32_t ms = millis();
   memcpy(b + 3, &n_tramas, 4);
   memcpy(b + 7, &ms, 4);

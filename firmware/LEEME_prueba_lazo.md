@@ -334,3 +334,31 @@ se puede, un video.
   - Se subió el tope a 5°. Probar de nuevo el modo centro y mandar el CSV.
   - Con la bola quieta, `tel_Ix` y `tel_Iy` dan el trim que falta corregir.
 
+
+---
+
+## PID y LQR en un solo programa (`bop_controlador_pid_lqr/`, 2026-11-25)
+
+Junta los dos controladores sin cambiar ninguna ley. Los firmwares `bop_controlador_estable`
+(PID) y `bop_controlador_lqr` (LQR) se conservan.
+
+| Pulsaciones de BOOT | Paso | LED |
+|---|---|---|
+| 0 | Desarmado (plato horizontal) | apagado |
+| 1 | Centro con **PID** | encendido fijo |
+| 2 | Centro con **LQR** | parpadeo lento (1 Hz) |
+| 3 | Ensayo automático con **PID** | un destello corto cada 0,6 s |
+| 4 | Ensayo automático con **LQR** | dos destellos cortos cada 0,6 s |
+| 5 | Vuelve a desarmado | apagado |
+
+- Al terminar un ensayo pasa solo a centro con el mismo controlador. La siguiente pulsación
+  sigue la secuencia desde ahí.
+- Sin tramas: parpadeo rápido y plato horizontal (watchdog).
+- Al cambiar de paso se borran el integrador y las entradas pasadas.
+- El modo círculo suelto no está en la secuencia: el ensayo automático ya incluye círculos.
+- **Verificado en la PC:** compilada con g++, cada ley del programa combinado da **exactamente**
+  lo mismo que su firmware original en 2000 pasos (diferencia 0). Falta compilarlo para la
+  ESP32 en el Arduino IDE.
+- **Telemetría:** el bit 3 de `tel_banderas` indica el controlador (0 PID, 1 LQR).
+  - `main_vision.py` lo muestra en la terminal: `└ ESP32 LQR (centro) | ErrX: ...`.
+  - El firmware `bop_controlador_lqr` también pone ese bit en 1.

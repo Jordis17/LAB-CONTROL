@@ -844,3 +844,14 @@ se movía la bola con la mano.
     prototipo (tabla PID vs LQR del mismo ensayo); la discusión y las conclusiones dicen que el
     LQR es el candidato para la siguiente iteración.
   - Métricas reproducibles con `informe/scripts/preparar_datos.py`.
+
+### 2026-11-25 — PID y LQR en un solo firmware (`firmware/bop_controlador_pid_lqr/`)
+
+- Pedido del equipo: elegir el controlador con el botón BOOT.
+- Secuencia: desarmado → centro PID → centro LQR → ensayo PID → ensayo LQR → desarmado.
+- Leyes copiadas sin cambios; con g++ dan una diferencia exacta de 0 frente a los firmwares
+  originales en 2000 pasos.
+- Bit 3 de `tel_banderas` = LQR. `main_vision.py` muestra en la terminal el controlador y el
+  modo.
+- Los firmwares `bop_controlador_estable` (PID) y `bop_controlador_lqr` se conservan. Al LQR
+  solo se le agregó el bit 3 en la telemetría.
