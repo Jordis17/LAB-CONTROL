@@ -1,0 +1,21 @@
+Enunciado del proyecto final (EL5409, II Sem 2026), copiado del mensaje del equipo el 2026-11-25:
+
+Proyecto final abierto - Grupos de 4 personas
+
+El proyecto final se evaluará mediante:
+
+a) Informe escrito.
+b) Prototipo funcionando.
+
+El proyecto deberá incluir la aplicación de la metodología Model-Based Design (MBD) utilizando dos estrategias de control diferentes. Por ejemplo:
+
+* PID.
+* LQR.
+* MPC.
+* Sliding Mode Control.
+
+Las estrategias seleccionadas quedan a criterio de cada grupo.
+
+Para ambas estrategias de control, se deberá desarrollar y validar el diseño hasta la etapa Model-in-the-Loop (MIL).
+
+Posteriormente, el grupo seleccionará una de las dos estrategias para continuar con las siguientes etapas de la metodología MBD hasta llegar a la implementación física.
