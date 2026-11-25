@@ -4,15 +4,17 @@
 // (LQR con accion integral) sin cambiar ninguna de las dos leyes. Los dos firmwares originales
 // quedan como estaban.
 //
-// Boton BOOT (GPIO0), cada pulsacion pasa al paso siguiente:
-//   0 DESARMADO        LED apagado
-//   1 CENTRO con PID   LED encendido fijo
-//   2 CENTRO con LQR   LED parpadeo lento (1 Hz)
-//   3 ENSAYO AUTOMATICO con PID   un destello corto cada 0,6 s
-//   4 ENSAYO AUTOMATICO con LQR   dos destellos cortos cada 0,6 s
+// Boton BOOT (GPIO0), cada pulsacion pasa al paso siguiente. El LED da tantos destellos
+// como el numero del paso y hace una pausa (cuenten los destellos):
+//   0 DESARMADO                   LED apagado
+//   1 CENTRO con PID              1 destello
+//   2 CENTRO con LQR              2 destellos
+//   3 CIRCULO con PID             3 destellos   (R_CIRC, T_CIRC; el radio crece en rampa)
+//   4 CIRCULO con LQR             4 destellos
+//   5 ENSAYO AUTOMATICO con PID   5 destellos
+//   6 ENSAYO AUTOMATICO con LQR   6 destellos
 //   -> vuelve a DESARMADO. Al terminar un ensayo pasa solo a CENTRO con el mismo controlador.
-//   (El modo circulo suelto no esta en la secuencia: el ensayo automatico ya tiene circulos.)
-// Sin tramas (watchdog): LED parpadeo rapido, plato horizontal.
+// Sin tramas (watchdog): LED parpadeo rapido continuo, plato horizontal.
 // Al cambiar de paso se borran el integrador y las entradas pasadas.
 //
 // Telemetria: igual que antes; el bit 3 de "banderas" (tel_banderas) dice que controlador
@@ -179,7 +181,7 @@ const float I_MAX_PID = 3.0f;        // deg: tope del integrador del PID
 const float I_MAX_LQR = 5.0f;        // deg: tope del integrador del LQR (2026-11-25: con 3 el integrador
                                      // quedaba pegado en el tope con la bola a 10-35 mm del centro)
 bool usar_lqr = false;               // controlador activo (lo fija el paso del boton BOOT)
-int  paso = 0;                       // 0 desarmado, 1 centro PID, 2 centro LQR, 3 ensayo PID, 4 ensayo LQR
+int  paso = 0;                       // 0 desarmado, 1-2 centro, 3-4 circulo, 5-6 ensayo (impar PID, par LQR)
 // (2026-11-13) Fuera de E_ZONA el integrador ya no queda congelado: se descarga con esta
 // constante de tiempo. En sesion_20261113_105834 la bola quedo 20 s quieta a x = -57 mm
 // porque el integrador seguia en +1,7 deg (acumulado con la bola del otro lado) y anulaba
@@ -516,10 +518,10 @@ void loop() {
   static uint32_t t_btn = 0;
   bool btn = digitalRead(PIN_BTN);
   if (btn == LOW && btn_prev == HIGH && ahora - t_btn > 300) {
-    paso = (paso + 1) % 5;
-    const int MODO_DE_PASO[5] = {0, 1, 1, 3, 3};
+    paso = (paso + 1) % 7;
+    const int MODO_DE_PASO[7] = {0, 1, 1, 2, 2, 3, 3};
     modo = MODO_DE_PASO[paso];
-    usar_lqr = (paso == 2 || paso == 4);
+    usar_lqr = (paso > 0) && (paso % 2 == 0);
     armado = (modo > 0);
     t_circ = 0.0f;
     t_ens = 0.0f;  fase = 0;  n_dither = 0;
@@ -593,10 +595,12 @@ void loop() {
     if (ahora - t_wd > 33) { t_wd = ahora; haciaHorizontal(); }
   }
 
-  // LED: centro = encendido; circulo = parpadeo lento; sin tramas = parpadeo rapido; desarmado = apagado
+  // LED: sin tramas = parpadeo rapido continuo; desarmado = apagado; armado = N destellos (N = paso)
   if (sin_tramas) digitalWrite(PIN_LED, (ahora / 100) % 2);
-  else if (modo == 3 && !usar_lqr) digitalWrite(PIN_LED, ((ahora / 150) % 4) == 0);        // un destello cada 0,6 s
-  else if (modo == 3 && usar_lqr)  digitalWrite(PIN_LED, ((ahora / 100) % 6) == 0 || ((ahora / 100) % 6) == 2);  // dos destellos
-  else if (modo == 1 && usar_lqr)  digitalWrite(PIN_LED, (ahora / 500) % 2);               // centro LQR: parpadeo lento
-  else digitalWrite(PIN_LED, armado ? HIGH : LOW);                                         // centro PID: fijo
+  else if (!armado) digitalWrite(PIN_LED, LOW);
+  else {
+    // tantos destellos como el numero del paso (120 ms encendido cada 300 ms) y pausa: ciclo de 2,4 s
+    uint32_t t = ahora % 2400;
+    digitalWrite(PIN_LED, (t / 300) < (uint32_t)paso && (t % 300) < 120);
+  }
 }

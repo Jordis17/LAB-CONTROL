@@ -848,7 +848,9 @@ se movía la bola con la mano.
 ### 2026-11-25 — PID y LQR en un solo firmware (`firmware/bop_controlador_pid_lqr/`)
 
 - Pedido del equipo: elegir el controlador con el botón BOOT.
-- Secuencia: desarmado → centro PID → centro LQR → ensayo PID → ensayo LQR → desarmado.
+- Secuencia: desarmado → centro PID → centro LQR → círculo PID → círculo LQR → ensayo PID →
+  ensayo LQR → desarmado. El círculo se agregó después, el mismo día. El LED da tantos destellos
+  como el número del paso.
 - Leyes copiadas sin cambios; con g++ dan una diferencia exacta de 0 frente a los firmwares
   originales en 2000 pasos.
 - Bit 3 de `tel_banderas` = LQR. `main_vision.py` muestra en la terminal el controlador y el

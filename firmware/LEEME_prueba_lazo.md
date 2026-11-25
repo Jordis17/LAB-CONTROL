@@ -342,20 +342,22 @@ se puede, un video.
 Junta los dos controladores sin cambiar ninguna ley. Los firmwares `bop_controlador_estable`
 (PID) y `bop_controlador_lqr` (LQR) se conservan.
 
-| Pulsaciones de BOOT | Paso | LED |
+| Pulsaciones de BOOT | Paso | LED (destellos y pausa) |
 |---|---|---|
 | 0 | Desarmado (plato horizontal) | apagado |
-| 1 | Centro con **PID** | encendido fijo |
-| 2 | Centro con **LQR** | parpadeo lento (1 Hz) |
-| 3 | Ensayo automático con **PID** | un destello corto cada 0,6 s |
-| 4 | Ensayo automático con **LQR** | dos destellos cortos cada 0,6 s |
-| 5 | Vuelve a desarmado | apagado |
+| 1 | Centro con **PID** | 1 destello |
+| 2 | Centro con **LQR** | 2 destellos |
+| 3 | Círculo con **PID** (R = 45 mm, 4 s por vuelta, radio en rampa) | 3 destellos |
+| 4 | Círculo con **LQR** | 4 destellos |
+| 5 | Ensayo automático con **PID** | 5 destellos |
+| 6 | Ensayo automático con **LQR** | 6 destellos |
+| 7 | Vuelve a desarmado | apagado |
 
+(2026-11-25: se agregó el modo círculo con los dos controladores; antes la secuencia tenía 5 pasos.)
 - Al terminar un ensayo pasa solo a centro con el mismo controlador. La siguiente pulsación
   sigue la secuencia desde ahí.
 - Sin tramas: parpadeo rápido y plato horizontal (watchdog).
 - Al cambiar de paso se borran el integrador y las entradas pasadas.
-- El modo círculo suelto no está en la secuencia: el ensayo automático ya incluye círculos.
 - **Verificado en la PC:** compilada con g++, cada ley del programa combinado da **exactamente**
   lo mismo que su firmware original en 2000 pasos (diferencia 0). Falta compilarlo para la
   ESP32 en el Arduino IDE.
