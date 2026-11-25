@@ -12,3 +12,12 @@ Casos (`<nombre>`): `D1_requisitos`, `D2_sin_saturacion`, `D2_sat_sin_AW`, `D2_s
 `D2b_PIDclasico_sat_sin_AW`, `D2b_PIDclasico_sat_con_AW`, `D3_desnivel`, `D4_dos_ejes`.
 Las métricas siguen las definiciones de `etapaC/C0_requisitos_BoP.m`; con un cambio de
 referencia menor a 5 mm, tr, ts y Mp quedan en NaN.
+
+## Segunda estrategia (D2)
+
+| Archivo | Columnas |
+|---|---|
+| `D2_comparacion.csv` | `caso` · `controlador` (PID o LQR) · `eje` · `x0_mm` · `r_mm` · `tr_s` · `ts_s` · `Mp_pct` · `ess_mm` · `max_abs_xhat_mm` · `max_abs_x_plato_mm` · `th_min_deg` · `th_max_deg` · `pct_saturado` · `t_saturado_s` · `std_th_ss_deg` |
+| `D_caso_LQR_<nombre>.csv` | Igual que `D_caso_<nombre>.csv`; `I_x_deg`, `I_y_deg` es el aporte del integrador del LQR (−Kz·z) |
+
+Casos LQR: `L1_requisitos`, `L2_sin_saturacion`, `L2_sat_sin_AW`, `L2_sat_con_AW`, `L3_desnivel`, `L4_dos_ejes`.

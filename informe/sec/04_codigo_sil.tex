@@ -107,11 +107,13 @@ $\Delta x = x_{\mathrm{SIL}} - x_{\mathrm{Normal}}$ junto con la trayectoria.
                legend pos=north east, legend columns=2]
   \addplot[cRojo] table[col sep=comma, x=t_s, y=dif_thx] {\G/F1_comparacion.csv};
   \addplot[cVerde, dashed] table[col sep=comma, x=t_s, y=dif_x] {\G/F1_comparacion.csv};
-  \legend{$\Delta\theta_x$ (\si{\radian}), $\Delta x$ (\si{\milli\metre})}
+  \addplot[cNaranja, densely dotted, line width=1.1pt] table[col sep=comma, x=t_s, y=dif_thx] {\G/G5_comparacion.csv};
+  \addplot[cAzul, dashdotted] table[col sep=comma, x=t_s, y=dif_x] {\G/G5_comparacion.csv};
+  \legend{SIL $\Delta\theta_x$ (\si{\radian}), SIL $\Delta x$ (\si{\milli\metre}), PIL $\Delta\theta_x$, PIL $\Delta x$}
 \end{groupplot}
 \end{tikzpicture}
-\caption{Banco SIL. Arriba: trayectoria de la rama Normal. Abajo: diferencias SIL $-$ Normal,
-idénticamente nulas en las \num{271} muestras.}
+\caption{Bancos SIL y PIL. Arriba: trayectoria de la rama Normal. Abajo: diferencias
+SIL $-$ Normal y PIL $-$ Normal (G5), idénticamente nulas en las \num{271} muestras.}
 \label{fig:sil}
 \end{figure}
 

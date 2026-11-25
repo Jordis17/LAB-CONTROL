@@ -1,0 +1,70 @@
+ETAPA D - D2_MIL_LQR_BoP   (2026-11-25 15:01:33)
+8.4.0
+PID (C1): Kp = 0.03412 deg/mm, Kd = 0.02588 deg/(mm/s), Ki = 0.02275 deg/(mm s), integracion condicional
+LQR (C2): Ke = 0.08118 deg/mm, Kv = 0.04705 deg/(mm/s), Kz = 0.046116 deg/(mm s), d = 4 entradas pasadas
+Los dos: th_lim = 10.0 deg, Kalman sigma_a = 500, sigma_m = 1, servo omega_n = 50 rad/s
+
+=== L1. Ensayo de requisitos: x0 = 100 mm, r = 0 ===
+ PID
+    x0 = 100.0 mm, r = 0.0 mm: tr = 0.80 s, ts = 1.30 s, Mp = 4.5 %, ess = 0.16 mm
+    max|x_hat| = 100.0 mm, max|x| plato = 102.4 mm, th_cmd en [-2.33, 3.60] deg, saturado 0.0 % (0.00 s), std th en reposo 0.308 deg
+  Verificacion de requisitos:
+    R1 ts  =  1.30 s   <= 3.0 s   -> CUMPLE
+    R2 Mp  =   4.5 %   <= 20 %    -> CUMPLE
+    R3 ess =  0.16 mm  <= 3.0 mm  -> CUMPLE
+    R4 max|x| (plato) = 102.4 mm <= 127 mm -> CUMPLE
+ LQR
+    x0 = 100.0 mm, r = 0.0 mm: tr = 0.57 s, ts = 2.03 s, Mp = 5.2 %, ess = 0.15 mm
+    max|x_hat| = 100.0 mm, max|x| plato = 105.2 mm, th_cmd en [-3.80, 8.46] deg, saturado 0.0 % (0.00 s), std th en reposo 0.621 deg
+  Verificacion de requisitos:
+    R1 ts  =  2.03 s   <= 3.0 s   -> CUMPLE
+    R2 Mp  =   5.2 %   <= 20 %    -> CUMPLE
+    R3 ess =  0.15 mm  <= 3.0 mm  -> CUMPLE
+    R4 max|x| (plato) = 105.2 mm <= 127 mm -> CUMPLE
+
+=== L2. Saturacion y anti-windup (LQR): empujon de 420 mm/s desde el centro, desnivel 1 deg ===
+  (1) actuador ideal, sin saturacion
+    max|x_hat| = 109.0 mm, max|x| plato = 123.2 mm, th_cmd en [-5.46, 23.78] deg, u en [-5.46, 23.78] deg
+    saturado 0.0 % del tiempo (0.00 s); aporte del integrador en [-0.928, 0.212] deg; |x_hat| < 3 mm desde NaN s; ess = 11.19 mm
+  (2) saturado, sin anti-windup
+    max|x_hat| = 126.0 mm, max|x| plato = 133.0 mm, th_cmd en [-4.94, 10.00] deg, u en [-4.94, 23.78] deg
+    saturado 6.7 % del tiempo (0.40 s); aporte del integrador en [-0.846, 0.252] deg; |x_hat| < 3 mm desde NaN s; ess = 12.67 mm
+    AVISO: la bola pasa |x| = 127 mm.
+  (3) saturado, con anti-windup
+    max|x_hat| = 126.0 mm, max|x| plato = 133.0 mm, th_cmd en [-4.91, 10.00] deg, u en [-4.91, 23.78] deg
+    saturado 6.7 % del tiempo (0.40 s); aporte del integrador en [-0.935, 0.162] deg; |x_hat| < 3 mm desde NaN s; ess = 11.58 mm
+    AVISO: la bola pasa |x| = 127 mm.
+
+=== L3. Perturbacion: desnivel de 1 deg en X, bola en el centro ===
+  PID: max|x_hat| = 31.3 mm, ess (ultimo s) = 0.89 mm, recupera |x_hat| < 3 mm a los 5.17 s
+  LQR: max|x_hat| = 24.0 mm, ess (ultimo s) = 1.23 mm, recupera |x_hat| < 3 mm a los 8.77 s
+
+=== L4. Dos ejes: (80, -60) -> (0, 0) y a los 4,5 s -> (50, 50) ===
+  PID eje X, tramo 1: tr = 0.77 s, ts = 2.97 s, Mp = 5.3 %, ess = 2.08 mm, th en [-2.0, 2.9] deg
+  PID eje X, tramo 2: tr = 0.77 s, ts = 3.70 s, Mp = 8.9 %, ess = 0.79 mm, th en [-2.3, 1.2] deg
+  PID eje Y, tramo 1: tr = 0.67 s, ts = 3.83 s, Mp = 10.5 %, ess = 3.72 mm, th en [-2.3, 1.7] deg
+  PID eje Y, tramo 2: tr = 0.67 s, ts = 4.00 s, Mp = 14.7 %, ess = 1.26 mm, th en [-2.3, 1.5] deg
+  LQR eje X, tramo 1: tr = 0.60 s, ts = 2.97 s, Mp = 6.4 %, ess = 1.17 mm, th en [-3.4, 6.8] deg
+  LQR eje X, tramo 2: tr = 0.60 s, ts = 4.13 s, Mp = 9.3 %, ess = 0.40 mm, th en [-3.6, 2.2] deg
+  LQR eje Y, tramo 1: tr = 0.57 s, ts = 3.80 s, Mp = 8.7 %, ess = 1.39 mm, th en [-4.4, 3.1] deg
+  LQR eje Y, tramo 2: tr = 0.53 s, ts = 4.37 s, Mp = 9.9 %, ess = 0.01 mm, th en [-4.4, 2.1] deg
+
+=== L5. Robustez: ensayo L1 con un parametro cambiado a la vez ===
+  caso                        ctrl   ts[s]   Mp[%]  ess[mm]  max|x|[mm]  cumple
+  nominal                     PID    1.30     4.5    0.70      102.4      CUMPLE
+  nominal                     LQR    2.03     5.2    0.87      105.2      CUMPLE
+  retardo 120 ms              PID    3.90     5.7    0.38      102.4      NO CUMPLE
+  retardo 120 ms              LQR    1.77     6.8    0.28      105.7      CUMPLE
+  c = 0,685                   PID    1.30     4.1    0.70      102.3      CUMPLE
+  c = 0,685                   LQR    2.03     5.1    0.87      105.1      CUMPLE
+  ruido 2 mm                  PID    7.00     7.6    0.33      102.4      NO CUMPLE
+  ruido 2 mm                  LQR    6.50     8.3    1.75      105.2      NO CUMPLE
+  firmware sin tabla          PID    4.90    24.6    0.90       80.2      NO CUMPLE
+  firmware sin tabla          LQR    7.00    20.0    1.50       80.2      NO CUMPLE
+  c = 0,2 (identificado)      PID    7.23    37.0    9.03      101.4      NO CUMPLE
+  c = 0,2 (identificado)      LQR     NaN    38.8    6.66      102.9      NO CUMPLE
+  c = 0,2 y retardo 0,3 s     PID     NaN    65.3    1.73      101.4      NO CUMPLE
+  c = 0,2 y retardo 0,3 s     LQR     NaN    65.3   32.67      103.1      NO CUMPLE
+
+Resultados en /home/user/LAB-CONTROL/etapaD/resultados
+FIN D2

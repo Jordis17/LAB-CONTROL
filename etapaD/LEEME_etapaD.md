@@ -126,3 +126,38 @@ cuando el plato se mueve rápido con la bola lejos del centro.
 
 Medir el retardo, el ruido y Ts (`run_benchmark.py`, `medir_ruido.py`), identificar c
 (Etapa B) y la dinámica real del servo. Después, volver a correr C1 y D1.
+
+---
+
+## 5. Segunda estrategia: MIL del LQR y comparación con el PID (`D2_MIL_LQR_BoP.m`, 2026-11-25)
+
+Corre el PID (C1) y el LQR (C2) con el mismo simulador, la misma planta, el mismo Ts, retardo,
+ruido (misma semilla), integrador numérico y duración. Casos:
+
+- L1: requisitos;
+- L2: saturación y anti-windup del LQR, con un empujón de 420 mm/s y 1° de desnivel;
+- L3: desnivel;
+- L4: dos ejes;
+- L5: robustez, incluidos c = 0,2 y retardo de 0,3 s identificados en el prototipo.
+
+**Cómo correrlo (MATLAB):** `cd etapaC`, `C2_disenar_LQR_BoP`; después `cd ../etapaD`,
+`D2_MIL_LQR_BoP` (unos minutos en MATLAB; en Octave tardó ~35 min). Devolver
+`etapaC/resultados/C2_*` y `etapaD/resultados/D2_*` y `D_caso_LQR_*`.
+
+**Resultados preliminares (Octave 8.4, `verificacion_octave/D2_consola.txt`):**
+
+| Ensayo | PID | LQR |
+|---|---|---|
+| L1 requisitos: ts / Mp / ess | 1,30 s / 4,5 % / 0,16 mm | 2,03 s / 5,2 % / 0,15 mm (cumplen los dos) |
+| L1: inclinación máxima / temblor en reposo | 3,6° / 0,31° | 8,5° / 0,62° |
+| L2 empujón (LQR): sin AW / con AW | — | ess 12,7 / 11,6 mm; los dos llegan a 133 mm (pasan el borde) |
+| L3 desnivel 1°: max\|x\| / ess / vuelve a < 3 mm | 31,3 mm / 0,89 mm / 5,2 s | 24,0 mm / 1,23 mm / 8,8 s |
+| L5 retardo 120 ms: ts | 3,90 s (no cumple) | 1,77 s (cumple) |
+| L5 ruido 2 mm: ts | 7,0 s | 6,5 s (ninguno cumple) |
+| L5 c = 0,2: Mp | 37 % | 39 % (ninguno cumple) |
+
+**Selección:** el PID sigue a las etapas E–H. Cumple los requisitos con menos de la mitad de la
+inclinación y la mitad del temblor del plato (importante con 1–2° de holgura), corrige el
+desnivel más rápido y es más simple: 3 ganancias y 2 variables internas, contra 7 y 5 del LQR.
+El LQR tolera mejor el retardo: es el candidato natural para un rediseño con el modelo
+identificado.

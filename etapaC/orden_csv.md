@@ -13,3 +13,15 @@ Todos en `etapaC/resultados/`, con fila de encabezado, separador coma y punto de
 `C1_controlador.mat`: `Ctrl` (Kp, Ki, Kd [rad/mm, rad/(mm·s), rad/(mm/s)], Ts, th_lim [rad],
 e_clip [mm], v_int [mm/s], Nq, Kf, kalman_sigma_a, kalman_sigma_m, te, zeta, a, w, Ti,
 omega_n_servo, margenes, P_diseno, fecha) y `Rq` (requisitos y definiciones).
+
+## Segunda estrategia (C2, LQR)
+
+| Archivo | Columnas |
+|---|---|
+| `C2_grilla.csv` | `e_max_mm` · `v_max_mm_s` · `th_max_deg` · `q_z` · `Ke_deg_mm` · `Kv_deg_mm_s` · `Kz_deg_mm_s` · `PM_deg` · `GM_sup_dB` · `GM_inf_dB` · `wc_rad_s` |
+| `C2_bode.csv` | `w_rad_s` · `mag_dB_LQR` · `fase_deg_LQR` · `mag_dB_PID` · `fase_deg_PID` |
+| `C2_robustez.csv` | `caso` (1 nominal, 2 retardo 120 ms, 3 c = 0,685, 4 h_sup = 40, 5 identificado X, 6 identificado Y, 7 identificado X con 0,44 s) · `PM_LQR` · `GMsup_LQR` · `GMinf_LQR` · `estable_LQR` · `PM_PID` · `GMsup_PID` · `GMinf_PID` · `estable_PID` |
+
+`C2_controlador_LQR.mat`: `Ctrl` (tipo = 'LQR', K [rad por unidad del estado], d, Ts, th_lim,
+e_clip, Kf, kalman_sigma_a, kalman_sigma_m, omega_n_servo, tau_d, Q, R, pesos, A, B, estados,
+margenes, P_diseno, fecha) y `Rq`.

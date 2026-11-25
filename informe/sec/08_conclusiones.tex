@@ -5,9 +5,12 @@ abierto. Por eso no aplicaban ni las reglas SIMC ni un PI, y la identificación 
 lazo cerrado. El modelo lineal es válido hasta unos \SI{3}{\degree} con cambios lentos de
 inclinación, pero solo hasta \SI{0.5}{\degree} con cambios rápidos, por el término centrífugo.
 
-Con el modelo de diseño, el controlador PD con integración condicional cumplió los requisitos en
-MIL ($t_s = \SI{1.30}{\second}$, $M_p = \SI{4.4}{\percent}$, $e_{ss} = \SI{0.18}{\milli\metre}$),
-mientras que el PID clásico llegó a \SI{38.8}{\percent} de sobreimpulso. La saturación de
+Con el modelo de diseño, las dos estrategias cumplieron los requisitos en MIL. El PID con
+integración condicional dio $t_s = \SI{1.30}{\second}$, $M_p = \SI{4.4}{\percent}$ y
+$e_{ss} = \SI{0.18}{\milli\metre}$, mientras que un PID clásico llegó a \SI{38.8}{\percent} de
+sobreimpulso. El LQR con acción integral dio $t_s = \SI{2.03}{\second}$ y $M_p =
+\SI{5.2}{\percent}$, con más tolerancia al retardo, pero con más del doble de inclinación y de
+temblor del plato. Por eso se seleccionó el PID para las etapas siguientes. La saturación de
 \SI{10}{\degree} que impone el mecanismo no alcanza para frenar un empujón de
 \SI{420}{\milli\metre\per\second} antes del borde.
 

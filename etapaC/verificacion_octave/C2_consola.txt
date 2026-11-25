@@ -1,0 +1,85 @@
+ETAPA C - C2_disenar_LQR_BoP   (2026-11-25 15:01:14)
+Octave 8.4.0
+
+=== 1. Modelo discreto de diseno ===
+  Planta: xdd = -c*g*th, c*g = 7007.1 mm/(s^2 rad); retardo de entrada tau_d = retardo + 2/omega_n = 0.1150 s
+  ZOH exacto con Ts = 0.0333 s: d = 4 entradas pasadas en el estado (tau_d = 3*Ts + 0.0150 s)
+  Estado aumentado (7): e_mm, v_mm_s, u_k-4_rad, u_k-3_rad, u_k-2_rad, u_k-1_rad, z_mm_s
+  A =
+              1     0.03333      -2.715      -1.178           0           0           0 
+              0           1      -105.1      -128.5           0           0           0 
+              0           0           0           1           0           0           0 
+              0           0           0           0           1           0           0 
+              0           0           0           0           0           1           0 
+              0           0           0           0           0           0           0 
+        0.03333           0           0           0           0           0           1 
+  B = [0 0 0 0 0 1 0 ]'
+
+=== 2. Grilla de pesos: margenes del lazo lineal (planta Etapa A + retardo 0.075 s + Kalman) ===
+  e_max[mm] v_max[mm/s] th_max[deg]   q_z      Ke[deg/mm]  Kv[deg/(mm/s)]  Kz[deg/(mm s)]  PM[deg] GMsup[dB] GMinf[dB] wc[rad/s]
+      50        100          3      1e-06      0.0574         0.0476         0.00275     48.8     13.1     -36.8     3.88
+      50        100          3      1e-05      0.0623         0.0489         0.00868     47.8     13.0     -27.7     3.95
+      50        100          3      1e-04      0.0770         0.0527         0.02731     45.0     12.5     -20.0     4.14
+      50        100          5      1e-06      0.0915         0.0690         0.00440     46.7     12.1     -38.7     4.77
+      50        100          5      1e-05      0.0987         0.0705         0.01390     45.7     12.0     -29.4     4.84
+      50        100          5      1e-04      0.1199         0.0748         0.04374     43.2     11.6     -21.5     5.02
+      50        300          3      1e-06      0.0580         0.0387         0.00280     44.9     13.4     -35.4     3.57
+      50        300          3      1e-05      0.0621         0.0400         0.00885     44.0     13.2     -26.2     3.64
+      50        300          3      1e-04      0.0748         0.0436         0.02784     41.6     12.7     -18.4     3.83
+      50        300          5      1e-06      0.0941         0.0527         0.00457     41.7     11.9     -37.0     4.39
+      50        300          5      1e-05      0.0997         0.0541         0.01443     40.9     11.8     -27.7     4.45
+      50        300          5      1e-04      0.1171         0.0582         0.04540     38.7     11.4     -19.5     4.63
+     100        100          3      1e-06      0.0316         0.0394         0.00278     55.1     14.4     -30.6     3.30
+     100        100          3      1e-05      0.0388         0.0416         0.00877     52.7     14.0     -22.8     3.43
+     100        100          3      1e-04      0.0583         0.0470         0.02752     47.8     13.1     -17.0     3.76
+     100        100          5      1e-06      0.0502         0.0586         0.00446     53.1     13.2     -32.7     4.17
+     100        100          5      1e-05      0.0610         0.0611         0.01406     51.0     12.9     -24.6     4.30
+     100        100          5      1e-04      0.0896         0.0674         0.04414     46.4     12.2     -18.5     4.61
+     100        300          3      1e-06      0.0312         0.0279         0.00285     49.7     15.5     -28.1     2.76
+     100        300          3      1e-05      0.0369         0.0301         0.00899     47.6     14.9     -20.0     2.90
+     100        300          3      1e-04      0.0535         0.0358         0.02817     43.2     13.8     -14.3     3.26
+     100        300          5      1e-06      0.0504         0.0383         0.00467     47.2     13.7     -29.8     3.46
+     100        300          5      1e-05      0.0582         0.0406         0.01472     45.3     13.3     -21.4     3.58
+     100        300          5      1e-04      0.0812         0.0470         0.04612     41.1     12.4     -15.2     3.94
+
+=== 3. Pesos elegidos y ganancias ===
+  e_max = 100 mm, v_max = 300 mm/s, th_max = 5 deg, q_z = 0.0001, e_clip = 5 mm  ->  Q = diag([0.0001 1.11e-05 0 0 0 0 0.0001 ]), R = 131.3
+  K = [-0.00141694 -0.000821163 0.0852143 0.18154 0.170915 0.160499 -0.000804878 ]   (u = -K*s, en rad y unidades del estado)
+  En grados: Ke = 0.08118 deg/mm, Kv = 0.04705 deg/(mm/s), Kz = 0.046116 deg/(mm s)
+  Peso de las entradas pasadas (predictor), de u[k-4] a u[k-1]: [0.0852 0.1815 0.1709 0.1605 ] (adimensional)
+  Polos de lazo cerrado del modelo de diseno: -0.0001+0.0001j  -0.0001-0.0001j  0.0001+0.0001j  0.0001-0.0001j  0.9369+0.0459j  0.9369-0.0459j  0.9657+0.0000j  
+    (radio maximo 0.9657; equivalentes continuos: 1.05 2.42 2.42 277.31 277.31 285.21 285.21  rad/s)
+
+  Ley discreta (cada cuadro, Ts = 0.0333 s), por eje:
+    e[k]      = x_hat[k] - r[k]                                       [mm]
+    u[k]      = -( Ke*e[k] + Kv*v_hat[k] + sum_i Ku_i*th_cmd[k-i] + Kz*z[k] )   [rad]
+    th_cmd[k] = min(max(u[k], -th_lim), th_lim),  th_lim = 10.0 deg (igual que el PID)
+    z[k+1]    = z[k] + Ts*sat(e[k], +-5 mm), salvo con th_cmd saturado y el integrador empujando
+                hacia la saturacion (clamping): z[k+1] = z[k]
+    Incremento por muestra del integrador: Kz*Ts = 1.537e-03 deg/mm  (Kz continua = 4.612e-02 deg/(mm s))
+
+=== 3b. Simulacion lineal del ensayo de requisitos (bola quieta a 100 mm, r = 0, 6 s) ===
+  juego de pesos                               ts[s]   Mp[%]  e_final[mm]  max|th|[deg]
+  q_z = 1e-5, sin recorte (primer intento)          NaN    16.1       12.10         3.88
+  q_z = 1e-4, v_max 200, sin recorte               4.03    24.3        0.93         8.31
+  q_z = 1e-4, v_max 200, recorte 10 mm             1.03     5.0        0.36         8.31
+  q_z = 1e-4, v_max 300, recorte 5 mm (elegido)    0.97     2.3        0.13         8.12
+
+=== 4. Lazo discreto nominal y robustez (mismas condiciones que C1) ===
+  LQR: wc = 3.940 rad/s, PM = 41.1 deg, GM = +12.4 / -15.2 dB, margen de retardo 182 ms, radio max 0.9577
+  PID: wc = 3.296 rad/s, PM = 40.9 deg, GM = +11.8 / -12.6 dB, margen de retardo 216 ms, radio max 0.9730
+
+  caso                              LQR: PM  GMsup  GMinf  estable | PID: PM  GMsup  GMinf  estable
+  nominal                            41.1   12.4  -15.2   si    |   40.9   11.8  -12.6   si
+  retardo 120 ms                     30.9    7.7  -14.4   si    |   32.3    8.0  -12.0   si
+  c = 0,685                          41.2   13.5  -14.8   si    |   41.0   12.5  -12.2   si
+  h_sup = 40 mm                      41.1   11.6  -15.2   si    |   40.9   11.3  -12.6   si
+  identificado X (c 0,18; 0,27 s)    -3.1    1.2   -Inf   NO    |   -9.5    2.5   -Inf   NO
+  identificado Y (c 0,28; 0,27 s)     6.3    5.2   -2.8   si    |    5.3   10.5   -1.5   si
+  identificado X, retardo 0,44 s    -15.5    3.9   -Inf   NO    |  -19.5   11.0   -Inf   NO
+  Casos: nominal | retardo 120 ms | c = 0,685 | h_sup = 40 mm | identificado X (c 0,18; 0,27 s) | identificado Y (c 0,28; 0,27 s) | identificado X, retardo 0,44 s
+  Nota: los casos "identificado" cambian solo c y el retardo en el modelo lineal; la zona
+  muerta y la holgura del prototipo no entran en este analisis.
+
+Controlador guardado en /home/user/LAB-CONTROL/etapaC/resultados/C2_controlador_LQR.mat (variable Ctrl)
+FIN C2

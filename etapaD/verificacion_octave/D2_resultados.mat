@@ -1,0 +1,5514 @@
+# Created by Octave 8.4.0, Wed Nov 25 15:41:23 2026 UTC <root@vm>
+# name: resultados
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 5
+# name: L1_PID
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.80000000000000004
+
+
+# name: ts
+# type: scalar
+1.3
+
+
+# name: Mp
+# type: scalar
+4.4713361897873876
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.15585548042534103
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.3879742618096
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3344804601261813
+
+
+# name: th_max_deg
+# type: scalar
+3.6018177001230645
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.30758069680228151
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: L1_LQR
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.56666666666666654
+
+
+# name: ts
+# type: scalar
+2.0333333333333332
+
+
+# name: Mp
+# type: scalar
+5.152156832849256
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.14555486241407489
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+105.21535294493678
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.8028035137901806
+
+
+# name: th_max_deg
+# type: scalar
+8.4639495931829458
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.62119544646644742
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: L2_sin_saturacion
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 18
+# name: x0
+# type: scalar
+-3.8707082932946664
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8707082932946664
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+11.193663929200651
+
+
+# name: max_abs_xhat
+# type: scalar
+108.96667237241391
+
+
+# name: max_abs_x_plato
+# type: scalar
+123.2125291243994
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-5.4603192325605132
+
+
+# name: th_max_deg
+# type: scalar
+23.781609724750915
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.63735140011966995
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+# name: t_rec
+# type: scalar
+NaN
+
+
+
+
+# name: L2_sat_sin_AW
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 18
+# name: x0
+# type: scalar
+-3.8833016027172409
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8833016027172409
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+12.669935096402755
+
+
+# name: max_abs_xhat
+# type: scalar
+125.95920713049726
+
+
+# name: max_abs_x_plato
+# type: scalar
+132.98598100765091
+
+
+# name: toca_pared
+# type: bool
+1
+
+
+# name: th_min_deg
+# type: scalar
+-4.940806670531388
+
+
+# name: th_max_deg
+# type: scalar
+10
+
+
+# name: pct_saturado
+# type: scalar
+6.7039106145251397
+
+
+# name: t_saturado
+# type: scalar
+0.40000000000000002
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.63690992434307003
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+0
+
+
+
+
+# name: t_rec
+# type: scalar
+NaN
+
+
+
+
+# name: L2_sat_con_AW
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 18
+# name: x0
+# type: scalar
+-3.8833016027172409
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8833016027172409
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+11.575577010663578
+
+
+# name: max_abs_xhat
+# type: scalar
+125.95920713049726
+
+
+# name: max_abs_x_plato
+# type: scalar
+132.98598100765091
+
+
+# name: toca_pared
+# type: bool
+1
+
+
+# name: th_min_deg
+# type: scalar
+-4.9145677998242761
+
+
+# name: th_max_deg
+# type: scalar
+10
+
+
+# name: pct_saturado
+# type: scalar
+6.7039106145251397
+
+
+# name: t_saturado
+# type: scalar
+0.40000000000000002
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.63698308403119352
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+0
+
+
+
+
+# name: t_rec
+# type: scalar
+NaN
+
+
+
+
+
+
+# name: tabla
+# type: cell
+# rows: 29
+# columns: 4
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+L1_requisitos
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+L1_requisitos
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+L2_sin_saturacion
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+L2_sat_sin_AW
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+L2_sat_con_AW
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+L3_desnivel
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+L3_desnivel
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeX_tramo1
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeX_tramo2
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeY_tramo1
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeY_tramo2
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeX_tramo1
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeX_tramo2
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeY_tramo1
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+L4_ejeY_tramo2
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+L5_nominal
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+L5_nominal
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+L5_retardo_120_ms
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+L5_retardo_120_ms
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+L5_c_0_685
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+L5_c_0_685
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+L5_ruido_2_mm
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+L5_ruido_2_mm
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+L5_firmware_sin_tabla
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+L5_firmware_sin_tabla
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+L5_c_0_2_identificado
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+L5_c_0_2_identificado
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 24
+L5_c_0_2_y_retardo_0_3_s
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 24
+L5_c_0_2_y_retardo_0_3_s
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+PID
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+2
+
+
+# name: <cell-element>
+# type: scalar
+2
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+2
+
+
+# name: <cell-element>
+# type: scalar
+2
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+# name: <cell-element>
+# type: scalar
+1
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.80000000000000004
+
+
+# name: ts
+# type: scalar
+1.3
+
+
+# name: Mp
+# type: scalar
+4.4713361897873876
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.15585548042534103
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.3879742618096
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3344804601261813
+
+
+# name: th_max_deg
+# type: scalar
+3.6018177001230645
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.30758069680228151
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.56666666666666654
+
+
+# name: ts
+# type: scalar
+2.0333333333333332
+
+
+# name: Mp
+# type: scalar
+5.152156832849256
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.14555486241407489
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+105.21535294493678
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.8028035137901806
+
+
+# name: th_max_deg
+# type: scalar
+8.4639495931829458
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.62119544646644742
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-3.8707082932946664
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8707082932946664
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+11.193663929200651
+
+
+# name: max_abs_xhat
+# type: scalar
+108.96667237241391
+
+
+# name: max_abs_x_plato
+# type: scalar
+123.2125291243994
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-5.4603192325605132
+
+
+# name: th_max_deg
+# type: scalar
+23.781609724750915
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.63735140011966995
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-3.8833016027172409
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8833016027172409
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+12.669935096402755
+
+
+# name: max_abs_xhat
+# type: scalar
+125.95920713049726
+
+
+# name: max_abs_x_plato
+# type: scalar
+132.98598100765091
+
+
+# name: toca_pared
+# type: bool
+1
+
+
+# name: th_min_deg
+# type: scalar
+-4.940806670531388
+
+
+# name: th_max_deg
+# type: scalar
+10
+
+
+# name: pct_saturado
+# type: scalar
+6.7039106145251397
+
+
+# name: t_saturado
+# type: scalar
+0.40000000000000002
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.63690992434307003
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+0
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-3.8833016027172409
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8833016027172409
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+11.575577010663578
+
+
+# name: max_abs_xhat
+# type: scalar
+125.95920713049726
+
+
+# name: max_abs_x_plato
+# type: scalar
+132.98598100765091
+
+
+# name: toca_pared
+# type: bool
+1
+
+
+# name: th_min_deg
+# type: scalar
+-4.9145677998242761
+
+
+# name: th_max_deg
+# type: scalar
+10
+
+
+# name: pct_saturado
+# type: scalar
+6.7039106145251397
+
+
+# name: t_saturado
+# type: scalar
+0.40000000000000002
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.63698308403119352
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+0
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-3.8833016027172409
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8833016027172409
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+0.88849508268809874
+
+
+# name: max_abs_xhat
+# type: scalar
+31.263408199500891
+
+
+# name: max_abs_x_plato
+# type: scalar
+30.162488849096981
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.6908139413832779
+
+
+# name: th_max_deg
+# type: scalar
+2.8263659569144304
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.27619014683683202
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-3.8833016027172409
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+3.8833016027172409
+
+
+# name: tr
+# type: scalar
+NaN
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+NaN
+
+
+# name: banda
+# type: scalar
+NaN
+
+
+# name: ess
+# type: scalar
+1.2335491620811738
+
+
+# name: max_abs_xhat
+# type: scalar
+23.965570690725748
+
+
+# name: max_abs_x_plato
+# type: scalar
+23.485288543639921
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-4.1123402335727031
+
+
+# name: th_max_deg
+# type: scalar
+5.1817801719938066
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.53412015591384743
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+79.991980920114827
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-79.991980920114827
+
+
+# name: tr
+# type: scalar
+0.76666666666666661
+
+
+# name: ts
+# type: scalar
+2.9666666666666668
+
+
+# name: Mp
+# type: scalar
+5.3384606296343193
+
+
+# name: banda
+# type: scalar
+3.9995990460057413
+
+
+# name: ess
+# type: scalar
+2.0827706666964581
+
+
+# name: max_abs_xhat
+# type: scalar
+80.007212651857913
+
+
+# name: max_abs_x_plato
+# type: scalar
+81.821112481618925
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.0099549156273389
+
+
+# name: th_max_deg
+# type: scalar
+2.9193919362748511
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.38481776762699216
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-1.5618781446996222
+
+
+# name: r
+# type: scalar
+50
+
+
+# name: D
+# type: scalar
+51.561878144699619
+
+
+# name: tr
+# type: scalar
+0.76666666666666661
+
+
+# name: ts
+# type: scalar
+3.6999999999999993
+
+
+# name: Mp
+# type: scalar
+8.8769528373841151
+
+
+# name: banda
+# type: scalar
+2.5780939072349813
+
+
+# name: ess
+# type: scalar
+0.7864821645621447
+
+
+# name: max_abs_xhat
+# type: scalar
+54.577123604974453
+
+
+# name: max_abs_x_plato
+# type: scalar
+53.70321717404088
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3050989413090139
+
+
+# name: th_max_deg
+# type: scalar
+1.2292967915078259
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.35367464292688694
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-60.279615778332804
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+60.279615778332804
+
+
+# name: tr
+# type: scalar
+0.66666666666666663
+
+
+# name: ts
+# type: scalar
+3.833333333333333
+
+
+# name: Mp
+# type: scalar
+10.516833367250625
+
+
+# name: banda
+# type: scalar
+3.0139807889166406
+
+
+# name: ess
+# type: scalar
+3.7196521540176972
+
+
+# name: max_abs_xhat
+# type: scalar
+60.256814964357723
+
+
+# name: max_abs_x_plato
+# type: scalar
+61.667843365731628
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3282927325323772
+
+
+# name: th_max_deg
+# type: scalar
+1.6547263331444713
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.34954328505721466
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+3.3492615924475477
+
+
+# name: r
+# type: scalar
+50
+
+
+# name: D
+# type: scalar
+46.650738407552453
+
+
+# name: tr
+# type: scalar
+0.66666666666666696
+
+
+# name: ts
+# type: scalar
+4
+
+
+# name: Mp
+# type: scalar
+14.700720607715597
+
+
+# name: banda
+# type: scalar
+2.3325369203776227
+
+
+# name: ess
+# type: scalar
+1.256141939018262
+
+
+# name: max_abs_xhat
+# type: scalar
+56.857994714730559
+
+
+# name: max_abs_x_plato
+# type: scalar
+55.30993881560304
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3246632723478879
+
+
+# name: th_max_deg
+# type: scalar
+1.4695663006191617
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.42049261026044843
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+79.991980920114827
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-79.991980920114827
+
+
+# name: tr
+# type: scalar
+0.59999999999999987
+
+
+# name: ts
+# type: scalar
+2.9666666666666668
+
+
+# name: Mp
+# type: scalar
+6.4176382982329656
+
+
+# name: banda
+# type: scalar
+3.9995990460057413
+
+
+# name: ess
+# type: scalar
+1.1708692890023249
+
+
+# name: max_abs_xhat
+# type: scalar
+80.007212651857913
+
+
+# name: max_abs_x_plato
+# type: scalar
+84.070051252561612
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.3520151935936702
+
+
+# name: th_max_deg
+# type: scalar
+6.8401475970670322
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.75889374789451503
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-0.64228535378330176
+
+
+# name: r
+# type: scalar
+50
+
+
+# name: D
+# type: scalar
+50.642285353783301
+
+
+# name: tr
+# type: scalar
+0.59999999999999964
+
+
+# name: ts
+# type: scalar
+4.1333333333333329
+
+
+# name: Mp
+# type: scalar
+9.3333244399895161
+
+
+# name: banda
+# type: scalar
+2.532114267689165
+
+
+# name: ess
+# type: scalar
+0.4045187635742013
+
+
+# name: max_abs_xhat
+# type: scalar
+54.726608795893888
+
+
+# name: max_abs_x_plato
+# type: scalar
+54.145952740395941
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.5554470301091117
+
+
+# name: th_max_deg
+# type: scalar
+2.2280555329360396
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.68914594569504928
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+-60.279615778332804
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+60.279615778332804
+
+
+# name: tr
+# type: scalar
+0.56666666666666654
+
+
+# name: ts
+# type: scalar
+3.7999999999999998
+
+
+# name: Mp
+# type: scalar
+8.7147172780910864
+
+
+# name: banda
+# type: scalar
+3.0139807889166406
+
+
+# name: ess
+# type: scalar
+1.3910405130991697
+
+
+# name: max_abs_xhat
+# type: scalar
+60.327150454231095
+
+
+# name: max_abs_x_plato
+# type: scalar
+63.503332492080553
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-4.4099757840941862
+
+
+# name: th_max_deg
+# type: scalar
+3.0676842301870657
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.66538698621390102
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+1.4301068593282622
+
+
+# name: r
+# type: scalar
+50
+
+
+# name: D
+# type: scalar
+48.569893140671738
+
+
+# name: tr
+# type: scalar
+0.53333333333333321
+
+
+# name: ts
+# type: scalar
+4.3666666666666671
+
+
+# name: Mp
+# type: scalar
+9.8762106365960634
+
+
+# name: banda
+# type: scalar
+2.4284946570335872
+
+
+# name: ess
+# type: scalar
+0.0079880958162927267
+
+
+# name: max_abs_xhat
+# type: scalar
+54.796864952542364
+
+
+# name: max_abs_x_plato
+# type: scalar
+53.323255845185649
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-4.3746890320346372
+
+
+# name: th_max_deg
+# type: scalar
+2.0514806423131722
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.86033280933202794
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.80000000000000004
+
+
+# name: ts
+# type: scalar
+1.3
+
+
+# name: Mp
+# type: scalar
+4.4713361897873876
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.70109838692883042
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.3879742618096
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3344804601261813
+
+
+# name: th_max_deg
+# type: scalar
+3.6018177001230645
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.37011373323209301
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.56666666666666654
+
+
+# name: ts
+# type: scalar
+2.0333333333333332
+
+
+# name: Mp
+# type: scalar
+5.152156832849256
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.86721115787698944
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+105.21535294493678
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.8028035137901806
+
+
+# name: th_max_deg
+# type: scalar
+8.4639495931829458
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.7035761390412042
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.63333333333333341
+
+
+# name: ts
+# type: scalar
+3.9000000000000004
+
+
+# name: Mp
+# type: scalar
+5.6744238259882982
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.37998052588719911
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.40936196201031
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.9681978654394636
+
+
+# name: th_max_deg
+# type: scalar
+3.6303029839637189
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.34502725245196492
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.993331817033933
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.993331817033933
+
+
+# name: tr
+# type: scalar
+0.46666666666666656
+
+
+# name: ts
+# type: scalar
+1.7666666666666666
+
+
+# name: Mp
+# type: scalar
+6.7612627661076772
+
+
+# name: banda
+# type: scalar
+4.9996665908516968
+
+
+# name: ess
+# type: scalar
+0.28099173042084252
+
+
+# name: max_abs_xhat
+# type: scalar
+100.00856229971262
+
+
+# name: max_abs_x_plato
+# type: scalar
+105.70504963843577
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-5.0835803739151926
+
+
+# name: th_max_deg
+# type: scalar
+8.4639495931829458
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.64223383663228317
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.996376369426784
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.996376369426784
+
+
+# name: tr
+# type: scalar
+0.80000000000000004
+
+
+# name: ts
+# type: scalar
+1.3
+
+
+# name: Mp
+# type: scalar
+4.0804813374678224
+
+
+# name: banda
+# type: scalar
+4.9998188184713399
+
+
+# name: ess
+# type: scalar
+0.69588225533081116
+
+
+# name: max_abs_xhat
+# type: scalar
+100.01505640915667
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.33376576211809
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.2700459844166989
+
+
+# name: th_max_deg
+# type: scalar
+3.6026517252327492
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.36885007124852515
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+99.996376369426784
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-99.996376369426784
+
+
+# name: tr
+# type: scalar
+0.59999999999999998
+
+
+# name: ts
+# type: scalar
+2.0333333333333332
+
+
+# name: Mp
+# type: scalar
+5.1263209996650607
+
+
+# name: banda
+# type: scalar
+4.9998188184713399
+
+
+# name: ess
+# type: scalar
+0.86845502707843758
+
+
+# name: max_abs_xhat
+# type: scalar
+100.01505640915667
+
+
+# name: max_abs_x_plato
+# type: scalar
+105.08530578611409
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.8596977499916121
+
+
+# name: th_max_deg
+# type: scalar
+8.4655904170022698
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.70344747469613378
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+1
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+100.0692740568435
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-100.0692740568435
+
+
+# name: tr
+# type: scalar
+0.83333333333333326
+
+
+# name: ts
+# type: scalar
+7
+
+
+# name: Mp
+# type: scalar
+7.5866600117934695
+
+
+# name: banda
+# type: scalar
+5.0034637028421756
+
+
+# name: ess
+# type: scalar
+0.32594232454842897
+
+
+# name: max_abs_xhat
+# type: scalar
+100.18387056734436
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.4091424548558
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.9624865493469716
+
+
+# name: th_max_deg
+# type: scalar
+3.8123627906197148
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.74307634530704225
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+100.0692740568435
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-100.0692740568435
+
+
+# name: tr
+# type: scalar
+0.59999999999999987
+
+
+# name: ts
+# type: scalar
+6.5
+
+
+# name: Mp
+# type: scalar
+8.2624586693990594
+
+
+# name: banda
+# type: scalar
+5.0034637028421756
+
+
+# name: ess
+# type: scalar
+1.7473490683433857
+
+
+# name: max_abs_xhat
+# type: scalar
+100.18387056734436
+
+
+# name: max_abs_x_plato
+# type: scalar
+105.21272520292604
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-5.2870055763006318
+
+
+# name: th_max_deg
+# type: scalar
+8.8501332788319846
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+1.4088109440354428
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+89.366240063518404
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-89.366240063518404
+
+
+# name: tr
+# type: scalar
+0.60000000000000009
+
+
+# name: ts
+# type: scalar
+4.9000000000000004
+
+
+# name: Mp
+# type: scalar
+24.630204307597168
+
+
+# name: banda
+# type: scalar
+4.46831200317592
+
+
+# name: ess
+# type: scalar
+0.89968363935014706
+
+
+# name: max_abs_xhat
+# type: scalar
+78.65381795308538
+
+
+# name: max_abs_x_plato
+# type: scalar
+80.165391252613716
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.137188897514136
+
+
+# name: th_max_deg
+# type: scalar
+0.97362135318808318
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.41730403224275919
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+89.366240063518404
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-89.366240063518404
+
+
+# name: tr
+# type: scalar
+0.56666666666666665
+
+
+# name: ts
+# type: scalar
+7
+
+
+# name: Mp
+# type: scalar
+19.997856390050615
+
+
+# name: banda
+# type: scalar
+4.46831200317592
+
+
+# name: ess
+# type: scalar
+1.4961253489444961
+
+
+# name: max_abs_xhat
+# type: scalar
+78.65381795308538
+
+
+# name: max_abs_x_plato
+# type: scalar
+80.165391252613716
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-4.1187399636479727
+
+
+# name: th_max_deg
+# type: scalar
+3.2763049856414512
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.77898730602920963
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+1
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+100.04679712873775
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-100.04679712873775
+
+
+# name: tr
+# type: scalar
+1.2333333333333334
+
+
+# name: ts
+# type: scalar
+7.2333333333333334
+
+
+# name: Mp
+# type: scalar
+37.013117404456281
+
+
+# name: banda
+# type: scalar
+5.0023398564368877
+
+
+# name: ess
+# type: scalar
+9.0328769807164804
+
+
+# name: max_abs_xhat
+# type: scalar
+100.12260520238323
+
+
+# name: max_abs_x_plato
+# type: scalar
+101.44762305031317
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-2.3157981789144992
+
+
+# name: th_max_deg
+# type: scalar
+3.616463995720586
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.42102944212262355
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+100.04679712873775
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-100.04679712873775
+
+
+# name: tr
+# type: scalar
+1
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+38.832213824224254
+
+
+# name: banda
+# type: scalar
+5.0023398564368877
+
+
+# name: ess
+# type: scalar
+6.6639623946484043
+
+
+# name: max_abs_xhat
+# type: scalar
+100.12260520238323
+
+
+# name: max_abs_x_plato
+# type: scalar
+102.93215270255898
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.9939251999876113
+
+
+# name: th_max_deg
+# type: scalar
+8.4927640621491562
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.79403459892732564
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+100.04679712873775
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-100.04679712873775
+
+
+# name: tr
+# type: scalar
+0.96666666666666679
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+65.318502226295607
+
+
+# name: banda
+# type: scalar
+5.0023398564368877
+
+
+# name: ess
+# type: scalar
+1.7348019923933111
+
+
+# name: max_abs_xhat
+# type: scalar
+100.12260520238323
+
+
+# name: max_abs_x_plato
+# type: scalar
+101.4095428244418
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-3.3388446147339934
+
+
+# name: th_max_deg
+# type: scalar
+3.9740698629948601
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.54826157600864545
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+1
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+# name: <cell-element>
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 17
+# name: x0
+# type: scalar
+100.04679712873775
+
+
+# name: r
+# type: scalar
+0
+
+
+# name: D
+# type: scalar
+-100.04679712873775
+
+
+# name: tr
+# type: scalar
+0.79999999999999982
+
+
+# name: ts
+# type: scalar
+NaN
+
+
+# name: Mp
+# type: scalar
+65.278439113406577
+
+
+# name: banda
+# type: scalar
+5.0023398564368877
+
+
+# name: ess
+# type: scalar
+32.672226634017143
+
+
+# name: max_abs_xhat
+# type: scalar
+100.12260520238323
+
+
+# name: max_abs_x_plato
+# type: scalar
+103.13272185196212
+
+
+# name: toca_pared
+# type: bool
+0
+
+
+# name: th_min_deg
+# type: scalar
+-6.0055303366204695
+
+
+# name: th_max_deg
+# type: scalar
+8.4927640621491562
+
+
+# name: pct_saturado
+# type: scalar
+0
+
+
+# name: t_saturado
+# type: scalar
+0
+
+
+# name: std_th_ss_deg
+# type: scalar
+0.95456619822297573
+
+
+# name: cumple
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: ts
+# type: bool
+0
+
+
+# name: Mp
+# type: bool
+0
+
+
+# name: ess
+# type: bool
+0
+
+
+# name: pared
+# type: bool
+1
+
+
+
+
+
+
+
+
+
+# name: Cpid
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 20
+# name: Kp
+# type: scalar
+0.00059548883249507583
+
+
+# name: Ki
+# type: scalar
+0.00039699255499671724
+
+
+# name: Kd
+# type: scalar
+0.00045161873056426543
+
+
+# name: Ts
+# type: scalar
+0.033333333333333333
+
+
+# name: th_lim
+# type: scalar
+0.17453292519943295
+
+
+# name: e_clip
+# type: scalar
+30
+
+
+# name: v_int
+# type: scalar
+25
+
+
+# name: Nq
+# type: scalar
+4
+
+
+# name: Kf
+# type: matrix
+# rows: 2
+# columns: 1
+ 0.64734273408073484
+ 9.8974921896529242
+
+
+# name: kalman_sigma_a
+# type: scalar
+500
+
+
+# name: kalman_sigma_m
+# type: scalar
+1
+
+
+# name: te
+# type: scalar
+0.13166666666666665
+
+
+# name: zeta
+# type: scalar
+0.69999999999999996
+
+
+# name: a
+# type: scalar
+1
+
+
+# name: w
+# type: scalar
+3.1645569620253169
+
+
+# name: Ti
+# type: scalar
+1.5
+
+
+# name: omega_n_servo
+# type: scalar
+50
+
+
+# name: margenes
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 9
+# name: wc
+# type: scalar
+3.2955072241693584
+
+
+# name: PM
+# type: scalar
+40.876430554597817
+
+
+# name: margen_retardo
+# type: scalar
+0.21648512690496838
+
+
+# name: GM_sup_dB
+# type: scalar
+11.770355354660884
+
+
+# name: GM_inf_dB
+# type: scalar
+-12.604095100314559
+
+
+# name: w180
+# type: matrix
+# rows: 1
+# columns: 4
+ 1.0032609873912786 10.177861104769175 23.046134775676183 28.437561011919691
+
+
+# name: polos_lc
+# type: complex matrix
+# rows: 8
+# columns: 1
+ (-0.32379220769641182,0)
+ (0.34315902287502442,0.41686661509481154)
+ (0.34315902287502442,-0.41686661509481154)
+ (0.85755458486301306,0.080541214633724947)
+ (0.85755458486301306,-0.080541214633724947)
+ (0.97255292590892295,0.028827808023629806)
+ (0.97255292590892295,-0.028827808023629806)
+ (-6.2822089977096269e-15,0)
+
+
+# name: radio_max
+# type: scalar
+0.97298008006816572
+
+
+# name: estable
+# type: bool
+1
+
+
+
+
+# name: P_diseno
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: g
+# type: scalar
+9810
+
+
+# name: r_bola
+# type: scalar
+20
+
+
+# name: m_bola_g
+# type: scalar
+34
+
+
+# name: c_rod
+# type: scalar
+0.7142857142857143
+
+
+# name: k_inercia
+# type: scalar
+0.39999999999999991
+
+
+# name: h_sup
+# type: scalar
+49
+
+
+# name: h
+# type: scalar
+69
+
+
+# name: x_max
+# type: scalar
+127
+
+
+# name: d
+# type: scalar
+70
+
+
+# name: r_brazo
+# type: scalar
+24
+
+
+# name: z_rot
+# type: scalar
+26.199999999999989
+
+
+# name: H_serv
+# type: scalar
+136
+
+
+# name: L_var
+# type: scalar
+162.19999999999999
+
+
+# name: sigma_brazo
+# type: scalar
+-1
+
+
+# name: phi_max
+# type: scalar
+0.78539816339744828
+
+
+# name: omega_srv
+# type: scalar
+10.471975511965976
+
+
+# name: T_pwm
+# type: scalar
+0.02
+
+
+# name: Ts
+# type: scalar
+0.033333333333333333
+
+
+# name: retardo
+# type: scalar
+0.074999999999999997
+
+
+# name: H_cam
+# type: scalar
+450
+
+
+# name: estado
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 8
+# name: c_rod
+# type: sq_string
+# elements: 1
+# length: 39
+NOMINAL 5/7 (identificar en la Etapa B)
+
+
+# name: h
+# type: sq_string
+# elements: 1
+# length: 51
+DISENO (pivote supuesto a media altura de la junta)
+
+
+# name: r_brazo
+# type: sq_string
+# elements: 1
+# length: 6
+DISENO
+
+
+# name: sigma_brazo
+# type: sq_string
+# elements: 1
+# length: 31
+DISENO (artefacto del ensamble)
+
+
+# name: omega_srv
+# type: sq_string
+# elements: 1
+# length: 45
+HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+
+
+# name: Ts
+# type: sq_string
+# elements: 1
+# length: 32
+PENDIENTE medir (nominal 30 fps)
+
+
+# name: retardo
+# type: sq_string
+# elements: 1
+# length: 28
+ESTIMADO a priori, no medido
+
+
+# name: H_cam
+# type: sq_string
+# elements: 1
+# length: 6
+MEDIDO
+
+
+
+
+
+
+# name: fecha
+# type: sq_string
+# elements: 1
+# length: 19
+2026-11-06 09:36:55
+
+
+
+
+# name: Clqr
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 23
+# name: tipo
+# type: sq_string
+# elements: 1
+# length: 3
+LQR
+
+
+# name: K
+# type: matrix
+# rows: 1
+# columns: 7
+ -0.0014169392950633879 -0.00082116306773857156 0.085214275175745216 0.18153953095937506 0.17091497232267844 0.16049929875001692 -0.00080487822839193002
+
+
+# name: d
+# type: scalar
+4
+
+
+# name: Ts
+# type: scalar
+0.033333333333333333
+
+
+# name: th_lim
+# type: scalar
+0.17453292519943295
+
+
+# name: e_clip
+# type: scalar
+5
+
+
+# name: Kf
+# type: matrix
+# rows: 2
+# columns: 1
+ 0.64734273408073484
+ 9.8974921896529242
+
+
+# name: kalman_sigma_a
+# type: scalar
+500
+
+
+# name: kalman_sigma_m
+# type: scalar
+1
+
+
+# name: omega_n_servo
+# type: scalar
+50
+
+
+# name: tau_d
+# type: scalar
+0.11499999999999999
+
+
+# name: Q
+# type: matrix
+# rows: 7
+# columns: 7
+ 0.0001 0 0 0 0 0 0
+ 0 1.1111111111111112e-05 0 0 0 0 0
+ 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0.0001
+
+
+# name: R
+# type: scalar
+131.31225400046978
+
+
+# name: e_max
+# type: scalar
+100
+
+
+# name: v_max
+# type: scalar
+300
+
+
+# name: th_max
+# type: scalar
+0.087266462599716474
+
+
+# name: q_z
+# type: scalar
+0.0001
+
+
+# name: A
+# type: matrix
+# rows: 7
+# columns: 7
+ 1 0.033333333333333333 -2.7152678571428552 -1.1775892857142876 0 0 0
+ 0 1 -105.10714285714275 -128.46428571428581 0 0 0
+ 0 0 0 1 0 0 0
+ 0 0 0 0 1 0 0
+ 0 0 0 0 0 1 0
+ 0 0 0 0 0 0 0
+ 0.033333333333333333 0 0 0 0 0 1
+
+
+# name: B
+# type: matrix
+# rows: 7
+# columns: 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+
+
+# name: estados
+# type: cell
+# rows: 1
+# columns: 7
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 4
+e_mm
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+v_mm_s
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+u_k-4_rad
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+u_k-3_rad
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+u_k-2_rad
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+u_k-1_rad
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+z_mm_s
+
+
+
+
+
+# name: margenes
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 12
+# name: wc
+# type: scalar
+3.9404273448475493
+
+
+# name: PM
+# type: scalar
+41.116423295578016
+
+
+# name: margen_retardo
+# type: scalar
+0.1821165321294099
+
+
+# name: GM_sup_dB
+# type: scalar
+12.40568926750235
+
+
+# name: GM_inf_dB
+# type: scalar
+-15.200586564072216
+
+
+# name: w180
+# type: matrix
+# rows: 1
+# columns: 4
+ 1.0513915884372853 12.466324543939251 21.754841474852501 31.19038604891189
+
+
+# name: Acl
+# type: matrix
+# rows: 12
+# columns: 12
+ 1 0.033333333333333333 -1.7031249999999996 -2.1897321428571432 0 0 0 0 0 0 0 0
+ 0 1 -58.392857142857125 -175.17857142857144 0 0 0 0 0 0 0 0
+ 0 0 0 1 0 0 0 0 0 0 0 0
+ 0 0 0 0 1 0 0 0 0 0 0 0
+ 0.0090447004066667083 0 -0.12662580569333393 0 0 -0.0076277611116033206 0.00056690436401846079 -0.085214275175745216 -0.18153953095937506 -0.17091497232267844 -0.16049929875001692 0.00080487822839193002
+ 0.64734273408073484 0 -9.0627982771302875 0 0 0.35265726591926516 0.011755242197308838 0 0 0 0 0
+ 9.8974921896529242 0 -138.56489065514094 0 0 -9.8974921896529242 0.67008359367823589 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 1 0 0 0
+ 0 0 0 0 0 0 0 0 0 1 0 0
+ 0 0 0 0 0 0 0 0 0 0 1 0
+ 0.0090447004066667083 0 -0.12662580569333393 0 0 -0.0076277611116033206 0.00056690436401846079 -0.085214275175745216 -0.18153953095937506 -0.17091497232267844 -0.16049929875001692 0.00080487822839193002
+ 0.021578091136024494 0 -0.30209327590434293 0 0 0.011755242197308838 0.00039184140657696126 0 0 0 0 1
+
+
+# name: idx
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 4
+# name: planta
+# type: matrix
+# rows: 1
+# columns: 5
+ 1 2 3 4 5
+
+
+# name: xhat
+# type: matrix
+# rows: 1
+# columns: 2
+ 6 7
+
+
+# name: ub
+# type: matrix
+# rows: 1
+# columns: 4
+ 8 9 10 11
+
+
+# name: z
+# type: scalar
+12
+
+
+
+
+# name: Cy
+# type: matrix
+# rows: 1
+# columns: 12
+ 1 0 -14 0 0 0 0 0 0 0 0 0
+
+
+# name: polos_lc
+# type: complex matrix
+# rows: 12
+# columns: 1
+ (-0.40860971592872419,0.17443252684489682)
+ (-0.40860971592872419,-0.17443252684489682)
+ (0.33643977246228085,0.64679206460666638)
+ (0.33643977246228085,-0.64679206460666638)
+ (0.486798127924432,0)
+ (0.74797190505303934,0)
+ (0.95765367956204617,0)
+ (0.94396676325036566,0)
+ (0.8701909719904849,0)
+ (5.2938781759826374e-06,0)
+ (-2.6469390865270194e-06,4.5846404522641607e-06)
+ (-2.6469390865270194e-06,-4.5846404522641607e-06)
+
+
+# name: radio_max
+# type: scalar
+0.95765367956204617
+
+
+# name: estable
+# type: bool
+1
+
+
+
+
+# name: P_diseno
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: g
+# type: scalar
+9810
+
+
+# name: r_bola
+# type: scalar
+20
+
+
+# name: m_bola_g
+# type: scalar
+34
+
+
+# name: c_rod
+# type: scalar
+0.7142857142857143
+
+
+# name: k_inercia
+# type: scalar
+0.39999999999999991
+
+
+# name: h_sup
+# type: scalar
+49
+
+
+# name: h
+# type: scalar
+69
+
+
+# name: x_max
+# type: scalar
+127
+
+
+# name: d
+# type: scalar
+70
+
+
+# name: r_brazo
+# type: scalar
+24
+
+
+# name: z_rot
+# type: scalar
+26.199999999999989
+
+
+# name: H_serv
+# type: scalar
+136
+
+
+# name: L_var
+# type: scalar
+162.19999999999999
+
+
+# name: sigma_brazo
+# type: scalar
+-1
+
+
+# name: phi_max
+# type: scalar
+0.78539816339744828
+
+
+# name: omega_srv
+# type: scalar
+10.471975511965976
+
+
+# name: T_pwm
+# type: scalar
+0.02
+
+
+# name: Ts
+# type: scalar
+0.033333333333333333
+
+
+# name: retardo
+# type: scalar
+0.074999999999999997
+
+
+# name: H_cam
+# type: scalar
+450
+
+
+# name: estado
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 8
+# name: c_rod
+# type: sq_string
+# elements: 1
+# length: 39
+NOMINAL 5/7 (identificar en la Etapa B)
+
+
+# name: h
+# type: sq_string
+# elements: 1
+# length: 51
+DISENO (pivote supuesto a media altura de la junta)
+
+
+# name: r_brazo
+# type: sq_string
+# elements: 1
+# length: 6
+DISENO
+
+
+# name: sigma_brazo
+# type: sq_string
+# elements: 1
+# length: 31
+DISENO (artefacto del ensamble)
+
+
+# name: omega_srv
+# type: sq_string
+# elements: 1
+# length: 45
+HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+
+
+# name: Ts
+# type: sq_string
+# elements: 1
+# length: 32
+PENDIENTE medir (nominal 30 fps)
+
+
+# name: retardo
+# type: sq_string
+# elements: 1
+# length: 28
+ESTIMADO a priori, no medido
+
+
+# name: H_cam
+# type: sq_string
+# elements: 1
+# length: 6
+MEDIDO
+
+
+
+
+
+
+# name: fecha
+# type: sq_string
+# elements: 1
+# length: 19
+2026-11-25 15:01:25
+
+
+
+
+# name: P
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 21
+# name: g
+# type: scalar
+9810
+
+
+# name: r_bola
+# type: scalar
+20
+
+
+# name: m_bola_g
+# type: scalar
+34
+
+
+# name: c_rod
+# type: scalar
+0.7142857142857143
+
+
+# name: k_inercia
+# type: scalar
+0.39999999999999991
+
+
+# name: h_sup
+# type: scalar
+49
+
+
+# name: h
+# type: scalar
+69
+
+
+# name: x_max
+# type: scalar
+127
+
+
+# name: d
+# type: scalar
+70
+
+
+# name: r_brazo
+# type: scalar
+24
+
+
+# name: z_rot
+# type: scalar
+26.199999999999989
+
+
+# name: H_serv
+# type: scalar
+136
+
+
+# name: L_var
+# type: scalar
+162.19999999999999
+
+
+# name: sigma_brazo
+# type: scalar
+-1
+
+
+# name: phi_max
+# type: scalar
+0.78539816339744828
+
+
+# name: omega_srv
+# type: scalar
+10.471975511965976
+
+
+# name: T_pwm
+# type: scalar
+0.02
+
+
+# name: Ts
+# type: scalar
+0.033333333333333333
+
+
+# name: retardo
+# type: scalar
+0.074999999999999997
+
+
+# name: H_cam
+# type: scalar
+450
+
+
+# name: estado
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 8
+# name: c_rod
+# type: sq_string
+# elements: 1
+# length: 39
+NOMINAL 5/7 (identificar en la Etapa B)
+
+
+# name: h
+# type: sq_string
+# elements: 1
+# length: 51
+DISENO (pivote supuesto a media altura de la junta)
+
+
+# name: r_brazo
+# type: sq_string
+# elements: 1
+# length: 6
+DISENO
+
+
+# name: sigma_brazo
+# type: sq_string
+# elements: 1
+# length: 31
+DISENO (artefacto del ensamble)
+
+
+# name: omega_srv
+# type: sq_string
+# elements: 1
+# length: 45
+HOJA_DATOS a 4,8 V (SUPUESTO de alimentacion)
+
+
+# name: Ts
+# type: sq_string
+# elements: 1
+# length: 32
+PENDIENTE medir (nominal 30 fps)
+
+
+# name: retardo
+# type: sq_string
+# elements: 1
+# length: 28
+ESTIMADO a priori, no medido
+
+
+# name: H_cam
+# type: sq_string
+# elements: 1
+# length: 6
+MEDIDO
+
+
+
+
+
+
+# name: Rq
+# type: scalar struct
+# ndims: 2
+ 1 1
+# length: 9
+# name: x0_mm
+# type: scalar
+100
+
+
+# name: ts_max_s
+# type: scalar
+3
+
+
+# name: Mp_max_pct
+# type: scalar
+20
+
+
+# name: ess_max_mm
+# type: scalar
+3
+
+
+# name: x_lim_mm
+# type: scalar
+127
+
+
+# name: PM_min_deg
+# type: scalar
+40
+
+
+# name: GM_min_dB
+# type: scalar
+6
+
+
+# name: banda_frac
+# type: scalar
+0.050000000000000003
+
+
+# name: ventana_ess_s
+# type: scalar
+1
+
+
+
+

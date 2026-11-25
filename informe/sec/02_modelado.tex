@@ -85,7 +85,7 @@ bruscos de inclinación.
 \begin{figure}[!t]
 \centering
 \begin{tikzpicture}
-\begin{axis}[estilo, height=3.8cm, xlabel={Amplitud del triplete $A$ (\si{\degree})},
+\begin{axis}[estilo, height=3.2cm, xlabel={Amplitud del triplete $A$ (\si{\degree})},
              ylabel={Error de trayectoria (\si{\percent})}, ymin=0, ymax=100, xmin=0, xmax=13.5,
              legend pos=north west]
   \addplot[cRojo, mark=*, mark size=1pt]
@@ -155,26 +155,12 @@ medida se ajustó, por mínimos cuadrados y en ventanas de \SI{1}{\second}, el m
 donde $c_{\mathrm{ef}}$ es una ganancia de rodadura efectiva, que incluye también la ganancia
 real de la transmisión servo--plato, $b$ representa un desnivel constante, $f$ un rozamiento o
 zona muerta, y $\tau$ el retardo entre la orden de inclinación y la respuesta de la bola. El
-retardo se buscó en una grilla, minimizando el error de ajuste. En la Fig.~\ref{fig:tau}, el
+retardo se buscó en una grilla, minimizando el error de ajuste: el
 mínimo está en \SI{340}{\milli\second} para X y en \SI{270}{\milli\second} para Y, y la suma de
 los dos ejes es mínima en \SI{270}{\milli\second}, que se tomó como retardo común. Las curvas son
 bastante planas alrededor del mínimo, así que el retardo queda determinado con poca precisión.
 
-\begin{figure}[!t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[estilo, height=3.6cm, xlabel={Retardo supuesto $\tau$ (\si{\second})},
-             ylabel={SSE (\si{\milli\metre\squared})}, legend pos=north east,
-             scaled y ticks=base 10:-3, ytick scale label code/.code={}, ylabel={SSE ($\times 10^{3}$ \si{\milli\metre\squared})}]
-  \addplot[cAzul]  table[col sep=comma, x=tau_s, y=sse_x] {\G/B3_tau.csv};
-  \addplot[cNaranja, dashed] table[col sep=comma, x=tau_s, y=sse_y] {\G/B3_tau.csv};
-  \legend{Eje X, Eje Y}
-\end{axis}
-\end{tikzpicture}
-\caption{Error de ajuste del modelo \eqref{eq:b3} en función del retardo supuesto, ensayo
-\texttt{sesion\_20261113\_151156}.}
-\label{fig:tau}
-\end{figure}
+
 
 La Tabla~\ref{tab:b3} reúne las identificaciones hechas a medida que cambiaba el prototipo.
 Salvo en el ensayo inmediatamente posterior a la lubricación, $c_{\mathrm{ef}}$ salió entre
@@ -276,7 +262,7 @@ que es lo que indica la autocorrelación del residuo.
 \begin{figure}[!t]
 \centering
 \begin{tikzpicture}
-\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.6cm}, estilo, height=3.3cm,
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.5cm}, estilo, height=2.9cm,
                   xmin=0, xmax=155, xticklabels={}, unbounded coords=jump]
 \nextgroupplot[ylabel={$x$ (\si{\milli\metre})}, legend pos=north east, legend columns=3]
   \addplot[cAzul, line width=0.9pt, restrict expr to domain={\thisrow{eje}}{1:1}]

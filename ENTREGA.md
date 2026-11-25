@@ -37,6 +37,17 @@ En Overleaf: subir la carpeta `informe/` completa y compilar `informe.tex` con p
 tiene 8 páginas. Antes de entregar, en `preambulo.tex` cambiar `\mostrarpendientestrue` por
 `\mostrarpendientesfalse` y revisar que no quede ningún recuadro.
 
+## 2b. Cumplimiento del enunciado (`Intrucciones.txt`, 2026-11-25)
+
+| Requisito | Estado |
+|---|---|
+| Grupo de 4 | Sí |
+| Informe escrito | Sí. Faltan los carnés de 2 integrantes |
+| Prototipo funcionando | Sigue un círculo de 45 mm; los escalones no se establecen. La versión vigente del firmware (trim e integrador del 18) no se ha probado |
+| Dos estrategias de control con MBD | Sí: PID con integración condicional (C1) y LQR con acción integral (C2) |
+| Las dos validadas hasta MIL | Sí: D1 y D2, que corre las dos en condiciones idénticas. **Falta correr C2 y D2 en MATLAB** (hoy hay resultados de Octave) |
+| Una estrategia hasta la implementación física | PID: código, SIL y PIL con igualdad exacta. En el prototipo corre un firmware escrito a mano con la misma ley |
+
 ## 3. Estado del informe (2026-11-22)
 
 El informe quedó completo: 10 páginas, sin recuadros `PENDIENTE` y con todos los números

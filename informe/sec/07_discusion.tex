@@ -32,7 +32,11 @@ $\Ti = \SI{5}{\second}$), que sube el margen de fase a \SI{43}{\degree} con la p
 más cerca de la referencia en los escalones (error final de \SIrange{1}{47}{\milli\metre}, contra
 \SIrange{9}{80}{\milli\metre}), pero siguió peor el círculo, con un error mediano de
 \SIrange{45}{58}{\milli\metre} contra \SI{30}{\milli\metre}. Por eso el equipo se quedó con el
-controlador original para las pruebas finales. El rediseño no pasó por MIL, SIL ni PIL. Además,
+controlador original para las pruebas finales. El rediseño no pasó por MIL, SIL ni PIL. El LQR de
+la Sección~III-B tampoco resuelve el problema por sí solo: con el modelo identificado también
+queda sin margen en el eje X, aunque su tolerancia al retardo en MIL (cumple R1 con
+\SI{120}{\milli\second}, donde el PID no) lo vuelve el candidato natural para un rediseño con el
+modelo nominal. Además,
 con un retardo de \SI{0.44}{\second} el requisito R1 de \SI{3}{\second} no se puede cumplir con márgenes
 de estabilidad aceptables: hay que aceptar un requisito menos exigente o reducir el retardo, con menos
 holgura mecánica y un \texttt{loop()} más rápido en la ESP32.
@@ -46,10 +50,6 @@ cambió varias veces con los ajustes del mecanismo, y el \emph{trim} se estimó 
 con la bola quieta, donde el rozamiento sesga la estimación. Los choques con el borde también
 actuaron como perturbaciones durante los círculos.
 
-Otras diferencias fueron favorables o de menor peso. La latencia medida de la visión fue menor
-que la supuesta, y el ruido de posición fue unas diez veces menor que el \SI{1}{\milli\metre} del
-diseño. Aun así, el parámetro del Kalman se mantuvo en \SI{1}{\milli\metre}, porque en
-simulación bajarlo a \SI{0.11}{\milli\metre} hacía oscilar el lazo. La relación servo--plato fue
-asimétrica y más empinada que la calculada, lo que se compensó con la tabla medida. El término
-centrífugo limita la validez del modelo lineal cuando el plato se mueve rápido; en los datos del
-prototipo su efecto no se pudo separar del de la holgura.
+Otras diferencias fueron favorables o de menor peso: la latencia y el ruido de la visión
+fueron menores que los supuestos, y la relación servo--plato, asimétrica y más empinada que la
+calculada, se compensó con la tabla medida.

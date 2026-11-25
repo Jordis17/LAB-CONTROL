@@ -17,8 +17,10 @@ equilibrio estable: sin control, cualquier inclinación lleva la bola al borde e
 segundo. Además, el periodo de muestreo no es libre, porque lo fija la cámara a
 \SI{30}{fps}, y la cadena de medición agrega un retardo que es tiempo muerto dentro del lazo.
 
-No se contó con requisitos dados por el curso para esta planta, así que los de la
-Tabla~\ref{tab:requisitos} los fijó el equipo como una decisión de ingeniería.
+El enunciado del proyecto pide aplicar el flujo de diseño basado en modelos con dos
+estrategias de control distintas, validar ambas hasta la simulación \emph{Model-in-the-Loop} y
+llevar una de ellas hasta la implementación física. No fija requisitos numéricos, así que los de
+la Tabla~\ref{tab:requisitos} los fijó el equipo como una decisión de ingeniería.
 
 \begin{table}[!t]
 \caption{Requisitos de desempeño fijados por el equipo. Ensayo: bola quieta a
@@ -57,5 +59,7 @@ código $\rightarrow$ SIL $\rightarrow$ PIL $\rightarrow$ implementación físic
 El orden real del trabajo no fue estrictamente ese. Para avanzar mientras se terminaba el
 prototipo, el diseño, el MIL, la generación de código, el SIL y el PIL se hicieron primero con el
 modelo físico, y la identificación con el prototipo se hizo después. Por eso la
-Sección~II presenta el modelo identificado, pero el controlador de las Secciones~III a V es el
-diseñado con el modelo físico; la Sección~VII analiza esa diferencia.
+Sección~II presenta el modelo identificado, pero los controladores de la Sección~III se
+diseñaron con el modelo físico; la Sección~VII analiza esa diferencia. Las dos estrategias fueron
+un PID con integración condicional y un LQR con acción integral; el PID es el que continuó hasta
+la implementación.

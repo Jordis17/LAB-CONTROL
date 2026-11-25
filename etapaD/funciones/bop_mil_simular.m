@@ -58,7 +58,7 @@ F = [1 Ts; 0 1];  H = [1 0];
 Q = cfg.kalman_sigma_a^2*[Ts^4/4 Ts^3/2; Ts^3/2 Ts^2];
 Rk = cfg.kalman_sigma_m^2;
 kf_x = cell(2,1);  kf_P = cell(2,1);  kf_ini = false;
-Ec = {bop_controlador_estado0(); bop_controlador_estado0()};
+Ec = {bop_controlador_estado0(C); bop_controlador_estado0(C)};
 
 % Cola de mediciones en transito
 cola_t = [];  cola_y = zeros(2,0);  cola_k = [];

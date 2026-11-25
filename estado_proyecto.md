@@ -730,3 +730,52 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
   carga hasta 3°. Al soltarla se descarga mientras la bola se mueve lejos de la referencia.
 - **Pendiente:** probarlo en el prototipo (modo centro, bola soltada quieta en 3 o 4 puntos) y
   mandar el CSV.
+
+### 2026-11-25 — Enunciado del proyecto final y segunda estrategia (LQR)
+
+- **Enunciado recibido** y guardado en `Intrucciones.txt`. Pide:
+  - grupos de 4 personas, un informe y el prototipo funcionando;
+  - **dos estrategias de control distintas** con MBD, las dos validadas hasta MIL;
+  - una de ellas llevada hasta la implementación física.
+  - No fija requisitos numéricos: siguen los R1–R4 del equipo.
+- **Faltaba la segunda estrategia.** Se agregó un LQR con acción integral (LQI), con un modelo
+  de diseño que incluye el retardo como estados (predictor):
+  - `etapaC/C2_disenar_LQR_BoP.m` y las funciones `bop_modelo_lqr`, `bop_ley_lqr`,
+    `dlqr_propio` y `bop_lazo_lineal_lqr`;
+  - `etapaD/D2_MIL_LQR_BoP.m` corre el MIL del PID y del LQR en condiciones idénticas.
+  - Detalle en `etapaC/LEEME_etapaC.md`, sección 7.
+- **Cambios en funciones compartidas:**
+  - `bop_controlador_paso` despacha según `C.tipo` ('LQR' o, por defecto, el PID).
+  - `bop_controlador_estado0(C)` agrega los estados del LQR.
+  - `bop_mil_simular` le pasa C a `bop_controlador_estado0`.
+  - El camino del PID no cambió: en Octave, el D1 del PID repite ts 1,30 s, Mp 4,47 % y
+    ess 0,156 mm, iguales a la corrida anterior en Octave.
+  - `bop_ley_control.m` (la fuente del código generado) **no se tocó**: E, F y G siguen válidas.
+- **Resultados (Octave 8.4, preliminares hasta correrlos en MATLAB; consolas en
+  `etapaC/verificacion_octave/` y `etapaD/verificacion_octave/`):**
+  - Pesos finales: e_max 100 mm, v_max 300 mm/s, θ_max 5°, q_z 1e-4, recorte del integrador
+    ±5 mm.
+  - Ganancias: Ke = 0,0812 °/mm, Kv = 0,0471 °/(mm/s), Kz = 0,0461 °/(mm·s).
+  - Márgenes: PM 41,1° y GM +12,4/−15,2 dB, contra 40,9° y +11,8/−12,6 dB del PID.
+  - MIL, ensayo de requisitos: ts 2,03 s, Mp 5,2 %, ess 0,15 mm (cumple), contra 1,30 s,
+    4,5 % y 0,16 mm del PID.
+  - El LQR pide 8,5° contra 3,6° y tiembla 0,62° contra 0,31°.
+  - Con 120 ms de retardo, el LQR cumple (1,77 s) y el PID no (3,90 s).
+  - Con c = 0,2 ninguno cumple.
+  - Detalle en `etapaD/LEEME_etapaD.md`, sección 5.
+- **Pesos descartados:**
+  - q_z = 1e-5: Mp 19 % en el MIL.
+  - Recorte de ±10 mm: ts 3,2 s.
+  - Recortes de 2–3 mm: no corrigen el desnivel.
+  - q_z ≥ 2e-4: PM menor que 40°.
+- **Selección:** el PID sigue hasta la implementación, porque usa menos inclinación, tiembla
+  menos, corrige el desnivel más rápido y es más simple. Así queda en el informe
+  (sección III-C).
+- **Pendiente para el equipo:** correr en MATLAB `etapaC/C2_disenar_LQR_BoP` y
+  `etapaD/D2_MIL_LQR_BoP`, y mandar las consolas. El informe cita hoy los números de Octave; con
+  el PID, Octave y MATLAB coincidieron salvo la secuencia de ruido.
+- **Telemetría en consola (`main_vision.py`) verificada con el firmware actual:**
+  - Se compiló en la PC la función `enviarTelemetria` de `bop_controlador_estable.ino` y el
+    parser de Python decodifica bien su trama.
+  - En una prueba con un puerto serie virtual y una ESP32 simulada (loop de 40 ms), la consola
+    tuvo telemetría en cada impresión: 74 tramas buenas y 0 malas.

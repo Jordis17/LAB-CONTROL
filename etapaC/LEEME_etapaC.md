@@ -112,3 +112,77 @@ I      ← I + Ki·Ts·sat(eps, ±30 mm)   si nq ≥ 4 y no (saturado y sign(eps
 | Integrar ε + Td·v̂ | Sin sobreimpulso, pero el desnivel tarda 8,6 s en corregirse |
 | Exigir 0,3 s quieta con 15 mm/s | El ruido de v̂ rompe la cuenta: el integrador casi nunca actúa |
 | Más amortiguamiento (ζ = 0,8–0,9) o a = 1,5–2 | Más sobreimpulso, no menos: la bola llega más lento y el integral se carga más |
+
+---
+
+## 7. Segunda estrategia: LQR con acción integral (`C2_disenar_LQR_BoP.m`, 2026-11-25)
+
+El enunciado del proyecto final (`Intrucciones.txt`) pide **dos estrategias de control
+distintas, validadas hasta MIL**, y llevar una de ellas hasta la implementación. La primera es
+el PID de las secciones anteriores. La segunda es una **realimentación de estados óptima (LQR)
+con integrador del error (LQI)**.
+
+### Por qué esta y no otra
+- La planta por eje es un doble integrador con retardo. El Kalman del pipeline ya entrega los
+  dos estados (x̂, v̂), así que no hacen falta sensores nuevos.
+- El retardo se modela con estados: las d inclinaciones ya mandadas, que el controlador conoce.
+  Con eso el LQR funciona como un **predictor**: sabe qué inclinaciones todavía no le llegaron a
+  la bola. El PID no compensa el retardo de forma explícita.
+- La sintonía minimiza un costo cuadrático con pesos Q y R. Es un método distinto de la
+  asignación de polos del PID.
+- Se descartaron MPC (necesita optimización en línea en la ESP32 y más tiempo de ajuste) y
+  sliding mode (la conmutación pelea con la zona muerta del mecanismo).
+
+### Modelo de diseño (`funciones/bop_modelo_lqr.m`)
+- Planta: ẍ = −c·g·θ, igual que para el PID, sin los ceros.
+- Retardo de entrada: τ_d = retardo + 2/ω_n = 0,115 s, con el atraso del servo.
+- Discretización: ZOH exacta con retardo fraccionario a Ts = 33,3 ms, con d = 4 entradas pasadas.
+- Estado aumentado (7): `[e, v, u[k−4], u[k−3], u[k−2], u[k−1], z]`, con e = x − r y
+  z = ∫e.
+
+### Pesos (regla de Bryson)
+- Pesos: Q = diag(1/e_max², 1/v_max², 0, 0, 0, 0, q_z) y R = 1/θ_max².
+- **Elegidos:** e_max = 100 mm, v_max = 300 mm/s, θ_max = 5°, q_z = 1e-4, y el error que entra
+  al integrador recortado a **±5 mm**.
+
+Cómo se llegó (Octave, 2026-11-25):
+
+| Juego | Margen | MIL, ensayo de requisitos | Desnivel de 1° |
+|---|---|---|---|
+| q_z = 1e-5, v_max 100, θ_max 3° (primer intento) | PM 52,7° | Mp 19 %, no se establece en 6 s | ess 5,4 mm |
+| q_z = 1e-4, v_max 200, recorte 10 mm | PM 42,6° | ts 3,20 s (no cumple R1), Mp 7,7 % | — |
+| q_z = 1e-4, v_max 200, recorte 5 mm | PM 42,6° | ts 2,97 s, Mp 6,1 % | ess 1,45 mm |
+| q_z = 1e-4, v_max 200, recorte 2–3 mm | PM 42,6° | ts 1,2–2,8 s | ess 7–12 mm (integral demasiado lenta) |
+| q_z = 2e-4 o 3e-4, recorte 3–4 mm | PM 38–40° (bajo el criterio) | ts ≈ 0,9 s | ess < 1 mm |
+| **q_z = 1e-4, v_max 300, recorte 5 mm (elegido)** | **PM 41,1°** | **ts 2,03 s, Mp 5,2 %, ess 0,15 mm** | **ess 1,23 mm** |
+
+- La sección 2 de C2 recorre la grilla de márgenes.
+- La sección 3b compara juegos con una simulación lineal rápida.
+- El MIL completo con el juego elegido está en `etapaD/D2_MIL_LQR_BoP.m`.
+
+### Ley discreta (`funciones/bop_ley_lqr.m`)
+```
+e      = x̂ − r
+u      = −( Ke·e + Kv·v̂ + Σ Ku_i·θ_cmd[k−i] + Kz·z )
+θ_cmd  = sat(u, ±10°)
+z      ← z + Ts·sat(e, ±5 mm)    salvo saturado y el integrador empujando hacia la saturación
+```
+
+### Resultados preliminares (Octave 8.4, `verificacion_octave/C2_consola.txt`; falta MATLAB)
+
+| Magnitud | LQR | PID (C1) |
+|---|---|---|
+| Ganancia de posición | Ke = 0,0812 °/mm | Kp = 0,0341 °/mm |
+| Ganancia de velocidad | Kv = 0,0471 °/(mm/s) | Kd = 0,0259 °/(mm/s) |
+| Integral | Kz = 0,0461 °/(mm·s), error recortado a ±5 mm | Ki = 0,0227 °/(mm·s), condicional, error recortado a ±30 mm |
+| Predictor (u[k−4] … u[k−1]) | 0,085 · 0,182 · 0,171 · 0,160 | — |
+| ωc / PM | 3,94 rad/s / 41,1° | 3,30 rad/s / 40,9° |
+| GM superior / inferior | +12,4 / −15,2 dB | +11,8 / −12,6 dB |
+| Margen de retardo | 182 ms | 216 ms |
+| Retardo de 120 ms | PM 30,9° | PM 32,3° |
+| Modelo identificado X (c 0,18; 0,27 s) | inestable (PM −3,1°) | inestable (PM −9,5°, integral lineal) |
+| Modelo identificado Y (c 0,28; 0,27 s) | PM 6,3° | PM 5,3° |
+
+**Cómo correrlo:** `cd etapaC`, `C2_disenar_LQR_BoP` (después de C1). Genera
+`resultados/C2_controlador_LQR.mat`, `C2_grilla.csv`, `C2_bode.csv`, `C2_robustez.csv` y
+`C2_consola.txt`.

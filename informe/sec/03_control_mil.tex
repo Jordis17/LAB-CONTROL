@@ -1,11 +1,13 @@
-\section{Diseño del controlador y evaluación MIL}
+\section{Diseño de los controladores y evaluación MIL}
 
-El diseño y la evaluación MIL se hicieron con el modelo de la Etapa~A ($c = 5/7$ y un retardo
-estimado de \SI{75}{\milli\second}), antes de contar con la identificación del prototipo. Este es
-el controlador que se generó, verificó en SIL y PIL, y se probó en la planta. El efecto de la
-diferencia entre ese modelo y el nominal de la Sección~II-D se analiza en la Sección~VII.
+Se diseñaron dos estrategias distintas: un PID con integración condicional, sintonizado por
+asignación de polos, y un regulador lineal cuadrático con acción integral (LQR). Las dos se
+diseñaron con el modelo de la Etapa~A ($c = 5/7$ y un retardo estimado de
+\SI{75}{\milli\second}) y se evaluaron en MIL bajo condiciones idénticas. El PID fue la estrategia
+que siguió hasta la generación de código, SIL, PIL y el prototipo. El efecto de la diferencia
+entre el modelo de diseño y el nominal de la Sección~II-D se analiza en la Sección~VII.
 
-\subsection{Estructura y sintonización}
+\subsection{Estrategia 1: PID con integración condicional}
 
 Cada eje es un doble integrador con retardo, así que la estructura se eligió a partir de esa
 dinámica y no del Proyecto~1. La acción derivativa es obligatoria para tener margen de fase. En
@@ -106,6 +108,66 @@ donde el \emph{clamping} congela el integrador cuando la salida está saturada y
 mismo signo que $u_k$ \cite{mw_antiwindup}.
 
 
+\subsection{Estrategia 2: LQR con acción integral}
+
+La segunda estrategia es una realimentación de estados óptima. El filtro de Kalman ya entrega los
+dos estados de cada eje, $\xh$ y $\vh$, así que no hacen falta sensores nuevos. La diferencia de
+fondo con el PID es el tratamiento del retardo. El modelo de diseño es el doble integrador
+$\ddot x = -c\,g\,\theta$ con un retardo de entrada $\tau_d = t_d + 2/\omega_{n,\mathrm{srv}} =
+\SI{0.115}{\second}$, discretizado con retenedor de orden cero y retardo fraccionario
+\cite{astrom1997}. El retardo queda representado por las $d = 4$ inclinaciones ya mandadas, que
+el controlador conoce, y el estado aumentado es
+$s_k = [\,e_k,\ \vh_k,\ u_{k-4},\ \dots,\ u_{k-1},\ z_k\,]^{\top}$, con $e_k = \xh_k - r_k$ y
+$z$ la integral del error. Al realimentar las entradas pasadas, el LQR actúa como un predictor:
+tiene en cuenta las inclinaciones que todavía no le llegan a la bola.
+
+La ganancia $K$ minimiza $\sum (s^{\top}Qs + Ru^{2})$, con pesos elegidos por la regla de Bryson:
+$Q = \mathrm{diag}(1/e_{\max}^{2},\ 1/v_{\max}^{2},\ 0,\dots,0,\ q_z)$ y $R = 1/\theta_{\max}^{2}$,
+con $e_{\max} = \SI{100}{\milli\metre}$, $v_{\max} = \SI{300}{\milli\metre\per\second}$,
+$\theta_{\max} = \SI{5}{\degree}$ y $q_z = \num{1e-4}$. Los pesos se escogieron recorriendo una
+grilla de 24 combinaciones y probando las mejores en el simulador MIL. Con una integral más débil
+($q_z = \num{1e-5}$) los márgenes eran mejores, pero la bola se pasaba un \SI{19}{\percent} y no
+se establecía en \SI{6}{\second}. Con una más fuerte, el margen de fase bajaba de \SI{40}{\degree}.
+Como en el PID, el error que entra al integrador se recorta, aquí a $\pm\SI{5}{\milli\metre}$, y el
+integrador se congela con la salida saturada. La ley queda
+
+\begin{equation}
+\begin{aligned}
+u_k &= -\Bigl(K_e e_k + K_v \vh_k + \textstyle\sum_{i=1}^{4} K_{u,i}\,\theta_{\mathrm{cmd},k-i} + K_z z_k\Bigr),\\
+z_{k+1} &= z_k + \Ts\,\operatorname{sat}(e_k, \pm\SI{5}{\milli\metre}),
+\end{aligned}
+\label{eq:lqr}
+\end{equation}
+
+con $\theta_{\mathrm{cmd},k} = \operatorname{sat}(u_k, \pm\thlim)$. La Tabla~\ref{tab:lqr} compara
+las ganancias y los márgenes de las dos estrategias, calculados con el mismo lazo discreto.
+
+\begin{table}[!t]
+\caption{Ganancias y márgenes de las dos estrategias sobre el mismo lazo discreto (planta de la
+Etapa~A, retardo, Kalman). Fuente: \texttt{etapaC/resultados/C2\_consola.txt}.}
+\label{tab:lqr}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Magnitud} & \textbf{PID} & \textbf{LQR} \\
+\midrule
+Posición ($K_p$, $K_e$) (\si{\degree\per\milli\metre}) & 0,0341 & 0,0812 \\
+Velocidad ($K_d$, $K_v$) (\si{\degree\second\per\milli\metre}) & 0,0259 & 0,0471 \\
+Integral ($K_i$, $K_z$) (\si{\degree\per(\milli\metre\second)}) & 0,0227 & 0,0461 \\
+Entradas pasadas $K_{u,1\dots4}$ & --- & 0,16/0,17/0,18/0,09 \\
+Frecuencia de cruce (\si{\radian\per\second}) & 3,30 & 3,94 \\
+Margen de fase (\si{\degree}) & 40,9 & 41,1 \\
+Margen de ganancia (\si{\deci\bel}) & +11,8 / $-$12,6 & +12,4 / $-$15,2 \\
+Margen de fase con \SI{120}{\milli\second} (\si{\degree}) & 32,3 & 30,9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Con márgenes de fase casi iguales, el LQR cruza a una frecuencia mayor y tolera una reducción de
+ganancia algo mayor, a cambio de ganancias de posición y velocidad de dos a tres veces las del PID.
+
 \subsection{Evaluación Model-in-the-Loop}
 
 El MIL simula la cadena completa con el modelo no lineal de dos ejes: la cámara toma muestras
@@ -120,15 +182,16 @@ y el de saturación, y la Tabla~\ref{tab:mil} las métricas.
 \begin{figure*}[!t]
 \centering
 \begin{tikzpicture}
-\begin{groupplot}[group style={group size=2 by 2, horizontal sep=1.3cm, vertical sep=0.9cm},
-                  estilo, ancho, xmin=0, xmax=6]
+\begin{groupplot}[group style={group size=2 by 2, horizontal sep=1.3cm, vertical sep=0.8cm},
+                  estilo, ancho, height=3.5cm, xmin=0, xmax=6]
 \nextgroupplot[ylabel={Posición (\si{\milli\metre})}, xticklabels={},
                title={\scriptsize D1: regulación desde \SI{100}{\milli\metre}}, title style={yshift=-2pt},
                legend pos=north east]
   \addplot[cAzul] table[col sep=comma, x=t_cap_s, y=xh_x_mm] {\G/D_caso_D1_requisitos.csv};
   \addplot[cVerde, dashed] table[col sep=comma, x=t_cap_s, y=x_plato_mm] {\G/D_caso_D1_requisitos.csv};
   \addplot[cGris, densely dotted] table[col sep=comma, x=t_cap_s, y=r_x_mm] {\G/D_caso_D1_requisitos.csv};
-  \legend{$\xh$, $x$ (plato), $r$}
+  \addplot[cNaranja, densely dashed] table[col sep=comma, x=t_cap_s, y=xh_x_mm] {\G/D_caso_LQR_L1_requisitos.csv};
+  \legend{$\xh$ PID, $x$ PID (plato), $r$, $\xh$ LQR}
 \nextgroupplot[ylabel={Posición (\si{\milli\metre})}, xticklabels={},
                title={\scriptsize D2: empujón con saturación y anti-windup}, title style={yshift=-2pt},
                legend pos=north east]
@@ -136,16 +199,18 @@ y el de saturación, y la Tabla~\ref{tab:mil} las métricas.
   \addplot[cVerde, dashed] table[col sep=comma, x=t_cap_s, y=x_plato_mm] {\G/D_caso_D2_sat_con_AW.csv};
   \addplot[cRojo, densely dotted, domain=0:6, samples=2] {127};
   \legend{$\xh$, $x$ (plato), Borde}
-\nextgroupplot[ylabel={$\thc$ (\si{\degree})}, xlabel={Tiempo (\si{\second})}]
-  \addplot[cNaranja] table[col sep=comma, x=t_cap_s, y=thcmd_x_deg] {\G/D_caso_D1_requisitos.csv};
+\nextgroupplot[ylabel={$\thc$ (\si{\degree})}, xlabel={Tiempo (\si{\second})}, legend pos=north east]
+  \addplot[cAzul] table[col sep=comma, x=t_cap_s, y=thcmd_x_deg] {\G/D_caso_D1_requisitos.csv};
+  \addplot[cNaranja, densely dashed] table[col sep=comma, x=t_cap_s, y=thcmd_x_deg] {\G/D_caso_LQR_L1_requisitos.csv};
+  \legend{PID, LQR}
 \nextgroupplot[ylabel={$\thc$ (\si{\degree})}, xlabel={Tiempo (\si{\second})}]
   \addplot[cNaranja] table[col sep=comma, x=t_cap_s, y=thcmd_x_deg] {\G/D_caso_D2_sat_con_AW.csv};
   \addplot[cRojo, densely dotted, domain=0:6, samples=2] {10};
 \end{groupplot}
 \end{tikzpicture}
-\caption{Evaluación MIL con el actuador medido. Izquierda: ensayo de requisitos. Derecha:
-empujón de \SI{420}{\milli\metre\per\second} con \SI{1}{\degree} de desnivel, con saturación a
-$\thlim = \SI{10}{\degree}$ y anti-windup.}
+\caption{Evaluación MIL con el actuador medido. Izquierda: ensayo de requisitos con las dos
+estrategias. Derecha: empujón de \SI{420}{\milli\metre\per\second} con \SI{1}{\degree} de
+desnivel, PID con saturación a $\thlim = \SI{10}{\degree}$ y anti-windup.}
 \label{fig:mil}
 \end{figure*}
 
@@ -167,15 +232,11 @@ D2 con sat., con AW           & ---  & ---  & 4,49 & 133,0 & 0,30 \\
 D2b PID clás., sin AW       & ---  & ---  & 2,97 & 133,0 & 0,33 \\
 D2b PID clás., con AW       & ---  & ---  & 2,40 & 133,0 & 0,30 \\
 D3 desnivel de \SI{1}{\degree} & ---  & ---  & 0,27 & 28,8  & 0 \\
-\midrule
-D5 retardo de \SI{120}{\milli\second} & 3,03 & 5,0  & 0,14 & 102,6 & 0 \\
-D5 ruido de \SI{2}{\milli\metre}      & 4,90 & 6,5  & 0,96 & 102,9 & 0 \\
-D5 firmware sin tabla                 & 4,73 & 23,8 & 0,78 & 80,2  & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-En el ensayo de requisitos el controlador cumple R1 a R4: $t_s = \SI{1.30}{\second}$,
+En el ensayo de requisitos el PID cumple R1 a R4: $t_s = \SI{1.30}{\second}$,
 $M_p = \SI{4.4}{\percent}$ y $e_{ss} = \SI{0.18}{\milli\metre}$, con un pico de
 \SI{3.8}{\degree} de inclinación, lejos de la saturación. La saturación solo aparece con
 perturbaciones que llevan la bola casi al borde. Con el empujón de D2, el plato satura
@@ -191,3 +252,50 @@ Los casos de robustez muestran dónde está el riesgo: con \SI{120}{\milli\secon
 \SI{2}{\milli\metre} de ruido, $t_s$ pasa de \SI{3}{\second}, y si el firmware convirtiera la
 inclinación en comando con la pendiente del diseño en vez de la tabla medida, el sobreimpulso
 subiría a \SI{23.8}{\percent}. Por eso el firmware usa la tabla.
+
+La Tabla~\ref{tab:comparacion} compara las dos estrategias en los mismos ensayos, con la misma
+planta, ruido, retardo y tiempo de simulación. Las dos cumplen R1 a R4 en el ensayo de
+requisitos. El LQR tiene un tiempo de subida menor (\SI{0.57}{} contra
+\SI{0.80}{\second}), pero se pasa un poco más y tarda más en entrar en la banda del
+\SI{5}{\percent}. También pide más del doble de inclinación, y en reposo el plato tiembla el doble
+(\SI{0.62}{\degree} contra \SI{0.31}{\degree} de desviación), porque sus ganancias más altas
+amplifican el ruido del Kalman. Su ventaja está en el retardo: con \SI{120}{\milli\second} el LQR
+sigue cumpliendo R1 ($t_s = \SI{1.77}{\second}$) y el PID no (\SI{3.90}{\second}), que es el
+efecto esperado de compensar el retardo con las entradas pasadas. Ante el empujón, los dos
+saturan (\SI{0.3}{} y \SI{0.4}{\second}) y no impiden que la bola llegue al borde; en el LQR el anti-windup baja
+el error final de \SI{12.7}{} a \SI{11.6}{\milli\metre}. Con la ganancia identificada en el
+prototipo ($c = 0{,}2$), ninguno de los dos cumple.
+
+\begin{table}[!t]
+\caption{Comparación MIL de las dos estrategias en condiciones idénticas (eje X), corrida en
+Octave; el PID repite el D1 de MATLAB salvo por la secuencia de ruido. Fuente:
+\texttt{etapaD/verificacion\_octave/D2\_consola.txt} (empujón del PID: \texttt{D1\_metricas.csv}).}
+\label{tab:comparacion}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Ensayo y métrica} & \textbf{PID} & \textbf{LQR} \\
+\midrule
+Requisitos: $t_s$ / $M_p$ & \SI{1.30}{\second} / \SI{4.5}{\percent} & \SI{2.03}{\second} / \SI{5.2}{\percent} \\
+Requisitos: $e_{ss}$ / $\max|\thc|$ & \SI{0.16}{\milli\metre} / \SI{3.6}{\degree} & \SI{0.15}{\milli\metre} / \SI{8.5}{\degree} \\
+Temblor del plato en reposo (desv.) & \SI{0.31}{\degree} & \SI{0.62}{\degree} \\
+Retardo de \SI{120}{\milli\second}: $t_s$ & \SI{3.90}{\second} & \SI{1.77}{\second} \\
+Desnivel de \SI{1}{\degree}: $\max|x|$ / $e_{ss}$ & \SI{31.3}{} / \SI{0.89}{\milli\metre} & \SI{24.0}{} / \SI{1.23}{\milli\metre} \\
+Desnivel: vuelve a menos de \SI{3}{\milli\metre} & \SI{5.2}{\second} & \SI{8.8}{\second} \\
+Empujón: $\max|x|$ / tiempo saturado & \SI{133}{\milli\metre} / \SI{0.3}{\second} & \SI{133}{\milli\metre} / \SI{0.4}{\second} \\
+Ruido de \SI{2}{\milli\metre}: $t_s$ & \SI{7.0}{\second} & \SI{6.5}{\second} \\
+$c = 0{,}2$: $M_p$ & \SI{37}{\percent} & \SI{39}{\percent} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Se seleccionó el PID para continuar con la generación de código y la implementación. Las dos
+estrategias cumplen los requisitos en MIL, pero el PID lo hace con menos de la mitad de la
+inclinación y la mitad del temblor del plato. Eso importa en un mecanismo con
+\SIrange{1}{2}{\degree} de holgura y servos de engranaje. También corrige el desnivel en menos
+tiempo, y su ley tiene tres ganancias y dos variables internas, contra siete ganancias y cinco
+variables internas del LQR. La mejor tolerancia del LQR al retardo es su argumento a favor y se retoma en la
+Sección~VII.
+

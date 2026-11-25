@@ -48,23 +48,10 @@ Se hicieron dos pruebas. En G4 se ejecutó el controlador solo, con las entradas
 casos D1 y D2; el segundo tiene nueve cuadros saturados, así que ejercita la saturación y el
 \emph{clamping} que el ensayo SIL no alcanzaba. En los dos casos $\thc$ e $I$ fueron idénticos y
 ninguna bandera de saturación difirió. En G5 se repitió el banco de lazo cerrado de la
-Sección~IV-C con la rama PIL. La Fig.~\ref{fig:pil} muestra las diferencias y la
+Sección~IV-C con la rama PIL. La Fig.~\ref{fig:sil} incluye las diferencias de esta prueba y la
 Tabla~\ref{tab:silpil} resume las dos verificaciones.
 
-\begin{figure}[!t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[estilo, height=3.2cm, xmin=0, xmax=9, ymin=-1, ymax=1,
-             xlabel={Tiempo (\si{\second})}, ylabel={Diferencia}, legend pos=north east,
-             legend columns=2]
-  \addplot[cRojo] table[col sep=comma, x=t_s, y=dif_thx] {\G/G5_comparacion.csv};
-  \addplot[cVerde, dashed] table[col sep=comma, x=t_s, y=dif_x] {\G/G5_comparacion.csv};
-  \legend{$\Delta\theta_x$ (\si{\radian}), $\Delta x$ (\si{\milli\metre})}
-\end{axis}
-\end{tikzpicture}
-\caption{Diferencias PIL $-$ Normal en el banco de lazo cerrado (G5).}
-\label{fig:pil}
-\end{figure}
+
 
 \begin{table}[!t]
 \caption{Resultados de las verificaciones SIL y PIL. LC: banco de lazo cerrado; G4: controlador

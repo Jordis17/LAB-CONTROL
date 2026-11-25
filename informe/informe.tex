@@ -24,10 +24,11 @@ Se documenta el desarrollo de un controlador de posición para una planta \emph{
 dos grados de libertad, en la que dos servos inclinan el plato y una cámara cenital mide la
 posición de la bola. Siguiendo un flujo de diseño basado en modelos, se obtuvo un modelo no
 lineal por el método de Lagrange cuya linealización es, por eje, un doble integrador que no es
-estable en lazo abierto. Se diseñó un controlador PD por asignación de polos con integración
-condicional, que en simulación \emph{Model-in-the-Loop} alcanzó un tiempo de establecimiento de
-\SI{1.30}{\second}, un sobreimpulso de \SI{4.4}{\percent} y un error estacionario de
-\SI{0.18}{\milli\metre}. El código generado con Embedded Coder reprodujo exactamente el modelo en
+estable en lazo abierto. Se diseñaron dos estrategias: un PID con integración condicional,
+sintonizado por asignación de polos, y un LQR con acción integral que compensa el retardo con
+las entradas pasadas. En simulación \emph{Model-in-the-Loop} las dos cumplieron los requisitos; el
+PID, con un tiempo de establecimiento de \SI{1.30}{\second} y un sobreimpulso de
+\SI{4.4}{\percent}, se seleccionó porque usa menos de la mitad de la inclinación. El código generado con Embedded Coder reprodujo exactamente el modelo en
 \emph{Software-in-the-Loop} y en \emph{Processor-in-the-Loop} sobre una ESP32, con igualdad en las
 \num{271} muestras comparadas. La identificación en lazo cerrado sobre el prototipo dio una
 ganancia efectiva de rodadura de \numrange{0.12}{0.28}, frente a \num{0.714} del modelo, un
@@ -38,7 +39,7 @@ entre \SI{9}{} y \SI{80}{\milli\metre} de la referencia.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Ball on plate, diseño basado en modelos, doble integrador, identificación en lazo cerrado,
+Ball on plate, diseño basado en modelos, doble integrador, LQR, identificación en lazo cerrado,
 integración condicional, SIL, PIL, ESP32, Embedded Coder.
 \end{IEEEkeywords}
 
