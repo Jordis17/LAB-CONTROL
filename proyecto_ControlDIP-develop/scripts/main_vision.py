@@ -145,7 +145,8 @@ def main():
                       + ("" if medida is not None
                          else f" | {detector.last_reject or ''}"))
 
-                # Telemetria del controlador (Anthony, commit 946641a). Va DENTRO de este
+                # Telemetria del controlador (Anthony, commit 946641a). "Ley" es la salida del
+                # controlador cargado (PID en bop_controlador_estable, LQR en bop_controlador_lqr). Va DENTRO de este
                 # bloque para imprimir una vez por segundo y no bajar los fps del lazo
                 # (antes salia en cada cuadro). Usa la ultima telemetria valida, porque la
                 # ESP32 responde ~25 de las 30 tramas y el cuadro 30 puede no traerla.
@@ -154,9 +155,9 @@ def main():
                     err_x = x - tel_ultima.get('rx', 0.0)
                     err_y = y - tel_ultima.get('ry', 0.0)
                     print(f"  └ ESP32 | ErrX:{err_x:5.1f}  ErrY:{err_y:5.1f} mm")
-                    print(f"          | PID X: {tel_ultima.get('leyx', 0):6.2f}° "
+                    print(f"          | Ley X: {tel_ultima.get('leyx', 0):6.2f}° "
                           f"(I: {tel_ultima.get('Ix', 0):5.2f}°) -> Motor X: {tel_ultima.get('thx', 0):6.2f}°")
-                    print(f"          | PID Y: {tel_ultima.get('leyy', 0):6.2f}° "
+                    print(f"          | Ley Y: {tel_ultima.get('leyy', 0):6.2f}° "
                           f"(I: {tel_ultima.get('Iy', 0):5.2f}°) -> Motor Y: {tel_ultima.get('thy', 0):6.2f}°")
                 elif enviado:
                     print("  └ ESP32 | Esperando telemetría...")

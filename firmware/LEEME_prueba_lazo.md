@@ -283,3 +283,43 @@ del commit `8d0f938` de `bop_prueba_circulo_lazo.ino`:
 Aviso: en simulación (holgura de 1°, retardo de 0,44 s, poco rozamiento), este controlador hace
 un ciclo límite de ±35 a 50 mm en Y. En el prototipo (`105834`), Y quedó a una mediana de 6 mm
 del centro. Si en las pruebas aparece una oscilación lenta (~10 s de periodo), es eso.
+
+---
+
+## Prueba del LQR en la ESP32 (`bop_controlador_lqr/`, 2026-11-25)
+
+**El PID no se toca.** `bop_controlador_estable/` sigue siendo la versión de trabajo. Para
+volver a ella, basta con cargarla de nuevo.
+
+`bop_controlador_lqr.ino` es una copia del estable con la ley cambiada por el LQR de la Etapa C
+(`etapaC/C2_disenar_LQR_BoP.m`).
+- Todo lo demás es igual: pines, tabla, TH_TRIM {1,5; 0,4}, límite de velocidad, filtro de
+  saltos, watchdog, modos del botón BOOT y telemetría.
+- **Verificado en la PC:** compilada con g++, la ley del firmware da lo mismo que la del MIL
+  (`bop_ley_lqr.m`) en 300 pasos, con una diferencia máxima de 9e-5° por la precisión simple.
+  Falta compilarlo para la ESP32 en el Arduino IDE.
+
+**Cómo probarlo:**
+1. Arduino IDE: abrir `firmware/bop_controlador_lqr/bop_controlador_lqr.ino`, elegir
+   "ESP32 Dev Module", subirlo y cerrar el Monitor Serie.
+2. Correr `main_vision.py` como siempre. En la terminal, "Ley X/Y" es la salida del LQR e
+   "I" es el aporte de su integrador.
+3. **Modo centro (1 pulsación de BOOT):** soltar la bola quieta en 3 o 4 puntos, 15 s cada
+   uno, sin empujarla.
+4. Si eso va bien, **ensayo automático (3 pulsaciones)**: escalones, perturbación y círculos.
+   Es el mismo ensayo con el que se midió el PID, así que se pueden comparar los dos.
+5. **Si la bola oscila cada vez más o golpea los bordes:** presionar BOOT (desarma y deja el
+   plato horizontal) o apagar la fuente.
+
+**Qué esperar:**
+- El LQR pide más inclinación que el PID: en el MIL 8,5° contra 3,6°. El plato se va a mover
+  más y a temblar más en reposo.
+- Se diseñó con el modelo de la Etapa A, con un retardo de 0,115 s. En el prototipo el retardo
+  real es de 0,3 a 0,44 s y la ganancia efectiva es menor.
+  - Con el modelo identificado, el análisis lineal da al LQR sin margen en el eje X, igual que
+    al PID.
+  - Es posible que oscile. Si pasa, es un resultado válido para el informe: hay que reportarlo
+    y mandar el CSV.
+
+**Qué mandar:** los CSV de `logs/` (anoten cuál es modo centro y cuál ensayo automático) y, si
+se puede, un video.

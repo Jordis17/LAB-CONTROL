@@ -779,3 +779,22 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
     parser de Python decodifica bien su trama.
   - En una prueba con un puerto serie virtual y una ESP32 simulada (loop de 40 ms), la consola
     tuvo telemetría en cada impresión: 74 tramas buenas y 0 malas.
+
+### 2026-11-25 — Firmware de prueba del LQR (`firmware/bop_controlador_lqr/`)
+
+- Pedido del equipo: probar el LQR en la ESP32 **sin tocar el PID**.
+- `bop_controlador_estable/` (PID, la versión que mejor funciona) no se modificó.
+- El nuevo es una copia con la ley cambiada por el LQR de C2:
+  - las 4 inclinaciones ya mandadas, después del límite de velocidad, alimentan el predictor;
+  - integrador con recorte de ±5 mm, clamping y tope de ±3°;
+  - en modo círculo no usa la predicción `x + v·TAU_PRED`, porque el predictor ya está en la
+    ley.
+- Verificación en la PC:
+  - la ley extraída del firmware, compilada con g++, coincide con `bop_ley_lqr.m` en 300 pasos
+    (diferencia máxima de 9e-5°);
+  - los dos sketches compilan con g++ usando stubs de Arduino;
+  - falta compilarlo para la ESP32 en el Arduino IDE.
+- `main_vision.py`: en la terminal la etiqueta pasa de "PID X/Y" a "Ley X/Y", para los dos
+  firmwares.
+- Pendiente: probarlo en el plato, primero en modo centro y después el ensayo automático, y
+  mandar los CSV. Procedimiento en `firmware/LEEME_prueba_lazo.md`.
