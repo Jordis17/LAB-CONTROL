@@ -798,3 +798,39 @@ Ensayo automático (modo 3) y 100 s de modo centro, con el firmware de compensac
   firmwares.
 - Pendiente: probarlo en el plato, primero en modo centro y después el ensayo automático, y
   mandar los CSV. Procedimiento en `firmware/LEEME_prueba_lazo.md`.
+
+### 2026-11-25 — Primera prueba del LQR en el prototipo
+
+Logs en `datos_prototipo/etapaB/`:
+- `sesion_20261125_100025`: ensayo automático (84 s) y después modo centro (78 s);
+- `sesion_20261125_100503`: modo centro, 93 s, con la bola soltada a mano varias veces.
+
+Bola detectada el 100 % en el ensayo y el 91 % en el centro; las pérdidas son los momentos en que
+se movía la bola con la mano.
+
+- **Era el LQR:** la regresión de la ley de la telemetría contra el error, la velocidad y las 4
+  inclinaciones pasadas da [0,072; 0,045; −0,16; −0,18; −0,16; −0,10], contra el diseño
+  [0,081; 0,047; −0,16; −0,17; −0,18; −0,085].
+- **Ensayo automático, frente al PID en el mismo ensayo (`105834`, 2026-11-13):**
+
+| | PID | LQR |
+|---|---|---|
+| Escalones (tramos de 4,8 s): error al final | 9 a 80 mm | 2 a 27 mm |
+| Escalones: sobrepaso | 0 % | 0–4 % en X; 49–67 % en Y |
+| Mejor escalón | — | X −40 → 0: ts 4,2 s, error final 2,0 mm |
+| Perturbación (fase 3): error mediano | 43 mm | 17 mm |
+| Círculos de 50 mm (fases 4 y 5): error mediano | 87–95 mm | 19–24 mm |
+| Inclinación mediana / máxima | 1,6–2,3° / 5,7° | 1,4–1,7° / 5,7° |
+
+- **Modo centro:** la bola vuelve siempre que se la suelta, sin oscilación creciente, pero se
+  queda a unos 10–35 mm del centro y nunca entra en ±10 mm.
+  - En `100503` el integrador del eje X llega al tope de −3° (`I_MAX`) y ahí se queda.
+  - Pide unos −2,2° en X, que con el trim de +1,5° son ≈ −0,7° aplicados: queda dentro de la
+    zona muerta.
+  - Lectura: el trim X {1,5} está pasado; el integrador intenta corregirlo y se topa con
+    `I_MAX`.
+- **Pendiente:**
+  - subir `I_MAX` del LQR a 5° (o bajar el trim X a ~0) y repetir el modo centro;
+  - leer en la telemetría el `tel_Ix` en reposo para fijar el trim.
+  - Decidir con el equipo si el informe reporta el LQR en el prototipo. Hoy el PID es la
+    estrategia seleccionada para E–H.
