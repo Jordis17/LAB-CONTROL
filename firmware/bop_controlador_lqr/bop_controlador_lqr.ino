@@ -15,7 +15,7 @@
 //   - Las ganancias se disenaron con Ts = 33,3 ms y un retardo de 0,115 s; la ESP32 procesa una
 //     trama cada ~40 ms y el retardo real medido es de 0,3 a 0,44 s. El predictor compensa
 //     solo una parte.
-//   - Tope del integrador en +-3 deg (proteccion de prueba, igual que el PID).
+//   - Tope del integrador en +-5 deg (proteccion de prueba; el PID usa 3).
 //   - En modo circulo no se usa la prediccion x + v*TAU_PRED: el LQR ya compensa el retardo.
 // Si la bola oscila cada vez mas: BOOT (desarma) o apagar la fuente, y mandar el CSV.
 //
@@ -162,7 +162,9 @@ float t_circ = 0.0f;           // s desde que se entro al modo circulo (cuenta p
 const float SLEW_DEG = 6.0f;         // deg por cuadro (= 180 deg/s a 30 fps). v2 usa 3; con 6 la bola
                                      // empujada a 500 mm/s se frena a 125 mm en vez de 138 (simulacion 2026-11-09)
 const float E_ZONA   = 40.0f;        // mm: lejos de esto, el integrador se descarga con la bola en movimiento (2026-11-18)
-const float I_MAX    = 3.0f;         // deg: tope del integrador
+const float I_MAX    = 5.0f;         // deg: tope del integrador. (2026-11-25, LQR) era 3: en
+                                     // sesion_20261125_100503 el integrador X quedo pegado en -3 deg
+                                     // con la bola quieta a 10-35 mm del centro (trim X pasado)
 // (2026-11-13) Fuera de E_ZONA el integrador ya no queda congelado: se descarga con esta
 // constante de tiempo. En sesion_20261113_105834 la bola quedo 20 s quieta a x = -57 mm
 // porque el integrador seguia en +1,7 deg (acumulado con la bola del otro lado) y anulaba

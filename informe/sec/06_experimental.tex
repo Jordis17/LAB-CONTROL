@@ -25,12 +25,10 @@ horizontal si la visión indica que no hay bola o si deja de recibir tramas dura
 \SI{200}{\milli\second}, y en cada cuadro devuelve por el mismo puerto la inclinación aplicada,
 que la PC guarda junto con la medición.
 
-Las pruebas encontraron problemas de implementación que no estaban en el modelo y que se
-corrigieron antes de medir: la ESP32 leía la trama byte a byte y trabajaba con datos unos
-\SI{0.6}{\second} atrasados, los ejes de la cámara quedaron cruzados por el orden de los clics de
-la calibración, y la primera tabla servo--plato tenía un desnivel en el neutro. Además, el
-\texttt{loop()} de la ESP32 corre cada \SI{40}{\milli\second}, por lo que el controlador procesa
-\num{25} de las \num{30} tramas por segundo.
+Durante las pruebas se corrigieron problemas que el modelo no tenía: la ESP32 trabajaba con
+datos \SI{0.6}{\second} atrasados por leer la trama byte a byte, y los ejes de la cámara quedaron
+cruzados por el orden de la calibración. Además, el \texttt{loop()} de la ESP32 corre cada
+\SI{40}{\milli\second}, así que procesa \num{25} de las \num{30} tramas por segundo.
 
 Antes de energizar se comprobó: fuente de los servos separada de la ESP32, con interruptor a
 mano y tierra común; primero se conecta la ESP32 y después la fuente; el firmware arranca
@@ -51,7 +49,7 @@ D4). No es el mismo ensayo, porque en el prototipo no se corrió el ensayo de re
 \begin{figure}[!t]
 \centering
 \begin{tikzpicture}
-\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.2cm,
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.5cm}, estilo, height=2.6cm,
                   xmin=0, xmax=30]
 \nextgroupplot[ylabel={$x$ (\si{\milli\metre})}, xticklabels={}, legend pos=north east,
                legend columns=2]
@@ -66,7 +64,7 @@ D4). No es el mismo ensayo, porque en el prototipo no se corrió el ensayo de re
 
 \vspace{2mm}
 \begin{tikzpicture}
-\begin{axis}[estilo, width=0.5\columnwidth, height=0.5\columnwidth, axis equal image,
+\begin{axis}[estilo, width=0.44\columnwidth, height=0.44\columnwidth, axis equal image,
              xmin=-127, xmax=127, ymin=-127, ymax=127,
              xlabel={$x$ (\si{\milli\metre})}, ylabel={$y$ (\si{\milli\metre})}]
   \addplot[cAzul, line width=0.3pt, aligera=2,
@@ -108,33 +106,58 @@ MIL D4, Y & $0 \rightarrow 50$        & 48,5  & 4,20 & 16,7 & 3,0 & 1,9 \\
 \end{tabular}
 \end{table}
 
-En el prototipo, ningún escalón se estableció dentro del tramo, así que $t_s$ solo tiene una
-cota inferior, y el error al final fue de \SIrange{9}{80}{\milli\metre}, contra
-\SIrange{1.5}{3.0}{\milli\metre} en el MIL. No hubo sobreimpulso: la bola se acerca lentamente y
-se detiene antes de llegar. El eje Y fue el peor. En el escalón de 0 a \SI{40}{\milli\metre} la
-bola estaba en \SI{-43}{\milli\metre} y prácticamente no se movió, aunque el plato llegó a pedir
-\SI{2}{\degree}. Es el comportamiento que se espera de la zona muerta y la baja ganancia efectiva
-identificadas en la Sección~II: con $\Kp = \SI{0.034}{\degree\per\milli\metre}$, un error de
-\SI{30}{\milli\metre} pide apenas \SI{1}{\degree}, del orden de la zona muerta.
+Con el PID, ningún escalón se estableció dentro del tramo, y el error final fue de
+\SIrange{9}{80}{\milli\metre}, contra \SIrange{1.5}{3.0}{\milli\metre} en el MIL, sin sobreimpulso:
+con $\Kp = \SI{0.034}{\degree\per\milli\metre}$, un error de \SI{30}{\milli\metre} pide apenas
+\SI{1}{\degree}, del orden de la zona muerta identificada. En el círculo de
+\SI{45}{\milli\metre}, la órbita quedó centrada en $(6, -4)\,\si{\milli\metre}$, con un error
+mediano de \SI{30}{\milli\metre}, y la bola se detectó en todos los cuadros.
 
-En el círculo, la órbita quedó centrada en $(6, -4)\,\si{\milli\metre}$, con un radio medio de
-\SI{45}{\milli\metre} (percentiles 10 y 90 de \SI{16}{} y \SI{73}{\milli\metre}) y un error
-mediano respecto de la referencia de \SI{30}{\milli\metre}. La bola estuvo a más de
-\SI{115}{\milli\metre} del centro solo el \SI{0.2}{\percent} del tiempo, y se detectó en todos
-los cuadros.
+El 2026-11-18, en modo centro, la bola quedó \SI{55}{\second} quieta en
+$(110, 58)\,\si{\milli\metre}$ con el integrador en cero, porque el firmware lo descargaba lejos de
+la referencia. Se corrigieron el \emph{trim} y la regla del integrador, que volvió a la de
+\eqref{eq:ley}; esa versión del PID no se alcanzó a probar.
 
-El 2026-11-18 se repitió el modo de centrado y apareció el mismo problema de forma más clara
-(\texttt{sesion\_20261118\_092357}): la bola quedó \SI{55}{\second} quieta en
-$(110, 58)\,\si{\milli\metre}$ con el plato pidiendo \SI{3.6}{\degree} y \SI{1.8}{\degree}, y el
-integrador en cero, porque el firmware lo descargaba con la bola lejos de la referencia. Con eso
-se corrigieron dos cosas: el \emph{trim} pasó a $\{1{,}5;\ 0{,}4\}\,\si{\degree}$, estimado como
-la inclinación aplicada menos la zona muerta, y el integrador volvió a la regla de
-\eqref{eq:ley}, que suma con la bola quieta en cualquier posición. En una simulación de un eje
-con zona muerta, ese cambio dejó la bola a menos de \SI{13}{\milli\metre} del centro en los 30
-casos probados, contra \SIrange{51}{57}{\milli\metre} en 3 casos con la regla anterior. Esta
-última versión no se alcanzó a probar en el prototipo.
+Aunque el LQR no fue la estrategia seleccionada, el 2026-11-25 se probó en el prototipo con un
+firmware de prueba que cambia solo la ley de control por \eqref{eq:lqr}. La ley de ese firmware,
+compilada en la PC, coincide con la del MIL hasta \SI{9e-5}{\degree}, y una regresión sobre la
+telemetría confirma las ganancias. La Tabla~\ref{tab:exp_lqr} compara el ensayo automático con el
+del PID. El trim y la protección del integrador no eran los mismos en las dos corridas, así que la
+comparación no es en condiciones idénticas.
 
-Con estos resultados, los requisitos R1 y R3 no se cumplen en la planta real. R4 tampoco se
+\begin{table}[!t]
+\caption{Ensayo automático en el prototipo con las dos estrategias. PID:
+\texttt{sesion\_20261113\_105834}; LQR: \texttt{sesion\_20261125\_100025}. Fuente:
+\texttt{informe/scripts/preparar\_datos.py}.}
+\label{tab:exp_lqr}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Métrica} & \textbf{PID} & \textbf{LQR} \\
+\midrule
+Escalones: error al final del tramo (\si{\milli\metre}) & 9 -- 80 & 2 -- 27 \\
+Escalones: sobrepaso, eje X / Y (\si{\percent}) & 0 / 0 & 0 -- 4 / 0 -- 67 \\
+Perturbación: error mediano (\si{\milli\metre}) & 43 & 17 \\
+Círculos de \SI{50}{\milli\metre}: error mediano (\si{\milli\metre}) & 87 -- 95 & 19 -- 24 \\
+Modo centro: distancia mediana al centro (\si{\milli\metre}) & 57 & 18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El LQR redujo el error en todas las fases del ensayo: los escalones terminaron más cerca de la
+referencia, y en los círculos el error mediano bajó de unos \SI{90}{} a unos
+\SI{20}{\milli\metre}, con inclinaciones del mismo orden (mediana de \SIrange{1.4}{1.7}{\degree},
+contra \SIrange{1.6}{2.3}{\degree}). A cambio, en el eje Y los escalones se pasaron hasta un
+\SI{67}{\percent}. En modo centro la bola vuelve cada vez que se la suelta, pero se queda a unos
+\SIrange{10}{35}{\milli\metre} del centro: en las dos corridas, el integrador de un eje quedó en su
+tope de \SI{3}{\degree}, lo que indica que el trim de ese eje estaba corrido más de lo que el
+integrador podía compensar. El tope se subió a \SI{5}{\degree}, pero esa versión todavía no se
+probó.
+
+Con estos resultados, los requisitos R1 y R3 no se cumplen en la planta real con ninguna de las
+dos estrategias. R4 tampoco se
 cumplió siempre: en el log del 2026-11-18 la bola llegó al borde en $x \approx \SI{127}{\milli\metre}$,
 y en las pruebas con la bola de PLA llegó a él decenas de veces. Fueron los bordes del plato los
 que evitaron que cayera.

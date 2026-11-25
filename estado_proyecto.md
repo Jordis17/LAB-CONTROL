@@ -834,3 +834,13 @@ se movía la bola con la mano.
   - leer en la telemetría el `tel_Ix` en reposo para fijar el trim.
   - Decidir con el equipo si el informe reporta el LQR en el prototipo. Hoy el PID es la
     estrategia seleccionada para E–H.
+- **Actualización (mismo día):**
+  - En el log `100025`, en modo centro después del ensayo, el integrador **Y** también quedó en
+    +3°, con la bola a 17 mm en Y. Pasa en los dos ejes.
+  - `I_MAX` del LQR pasa de 3° a **5°** (`bop_controlador_lqr.ino`). El firmware del PID no
+    cambia.
+  - **Decisión del equipo (opción recomendada):** el PID sigue siendo la estrategia
+    seleccionada para E–H. El informe agrega en la sección VI la prueba del LQR en el
+    prototipo (tabla PID vs LQR del mismo ensayo); la discusión y las conclusiones dicen que el
+    LQR es el candidato para la siguiente iteración.
+  - Métricas reproducibles con `informe/scripts/preparar_datos.py`.

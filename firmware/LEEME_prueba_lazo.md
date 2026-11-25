@@ -323,3 +323,14 @@ volver a ella, basta con cargarla de nuevo.
 
 **Qué mandar:** los CSV de `logs/` (anoten cuál es modo centro y cuál ensayo automático) y, si
 se puede, un video.
+
+**Resultado de la primera prueba (2026-11-25, logs `100025` y `100503`):**
+- **Ensayo automático:** el LQR funcionó mejor que el PID en el mismo ensayo.
+  - Escalones: error final de 2–27 mm, contra 9–80 mm del PID.
+  - Círculos: error mediano de 19–24 mm, contra 87–95 mm.
+  - En Y los escalones se pasaron hasta un 67 %.
+- **Modo centro:** la bola vuelve, pero queda a 10–35 mm del centro, con el integrador de un
+  eje pegado en el tope de 3°.
+  - Se subió el tope a 5°. Probar de nuevo el modo centro y mandar el CSV.
+  - Con la bola quieta, `tel_Ix` y `tel_Iy` dan el trim que falta corregir.
+

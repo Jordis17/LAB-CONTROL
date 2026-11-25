@@ -25,10 +25,12 @@ al mecanismo. El modelo de diseño no representa bien el prototipo, y eso explic
 real no se cumplieran R1 ni R3: los escalones no se establecieron en \SI{4.8}{\second} y
 terminaron a entre \SI{9}{} y \SI{80}{\milli\metre} de la referencia, aunque sin sobreimpulso. El
 seguimiento de un círculo de \SI{45}{\milli\metre} sí funcionó, con un error mediano de
-\SI{30}{\milli\metre}.
+\SI{30}{\milli\metre}. El LQR, probado después en el prototipo, redujo el error de los escalones a
+\SIrange{2}{27}{\milli\metre} y el de los círculos a unos \SI{20}{\milli\metre}, lo que confirma
+que compensar el retardo es lo que más mejora el desempeño en esta planta, aunque en el eje Y se
+pasó más.
 
-Las limitaciones principales del trabajo son tres. La implementación física usó un firmware
-escrito a mano con la misma ley, y no el código generado. El rediseño con el modelo identificado
-solo se evaluó en el prototipo. Y la última versión del firmware, con el integrador corregido y el
-nivel reajustado, no se alcanzó a probar. Para mejorar el desempeño hace falta, antes que otro
-controlador, reducir la holgura y el retardo del mecanismo, sobre todo en el eje Y.
+Las limitaciones principales son que la implementación física usó un firmware escrito a mano
+con la misma ley, y no el código generado, y que las últimas versiones de los dos firmwares no
+se alcanzaron a probar. Antes que otro controlador, hace falta reducir la holgura y el retardo
+del mecanismo, sobre todo en el eje Y.

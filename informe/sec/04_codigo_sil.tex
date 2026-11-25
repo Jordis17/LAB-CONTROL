@@ -17,7 +17,7 @@ parámetros como bloques \texttt{Constant} y un solo bloque con la ley; la plant
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.85\columnwidth]{figuras/Controller_BoP_slx.png}
+\includegraphics[width=0.68\columnwidth]{figuras/Controller_BoP_slx.png}
 \caption{Modelo \texttt{Controller\_BoP.slx} (vista generada por Simulink): las cuatro entradas
 de la interfaz, los ocho parámetros calibrables como bloques \texttt{Constant} y el bloque
 \texttt{ley\_control}, que implementa \eqref{eq:ley}.}
@@ -91,29 +91,22 @@ $(80, -60)\,\si{\milli\metre}$, $\Ts$, la secuencia de ruido y el tiempo de \SI{
 rama tiene su propia planta no lineal de dos ejes y sus dos instancias del controlador, porque
 las acciones de control se calculan por separado. La Fig.~\ref{fig:sil} muestra la diferencia
 $\Delta\theta_x = \theta_{x,\mathrm{SIL}} - \theta_{x,\mathrm{Normal}}$ y
-$\Delta x = x_{\mathrm{SIL}} - x_{\mathrm{Normal}}$ junto con la trayectoria.
+$\Delta x = x_{\mathrm{SIL}} - x_{\mathrm{Normal}}$.
 
 \begin{figure}[!t]
 \centering
 \begin{tikzpicture}
-\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.7cm}, estilo, height=3.2cm,
-                  xmin=0, xmax=9]
-\nextgroupplot[ylabel={Posición (\si{\milli\metre})}, xticklabels={}, legend pos=south east,
-               legend columns=2]
-  \addplot[cAzul] table[col sep=comma, x=t_s, y=Normal_x] {\G/F1_comparacion.csv};
-  \addplot[cNaranja, dashed] table[col sep=comma, x=t_s, y=Normal_y] {\G/F1_comparacion.csv};
-  \legend{$x$, $y$}
-\nextgroupplot[ylabel={Diferencia}, xlabel={Tiempo (\si{\second})}, ymin=-1, ymax=1,
+\begin{axis}[estilo, height=3.2cm, xmin=0, xmax=9, ylabel={Diferencia}, xlabel={Tiempo (\si{\second})}, ymin=-1, ymax=1,
                legend pos=north east, legend columns=2]
   \addplot[cRojo] table[col sep=comma, x=t_s, y=dif_thx] {\G/F1_comparacion.csv};
   \addplot[cVerde, dashed] table[col sep=comma, x=t_s, y=dif_x] {\G/F1_comparacion.csv};
   \addplot[cNaranja, densely dotted, line width=1.1pt] table[col sep=comma, x=t_s, y=dif_thx] {\G/G5_comparacion.csv};
   \addplot[cAzul, dashdotted] table[col sep=comma, x=t_s, y=dif_x] {\G/G5_comparacion.csv};
   \legend{SIL $\Delta\theta_x$ (\si{\radian}), SIL $\Delta x$ (\si{\milli\metre}), PIL $\Delta\theta_x$, PIL $\Delta x$}
-\end{groupplot}
+\end{axis}
 \end{tikzpicture}
-\caption{Bancos SIL y PIL. Arriba: trayectoria de la rama Normal. Abajo: diferencias
-SIL $-$ Normal y PIL $-$ Normal (G5), idénticamente nulas en las \num{271} muestras.}
+\caption{Diferencias SIL $-$ Normal y PIL $-$ Normal (G5) en el banco de lazo cerrado,
+idénticamente nulas en las \num{271} muestras.}
 \label{fig:sil}
 \end{figure}
 

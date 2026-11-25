@@ -123,7 +123,38 @@ def metricas_circulo(nombre, R):
           f'deteccion {det:.1f} %')
 
 
+# ---------------------------------------------------------------- fases del ensayo y modo centro
+def metricas_fases(nombre, t_centro_desde=0.0):
+    """Error a la referencia por fase del ensayo automatico (3 perturbacion, 4 y 5 circulos;
+    se descarta el primer 15 % de cada fase) y estadistica del modo centro."""
+    r = leer_log(nombre)
+    q = lambda v, p: sorted(v)[int(p * (len(v) - 1))]
+    print(f'\nFases del ensayo de {nombre}:')
+    ens = [x for x in r if x['tel_modo'] == '3']
+    for fase, txt in ((3, 'perturbacion'), (4, 'circulo 50 mm, 6 s'), (5, 'circulo 50 mm, 4 s')):
+        s_ = [x for x in ens if (int(x['tel_banderas']) >> 4) == fase]
+        if not s_:
+            continue
+        s_ = s_[int(len(s_) * 0.15):]
+        err = [math.hypot(f(x['x']) - f(x['tel_rx']), f(x['y']) - f(x['tel_ry'])) for x in s_]
+        th = [max(abs(f(x['tel_thx'])), abs(f(x['tel_thy']))) for x in s_]
+        print(f'  fase {fase} ({txt}): error a la referencia mediana {st.median(err):.1f} mm, '
+              f'p90 {q(err, .9):.1f} mm; |th| mediana {st.median(th):.2f} deg, max {max(th):.1f} deg')
+    cen = [x for x in r if x['tel_modo'] == '1' and x['detectada'] == '1' and x['ts'] >= t_centro_desde]
+    if cen:
+        d = [math.hypot(f(x['x']), f(x['y'])) for x in cen]
+        ix = [f(x['tel_Ix']) for x in cen]
+        print(f'  modo centro (desde {t_centro_desde:.0f} s, {cen[-1]["ts"] - cen[0]["ts"]:.0f} s): distancia al centro '
+              f'mediana {st.median(d):.1f} mm, p90 {q(d, .9):.1f} mm, tiempo a <= 10 mm {100*sum(v <= 10 for v in d)/len(d):.0f} %; '
+              f'integrador X en [{min(ix):.2f}, {max(ix):.2f}] deg')
+
+
 if __name__ == '__main__':
     b3_validacion()
     metricas_escalones('sesion_20261113_105834')
     metricas_circulo('sesion_20261113_105517', 45)
+    # LQR en el prototipo (2026-11-25) frente al PID en el mismo ensayo (105834)
+    metricas_escalones('sesion_20261125_100025')
+    metricas_fases('sesion_20261125_100025', t_centro_desde=89)
+    metricas_fases('sesion_20261125_100503')
+    metricas_fases('sesion_20261113_105834', t_centro_desde=60)
