@@ -37,16 +37,17 @@ En Overleaf: subir la carpeta `informe/` completa y compilar `informe.tex` con p
 tiene 8 páginas. Antes de entregar, en `preambulo.tex` cambiar `\mostrarpendientestrue` por
 `\mostrarpendientesfalse` y revisar que no quede ningún recuadro.
 
-## 2b. Cumplimiento del enunciado (`Intrucciones.txt`, 2026-11-25)
+## 2b. Cumplimiento del enunciado (`Intrucciones.txt`), revisado el 2026-11-26
 
-| Requisito | Estado |
-|---|---|
-| Grupo de 4 | Sí |
-| Informe escrito | Sí. Faltan los carnés de 2 integrantes |
-| Prototipo funcionando | Sigue un círculo de 45 mm; los escalones no se establecen. La versión vigente del firmware (trim e integrador del 18) no se ha probado |
-| Dos estrategias de control con MBD | Sí: PID con integración condicional (C1) y LQR con acción integral (C2) |
-| Las dos validadas hasta MIL | Sí: D1 y D2, que corre las dos en condiciones idénticas. **Falta correr C2 y D2 en MATLAB** (hoy hay resultados de Octave) |
-| Una estrategia hasta la implementación física | PID: código, SIL y PIL con igualdad exacta. En el prototipo corre un firmware escrito a mano con la misma ley |
+| Requisito | Estado | Evidencia |
+|---|---|---|
+| Grupo de 4 | ✅ | Abner López, Jordi Segura, Anthony Villalta, Yonaikel Tencio |
+| a) Informe escrito | ✅ casi listo | `informe/informe.pdf`, 10 páginas, IEEE dos columnas, sin pendientes visibles. **Falta**: nombres completos y carnés de Anthony y Yonaikel |
+| b) Prototipo funcionando | ✅ con observaciones | Los dos controladores corrieron en el plato (PID 2026-11-13, LQR 2026-11-25), en un mismo firmware (`bop_controlador_pid_lqr`, BOOT elige). Ninguno cumple todos los requisitos en la planta real (sección VI) |
+| Dos estrategias de control distintas con MBD | ✅ | PID con integración condicional (asignación de polos, C1) y LQR con acción integral (Riccati, C2) |
+| Las dos validadas hasta MIL | ✅ | D1 (PID, MATLAB) y D2 (PID y LQR en condiciones idénticas). **D2 y C2 solo en Octave**: conviene correrlos en MATLAB antes de entregar |
+| Una estrategia hasta la implementación física | ✅ | PID: código (E), SIL (F) y PIL (G) con igualdad exacta, y prototipo. En el plato corre firmware escrito a mano con la misma ley (el informe lo dice) |
+| Formato (el del Proyecto 1: IEEE, 8–10 páginas, sin anexos) | ✅ | 10 páginas; todas las figuras, tablas y ecuaciones citadas en el texto |
 
 ## 3. Estado del informe (2026-11-22)
 

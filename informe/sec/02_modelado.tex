@@ -63,7 +63,7 @@ Pendiente servo $\rightarrow$ plato (diseño) & \SI{0.343}{\degree\per\degree} \
 \end{tabular}
 \end{table}
 
-El doble polo en el origen tiene tres consecuencias que salen del modelo. Primero, la planta no
+El doble polo en el origen de \eqref{eq:lineal} y \eqref{eq:linealm} tiene tres consecuencias que salen del modelo. Primero, la planta no
 es estable en lazo abierto: con \SI{2}{\degree} de inclinación la bola llega a la pared en
 aproximadamente \SI{1.0}{\second}, de modo que un ensayo escalón en lazo abierto no es posible.
 Segundo, el método SIMC usado en el Proyecto~1 no aplica, porque supone una planta estable de
@@ -250,7 +250,7 @@ G_{p,\mathrm{nom}}(s) = \frac{X(s)}{\Theta(s)} = -\frac{c_{\mathrm{ef}}\,g\;e^{-
 \label{eq:gpnom}
 \end{equation}
 
-con $c_{\mathrm{ef}}\,g = \SI{1780}{\milli\metre\per\second\squared\per\radian}$ en X
+donde, en \eqref{eq:gpnom}, $c_{\mathrm{ef}}\,g = \SI{1780}{\milli\metre\per\second\squared\per\radian}$ en X
 ($c_{\mathrm{ef}} = \num{0.18}$), \SI{2765}{\milli\metre\per\second\squared\per\radian} en Y
 ($c_{\mathrm{ef}} = \num{0.28}$) y $\tau_{\mathrm{nom}} = \SI{0.27}{\second}$, más una zona
 muerta de \SI{0.86}{\degree} en X y \SI{1.18}{\degree} en Y. El desnivel identificado se corrige
